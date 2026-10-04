@@ -57,6 +57,33 @@ function createDemoJwt(sub: string, email: string, groups: string[]): string {
   return `${header}.${payload}.demo_signature`;
 }
 
+async function authenticateWithCognito(email: string, pass: string): Promise<string | null> {
+  const clientId = import.meta.env.VITE_COGNITO_CLIENT_ID || '2g4b36dekkv7f0lu9ad4h4s7oa';
+  try {
+    const res = await fetch('https://cognito-idp.ap-south-1.amazonaws.com/', {
+      method: 'POST',
+      headers: {
+        'X-Amz-Target': 'AWSCognitoIdentityProviderService.InitiateAuth',
+        'Content-Type': 'application/x-amz-json-1.1',
+      },
+      body: JSON.stringify({
+        AuthFlow: 'USER_PASSWORD_AUTH',
+        ClientId: clientId,
+        AuthParameters: {
+          USERNAME: email,
+          PASSWORD: pass,
+        },
+      }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.AuthenticationResult?.IdToken || null;
+  } catch (err) {
+    console.error('Cognito auth failed:', err);
+    return null;
+  }
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -68,35 +95,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const initSession = async () => {
     setIsLoading(true);
     const savedRole = (localStorage.getItem('saafsafari_demo_role') as UserRole) || 'citizen';
-    const savedToken = localStorage.getItem('saafsafari_id_token');
-
-    if (savedToken) {
-      setToken(savedToken);
-      api.setToken(savedToken);
-      try {
-        const profile = await api.getMe();
-        setUser(profile);
-        setRole(profile.role as UserRole);
-        setIsLoading(false);
-        return;
-      } catch (err) {
-        console.warn('Failed to load profile from saved token, falling back to demo persona');
-      }
-    }
-
-    // Default to Aarav Sharma demo persona
-    const initialUser = savedRole === 'ward_admin' ? WARD_ADMIN_DEMO_USER : CITIZEN_DEMO_USER;
-    const initialToken = createDemoJwt(
-      initialUser.userId,
-      initialUser.email,
+    const email = savedRole === 'ward_admin' ? 'demo-admin@saafsafari.local' : 'demo-citizen@saafsafari.local';
+    
+    // Attempt live Cognito authentication
+    const liveToken = await authenticateWithCognito(email, 'REMOVED_CREDENTIAL');
+    const tokenToUse = liveToken || createDemoJwt(
+      savedRole === 'ward_admin' ? WARD_ADMIN_DEMO_USER.userId : CITIZEN_DEMO_USER.userId,
+      email,
       savedRole === 'ward_admin' ? ['ward_admin', 'citizen'] : ['citizen'],
     );
 
-    setUser(initialUser);
-    setRole(savedRole);
-    setToken(initialToken);
-    api.setToken(initialToken);
-    setIsLoading(false);
+    setToken(tokenToUse);
+    api.setToken(tokenToUse);
+    localStorage.setItem('saafsafari_id_token', tokenToUse);
+
+    try {
+      const profile = await api.getMe();
+      setUser(profile);
+      setRole(savedRole);
+    } catch {
+      // Fallback to demo persona
+      const initialUser = savedRole === 'ward_admin' ? WARD_ADMIN_DEMO_USER : CITIZEN_DEMO_USER;
+      setUser(initialUser);
+      setRole(savedRole);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -105,21 +129,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const switchPersona = async (newRole: 'citizen' | 'ward_admin') => {
     setIsLoading(true);
-    const targetUser = newRole === 'ward_admin' ? WARD_ADMIN_DEMO_USER : CITIZEN_DEMO_USER;
-    const newToken = createDemoJwt(
-      targetUser.userId,
-      targetUser.email,
+    localStorage.setItem('saafsafari_demo_role', newRole);
+    const email = newRole === 'ward_admin' ? 'demo-admin@saafsafari.local' : 'demo-citizen@saafsafari.local';
+
+    // Get live token from Cognito
+    const liveToken = await authenticateWithCognito(email, 'REMOVED_CREDENTIAL');
+    const tokenToUse = liveToken || createDemoJwt(
+      newRole === 'ward_admin' ? WARD_ADMIN_DEMO_USER.userId : CITIZEN_DEMO_USER.userId,
+      email,
       newRole === 'ward_admin' ? ['ward_admin', 'citizen'] : ['citizen'],
     );
 
-    localStorage.setItem('saafsafari_demo_role', newRole);
-    localStorage.setItem('saafsafari_id_token', newToken);
-
-    setUser(targetUser);
+    setToken(tokenToUse);
+    api.setToken(tokenToUse);
+    localStorage.setItem('saafsafari_id_token', tokenToUse);
     setRole(newRole);
-    setToken(newToken);
-    api.setToken(newToken);
-    setIsLoading(false);
+
+    try {
+      const profile = await api.getMe();
+      setUser(profile);
+    } catch {
+      const targetUser = newRole === 'ward_admin' ? WARD_ADMIN_DEMO_USER : CITIZEN_DEMO_USER;
+      setUser(targetUser);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const refreshProfile = async () => {
