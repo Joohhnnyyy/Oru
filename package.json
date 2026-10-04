@@ -8,12 +8,19 @@
   },
   "scripts": {
     "build": "pnpm -r build",
-    "test": "pnpm -r test",
+    "test": "pnpm -r test && vitest run scripts/test/seed.test.ts",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
-    "cdk": "pnpm --filter @saafsafari/infra cdk"
+    "cdk": "pnpm --filter @saafsafari/infra cdk",
+    "seed": "tsx scripts/seed.ts"
   },
   "devDependencies": {
+    "@aws-sdk/client-dynamodb": "^3.750.0",
+    "@aws-sdk/lib-dynamodb": "^3.750.0",
+    "@saafsafari/game-rules": "workspace:*",
+    "@saafsafari/shared": "workspace:*",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.3",
     "typescript": "^5.7.3",
     "vitest": "^3.0.7"
   },
