@@ -59,3 +59,9 @@
 - status: locked
 - decision: Use Amazon Location Service MapLibre vector tiles for web and mobile base maps, Geofence collection for static QR source validation, and Tracker resource for collector-mode live truck locations and distance validation.
 - scope: geospatial, Amazon Location Service, tracking, geofence
+
+## DEC-11: Backend-First Development Sequence
+- source: user directive (2026-10-04)
+- status: locked
+- decision: Strict separation of backend and frontend milestones. Complete 100% of backend development (CDK infra, database schema, game rules engine, all Lambda API handlers, Step Functions AI pipelines, EventBridge scheduler, and integration verification tests against deployed AWS) before initializing frontend (Web/Mobile) client application development.
+- scope: development strategy, phasing, backend, frontend

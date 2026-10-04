@@ -74,6 +74,7 @@ Verifiable civic waste and energy actions directly tied to immediate, local feed
 | DEC-08: pnpm Monorepo with Shared Game Rules | Pure TypeScript game math isolated in `packages/game-rules` with 100% unit test coverage | ✓ Good |
 | DEC-09: Cedar Authorization in Lambda | Enforces strict ward-level tenancy for ward admins and collector equipment isolation | ✓ Good |
 | DEC-10: Amazon Location Service for Maps & Geofences | Deep AWS integration replacing third-party Mapbox/Google Maps with native vector tiles and trackers | ✓ Good |
+| DEC-11: Backend-First Development Sequence | User directive: Complete 100% of backend & infra on AWS before initializing frontend development | ✓ Good |
 
 ---
-*Last updated: 2026-10-04 after doc ingestion bootstrap*
+*Last updated: 2026-10-04 after adopting backend-first phased sequencing*

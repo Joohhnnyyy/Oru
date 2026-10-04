@@ -104,31 +104,31 @@
 | AUTH-01 | Phase 1: Foundation & Authentication | Pending |
 | AUTH-02 | Phase 1: Foundation & Authentication | Pending |
 | AUTH-03 | Phase 1: Foundation & Authentication | Pending |
-| MAP-01 | Phase 2: Game Engine & QR Verification | Pending |
-| MAP-02 | Phase 2: Game Engine & QR Verification | Pending |
-| MAP-03 | Phase 2: Game Engine & QR Verification | Pending |
-| TASK-01 | Phase 2: Game Engine & QR Verification | Pending |
-| TASK-02 | Phase 2: Game Engine & QR Verification | Pending |
-| CRED-01 | Phase 2: Game Engine & QR Verification | Pending |
-| CRED-02 | Phase 2: Game Engine & QR Verification | Pending |
-| QR-01 | Phase 2: Game Engine & QR Verification | Pending |
-| QR-02 | Phase 2: Game Engine & QR Verification | Pending |
-| QR-03 | Phase 2: Game Engine & QR Verification | Pending |
-| WALT-01 | Phase 2: Game Engine & QR Verification | Pending |
-| WALT-02 | Phase 2: Game Engine & QR Verification | Pending |
-| COL-01 | Phase 3: Collector Mode & Live Tracking | Pending |
-| COL-02 | Phase 3: Collector Mode & Live Tracking | Pending |
-| TRK-01 | Phase 3: Collector Mode & Live Tracking | Pending |
-| AI-01 | Phase 4: AI Photo Proof & Municipal Console | Pending |
-| AI-02 | Phase 4: AI Photo Proof & Municipal Console | Pending |
-| AI-03 | Phase 4: AI Photo Proof & Municipal Console | Pending |
-| HOT-01 | Phase 4: AI Photo Proof & Municipal Console | Pending |
-| HOT-02 | Phase 4: AI Photo Proof & Municipal Console | Pending |
-| ADM-01 | Phase 4: AI Photo Proof & Municipal Console | Pending |
-| ADM-02 | Phase 4: AI Photo Proof & Municipal Console | Pending |
-| ADM-03 | Phase 4: AI Photo Proof & Municipal Console | Pending |
-| LEAD-01 | Phase 5: Leaderboards & Demo Polish | Pending |
-| LEAD-02 | Phase 5: Leaderboards & Demo Polish | Pending |
+| MAP-01 | Phase 2: Game Engine & Seed Pipeline | Pending |
+| MAP-02 | Phase 2: Game Engine & Seed Pipeline | Pending |
+| MAP-03 | Phase 2: Game Engine & Seed Pipeline | Pending |
+| TASK-01 | Phase 2: Game Engine & Seed Pipeline | Pending |
+| TASK-02 | Phase 2: Game Engine & Seed Pipeline | Pending |
+| CRED-01 | Phase 2: Game Engine & Seed Pipeline | Pending |
+| CRED-02 | Phase 3: Core API Services & Ledger | Pending |
+| QR-01 | Phase 3: Core API Services & Ledger | Pending |
+| QR-02 | Phase 3: Core API Services & Ledger | Pending |
+| QR-03 | Phase 3: Core API Services & Ledger | Pending |
+| COL-01 | Phase 3: Core API Services & Ledger | Pending |
+| COL-02 | Phase 3: Core API Services & Ledger | Pending |
+| TRK-01 | Phase 3: Core API Services & Ledger | Pending |
+| WALT-01 | Phase 3: Core API Services & Ledger | Pending |
+| WALT-02 | Phase 3: Core API Services & Ledger | Pending |
+| LEAD-01 | Phase 3: Core API Services & Ledger | Pending |
+| LEAD-02 | Phase 3: Core API Services & Ledger | Pending |
+| AI-01 | Phase 4: Async Workflows & Admin | Pending |
+| AI-02 | Phase 4: Async Workflows & Admin | Pending |
+| AI-03 | Phase 4: Async Workflows & Admin | Pending |
+| HOT-01 | Phase 4: Async Workflows & Admin | Pending |
+| HOT-02 | Phase 4: Async Workflows & Admin | Pending |
+| ADM-01 | Phase 4: Async Workflows & Admin | Pending |
+| ADM-02 | Phase 4: Async Workflows & Admin | Pending |
+| ADM-03 | Phase 4: Async Workflows & Admin | Pending |
 
 **Coverage:**
 - v1 requirements: 28 total
@@ -137,4 +137,4 @@
 
 ---
 *Requirements defined: 2026-10-04*
-*Last updated: 2026-10-04 after initial doc ingest*
+*Last updated: 2026-10-04 after backend-first realignment*
