@@ -1,6 +1,6 @@
 import React from 'react';
 import type { TerritoryMetadata } from '@saafsafari/game-rules';
-import { X, Heart, ShieldAlert, Sparkles, MapPin, Award, ArrowRight } from 'lucide-react';
+import { X, Heart, ShieldAlert, Sparkles, MapPin, ArrowRight } from 'lucide-react';
 
 interface TerritoryDrawerProps {
   territory: TerritoryMetadata | null;

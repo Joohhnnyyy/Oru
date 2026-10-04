@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { UserProfile } from '@saafsafari/shared';
+import type { UserProfile, UserRole } from '@saafsafari/shared';
 import { api } from '../services/api';
 
-export type UserRole = 'citizen' | 'collector' | 'ward_admin' | 'merchant';
+export type { UserRole };
 
 interface AuthContextType {
   user: UserProfile | null;

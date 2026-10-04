@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import type { FeatureCollection, Polygon } from 'geojson';
 import { DELHI_TERRITORIES, type TerritoryMetadata } from '@saafsafari/game-rules';
-import { Truck, ShieldCheck, Flame, Compass, Layers } from 'lucide-react';
+import { Truck, Compass } from 'lucide-react';
 import { api } from '../../services/api';
 
 interface TerritoryMapProps {
@@ -11,7 +12,7 @@ interface TerritoryMapProps {
 }
 
 // Convert game-rules territories into a GeoJSON FeatureCollection
-function generateTerritoryGeoJson(): GeoJSON.FeatureCollection {
+function generateTerritoryGeoJson(): FeatureCollection<Polygon> {
   return {
     type: 'FeatureCollection',
     features: DELHI_TERRITORIES.map((t) => {

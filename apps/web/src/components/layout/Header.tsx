@@ -1,13 +1,13 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Flame, Coins, ShieldCheck, UserCheck, ChevronDown, Award } from 'lucide-react';
+import { Flame, Coins, ShieldCheck, UserCheck, ChevronDown } from 'lucide-react';
 
 interface HeaderProps {
-  activeTab: string;
+  activeTab?: string;
   onTabChange: (tab: string) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ activeTab, onTabChange }) => {
+export const Header: React.FC<HeaderProps> = ({ onTabChange }) => {
   const { user, role, switchPersona } = useAuth();
   const [menuOpen, setMenuOpen] = React.useState(false);
 
