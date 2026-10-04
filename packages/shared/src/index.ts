@@ -3,3 +3,8 @@ export * from './schemas/errors.js';
 export * from './schemas/territory.js';
 export * from './schemas/qr.js';
 export * from './schemas/merchant.js';
+export * from './schemas/tasks.js';
+export * from './schemas/leaderboard.js';
+export * from './schemas/scans.js';
+export * from './schemas/wallet.js';
+export * from './schemas/trucks.js';

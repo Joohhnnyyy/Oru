@@ -38,6 +38,8 @@ const apiStack = new ApiStack(app, 'SaafSafari-ApiStack', {
   proofsBucket: dataStack.proofsBucket,
   userPool: authStack.userPool,
   userPoolClient: authStack.userPoolClient,
+  geofenceCollectionArn: geoStack.geofenceCollection.attrArn,
+  trackerArn: geoStack.tracker.attrArn,
 });
 
 // Explicit dependency ordering

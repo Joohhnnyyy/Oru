@@ -1,9 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { App } from 'aws-cdk-lib';
 import { Template, Match } from 'aws-cdk-lib/assertions';
-import * as apigwv2 from 'aws-cdk-lib/aws-apigatewayv2';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import { DataStack } from '../lib/data-stack';
 import { AuthStack } from '../lib/auth-stack';
 import { GeoStack } from '../lib/geo-stack';
@@ -104,16 +101,19 @@ describe('AWS CDK Infrastructure Stacks', () => {
     });
   });
 
-  it('ApiStack provisions HTTP API Gateway v2, Cognito JWT Authorizer, and Phase 1 routes', () => {
+  it('ApiStack provisions HTTP API Gateway v2, Cognito JWT Authorizer, and all Phase 1-3 routes', () => {
     const app = new App();
     const dataStack = new DataStack(app, 'TestDataStackForApi', { env });
     const authStack = new AuthStack(app, 'TestAuthStackForApi', { env });
+    const geoStack = new GeoStack(app, 'TestGeoStackForApi', { env });
     const apiStack = new ApiStack(app, 'TestApiStack', {
       env,
       table: dataStack.table,
       proofsBucket: dataStack.proofsBucket,
       userPool: authStack.userPool,
       userPoolClient: authStack.userPoolClient,
+      geofenceCollectionArn: geoStack.geofenceCollection.attrArn,
+      trackerArn: geoStack.tracker.attrArn,
     });
 
     const template = Template.fromStack(apiStack);
@@ -128,20 +128,37 @@ describe('AWS CDK Infrastructure Stacks', () => {
       Name: 'SaafSafariCognitoAuthorizer',
     });
 
-    // Check routes
-    template.hasResourceProperties('AWS::ApiGatewayV2::Route', {
-      RouteKey: 'POST /v1/onboarding',
-      AuthorizationType: 'JWT',
-    });
+    // Secured routes
+    const securedRoutes = [
+      'POST /v1/onboarding',
+      'GET /v1/me',
+      'PATCH /v1/me',
+      'GET /v1/tasks',
+      'POST /v1/tasks/checkin',
+      'POST /v1/scans',
+      'GET /v1/wallet',
+      'POST /v1/coupons/redeem',
+    ];
 
-    template.hasResourceProperties('AWS::ApiGatewayV2::Route', {
-      RouteKey: 'GET /v1/me',
-      AuthorizationType: 'JWT',
-    });
+    for (const routeKey of securedRoutes) {
+      template.hasResourceProperties('AWS::ApiGatewayV2::Route', {
+        RouteKey: routeKey,
+        AuthorizationType: 'JWT',
+      });
+    }
 
-    template.hasResourceProperties('AWS::ApiGatewayV2::Route', {
-      RouteKey: 'PATCH /v1/me',
-      AuthorizationType: 'JWT',
-    });
+    // Public routes
+    const publicRoutes = [
+      'GET /v1/leaderboards',
+      'GET /v1/coupons',
+      'GET /v1/trucks/live',
+    ];
+
+    for (const routeKey of publicRoutes) {
+      template.hasResourceProperties('AWS::ApiGatewayV2::Route', {
+        RouteKey: routeKey,
+        AuthorizationType: 'NONE',
+      });
+    }
   });
 });

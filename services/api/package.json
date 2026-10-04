@@ -12,6 +12,7 @@
     "@aws-lambda-powertools/logger": "^2.16.0",
     "@aws-sdk/client-dynamodb": "^3.750.0",
     "@aws-sdk/lib-dynamodb": "^3.750.0",
+    "@saafsafari/game-rules": "workspace:*",
     "@saafsafari/shared": "workspace:*",
     "h3-js": "^4.1.0",
     "zod": "^3.24.2"

@@ -50,9 +50,9 @@ Following a strict **Backend-First Development Strategy** (DEC-11), all cloud in
   3. All balance modifications execute via idempotent `TransactWriteItems`, atomically updating user balance, ledger, and collector rewards.
   4. Endpoints for `/v1/me`, `/v1/tasks`, `/v1/wallet`, `/v1/coupons/redeem`, and `/v1/leaderboards` respond with valid schema outputs.
 **Plans**: 3 plans
-- [ ] 03-01: Core user, periodic task assignment, and leaderboard Lambda handlers.
-- [ ] 03-02: QR verification Lambda handler with HMAC verification, Amazon Location geofencing, and proximity checks.
-- [ ] 03-03: Wallet and coupon redemption Lambda handlers with conditional DynamoDB transaction guarantees.
+- [x] 03-01: Core user, periodic task assignment, and leaderboard Lambda handlers.
+- [x] 03-02: QR verification Lambda handler with HMAC verification, Amazon Location geofencing, and proximity checks.
+- [x] 03-03: Wallet and coupon redemption Lambda handlers with conditional DynamoDB transaction guarantees.
 
 ### Phase 4: Async Workflows, AI Photo Pipeline & Admin Services
 **Goal**: Implement S3 presigned proof upload, Step Functions AI verification pipeline (Rekognition + Bedrock Nova Lite), EventBridge nightly health decay scheduler, and municipal admin endpoints.
@@ -119,7 +119,7 @@ Following a strict **Backend-First Development Strategy** (DEC-11), all cloud in
 |-------|-----------|----------------|--------|-----------|
 | 1. Foundation, CDK Infrastructure & Auth | M1 (Backend) | 3/3 | Complete | 2026-10-04 |
 | 2. Game Engine, Territory Pipeline & Seed | M1 (Backend) | 3/3 | Complete | 2026-10-05 |
-| 3. Core API Services, QR Verification & Ledger | M1 (Backend) | 0/3 | Planned | - |
+| 3. Core API Services, QR Verification & Ledger | M1 (Backend) | 3/3 | Complete | 2026-10-05 |
 | 4. Async Workflows, AI Photo Pipeline & Admin | M1 (Backend) | 0/3 | Not started | - |
 | 5. Backend Deployment & Integration Verification | M1 (Backend) | 0/2 | Not started | - |
 | 6. Web Applications (Citizen & Municipal) | M2 (Frontend) | 0/3 | Not started | - |
