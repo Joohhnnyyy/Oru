@@ -36,9 +36,9 @@ Following a strict **Backend-First Development Strategy** (DEC-11), all cloud in
   2. Python/TypeScript script generates 60+ H3 res-7 Delhi NCR territories classified with animal mascots into GeoJSON and DynamoDB items.
   3. Database seed script populates 40 initial QR sources, 6 merchants, and 25 active users with historical actions.
 **Plans**: 3 plans
-- [ ] 02-01: Pure game rules engine implementation and comprehensive unit test suite in `packages/game-rules`.
-- [ ] 02-02: Delhi NCR OSM to Uber H3 res-7 territory classification and GeoJSON generator.
-- [ ] 02-03: DynamoDB seed scripts for territories, QR sources, merchants, and demo users.
+- [x] 02-01: Pure game rules engine implementation and comprehensive unit test suite in `packages/game-rules`.
+- [x] 02-02: Delhi NCR OSM to Uber H3 res-7 territory classification and GeoJSON generator.
+- [x] 02-03: DynamoDB seed scripts for territories, QR sources, merchants, and demo users.
 
 ### Phase 3: Core API Services, QR Verification & Ledger
 **Goal**: Implement and test all core REST endpoints: user profile, task boards, static/rotating QR scan verification, atomic credit ledger transactions, wallet, and coupon redemption.

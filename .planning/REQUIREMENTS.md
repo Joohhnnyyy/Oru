@@ -13,15 +13,15 @@
 
 ### Territory Map & Mascots
 
-- [ ] **MAP-01**: User can view an interactive MapLibre map displaying H3 res-7 hexagonal cells colored by land-cover mascot.
-- [ ] **MAP-02**: User can inspect territory details including current Health (0–100), active animal mascot, and 4 mood states (Sick, Recovering, Thriving, Legendary).
-- [ ] **MAP-03**: Territory health decays 3% nightly via EventBridge Scheduler and recalculates from daily verified actions via DynamoDB Streams.
+- [x] **MAP-01**: User can view an interactive MapLibre map displaying H3 res-7 hexagonal cells colored by land-cover mascot.
+- [x] **MAP-02**: User can inspect territory details including current Health (0–100), active animal mascot, and 4 mood states (Sick, Recovering, Thriving, Legendary).
+- [x] **MAP-03**: Territory health decays 3% nightly via EventBridge Scheduler and recalculates from daily verified actions via DynamoDB Streams.
 
 ### Tasks & Game Engine
 
-- [ ] **TASK-01**: User receives daily task board (3 tasks: 1 segregation habit, 1 T1, 1 T2), weekly board (3 tasks), and monthly board (2 tasks + 1 territory goal).
-- [ ] **TASK-02**: Tasks are deterministically generated using pure functions seeded by userId and period key to guarantee idempotency.
-- [ ] **CRED-01**: Green Credits (GC) and XP are computed via pure functions applying trust weights, capped multipliers (max 2.0x), and flat bonuses.
+- [x] **TASK-01**: User receives daily task board (3 tasks: 1 segregation habit, 1 T1, 1 T2), weekly board (3 tasks), and monthly board (2 tasks + 1 territory goal).
+- [x] **TASK-02**: Tasks are deterministically generated using pure functions seeded by userId and period key to guarantee idempotency.
+- [x] **CRED-01**: Green Credits (GC) and XP are computed via pure functions applying trust weights, capped multipliers (max 2.0x), and flat bonuses.
 - [ ] **CRED-02**: Mutating actions use DynamoDB TransactWriteItems to atomically record immutable ledger entries, update user balance, and advance task progress.
 
 ### QR Code Verification
