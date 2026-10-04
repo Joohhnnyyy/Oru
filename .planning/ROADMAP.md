@@ -120,7 +120,7 @@ Following a strict **Backend-First Development Strategy** (DEC-11), all cloud in
 | 1. Foundation, CDK Infrastructure & Auth | M1 (Backend) | 3/3 | Complete | 2026-10-04 |
 | 2. Game Engine, Territory Pipeline & Seed | M1 (Backend) | 3/3 | Complete | 2026-10-05 |
 | 3. Core API Services, QR Verification & Ledger | M1 (Backend) | 3/3 | Complete | 2026-10-05 |
-| 4. Async Workflows, AI Photo Pipeline & Admin | M1 (Backend) | 0/3 | Not started | - |
+| 4. Async Workflows, AI Photo Pipeline & Admin | M1 (Backend) | 0/3 | Planned | - |
 | 5. Backend Deployment & Integration Verification | M1 (Backend) | 0/2 | Not started | - |
 | 6. Web Applications (Citizen & Municipal) | M2 (Frontend) | 0/3 | Not started | - |
 | 7. Mobile Application (Citizen & Collector) | M2 (Frontend) | 0/3 | Not started | - |
