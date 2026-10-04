@@ -128,8 +128,10 @@ export function generateDelhiTerritories(): TerritoryMetadata[] {
     const item = DELHI_NEIGHBORHOODS[i];
     const h3Index = h3.latLngToCell(item.baseLat, item.baseLng, 7);
 
-    // If duplicate hex from proximity, use index or offset slightly
-    const key = seenH3.has(h3Index) ? `${h3Index}_sub_${i}` : h3Index;
+    // If duplicate hex from proximity, skip to ensure unique H3 cells
+    if (seenH3.has(h3Index)) {
+      continue;
+    }
     seenH3.add(h3Index);
 
     // Get exact center of H3 cell
@@ -209,3 +211,6 @@ export function generateTerritoriesGeoJson(territories: TerritoryMetadata[]): Fe
     features,
   };
 }
+
+export type { TerritoryMetadata };
+export const DELHI_TERRITORIES: TerritoryMetadata[] = generateDelhiTerritories();
