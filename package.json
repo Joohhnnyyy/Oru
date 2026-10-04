@@ -22,6 +22,8 @@
     "@aws-sdk/client-dynamodb": "^3.750.0",
     "@aws-sdk/lib-dynamodb": "^3.750.0",
     "@types/node": "^22.13.0",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
     "@saafsafari/game-rules": "workspace:*",
     "@saafsafari/shared": "workspace:*",
     "ts-node": "^10.9.2",

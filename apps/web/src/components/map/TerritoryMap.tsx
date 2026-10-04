@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import { DELHI_TERRITORIES, TerritoryMetadata } from '@saafsafari/game-rules';
+import { DELHI_TERRITORIES, type TerritoryMetadata } from '@saafsafari/game-rules';
 import { Truck, ShieldCheck, Flame, Compass, Layers } from 'lucide-react';
 import { api } from '../../services/api';
 
