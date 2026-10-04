@@ -1,0 +1,29 @@
+{
+  "source_path": "/Users/anshjohnson/Oru/docs/00-PROJECT-CONTEXT.md",
+  "type": "PRD",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "SaafSafari — Master Project Context",
+  "summary": "Master project context for SaafSafari civic waste & energy gamification app, outlining problem, core loop, user roles, prioritized feature list, and demo goals.",
+  "scope": [
+    "SaafSafari",
+    "civic engagement",
+    "waste segregation",
+    "energy actions",
+    "green credits",
+    "mascot health",
+    "territories",
+    "user roles",
+    "P0 P1 P2 features"
+  ],
+  "cross_refs": [
+    "05-GAME-DESIGN.md",
+    "01-AWS-REQUIREMENTS.md",
+    "02-BACKEND-CONTEXT.md",
+    "03-WEB-CONTEXT.md",
+    "04-MOBILE-CONTEXT.md"
+  ],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

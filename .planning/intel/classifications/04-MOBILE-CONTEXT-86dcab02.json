@@ -1,0 +1,29 @@
+{
+  "source_path": "/Users/anshjohnson/Oru/docs/04-MOBILE-CONTEXT.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "SaafSafari — Mobile Context",
+  "summary": "Mobile application specification for Expo React Native covering citizen experience, collector mode, QR scanner, offline queue, and EAS Android builds.",
+  "scope": [
+    "Mobile",
+    "Expo",
+    "React Native",
+    "TypeScript",
+    "Citizen Mode",
+    "Collector Mode",
+    "QR Scanner",
+    "Camera",
+    "Offline Queue",
+    "EAS Build"
+  ],
+  "cross_refs": [
+    "00-PROJECT-CONTEXT.md",
+    "01-AWS-REQUIREMENTS.md",
+    "02-BACKEND-CONTEXT.md",
+    "05-GAME-DESIGN.md"
+  ],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}
