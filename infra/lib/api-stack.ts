@@ -1,3 +1,5 @@
+import * as path from 'path';
+import { fileURLToPath } from 'url';
 import { CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
 import * as apigwv2 from 'aws-cdk-lib/aws-apigatewayv2';
 import { HttpJwtAuthorizer } from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
@@ -6,6 +8,7 @@ import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
+import { TsLambda } from './constructs/ts-lambda';
 
 export interface ApiStackProps extends StackProps {
   table: dynamodb.ITable;
@@ -49,6 +52,57 @@ export class ApiStack extends Stack {
         maxAge: Duration.days(1),
       },
     });
+
+    // Resolve path to services/api handlers
+    const apiBasePath = path.resolve(__dirname, '../../services/api/src');
+
+    // 1. Onboarding Handler (POST /v1/onboarding)
+    const completeOnboardingFn = new TsLambda(this, 'CompleteOnboardingFunction', {
+      entry: path.join(apiBasePath, 'handlers/onboarding/completeOnboarding.ts'),
+      serviceName: 'saafsafari-onboarding',
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+    table.grantReadWriteData(completeOnboardingFn);
+
+    this.addSecuredRoute(
+      '/v1/onboarding',
+      [apigwv2.HttpMethod.POST],
+      new HttpLambdaIntegration('OnboardingIntegration', completeOnboardingFn),
+    );
+
+    // 2. Get User Profile Handler (GET /v1/me)
+    const getMeFn = new TsLambda(this, 'GetMeFunction', {
+      entry: path.join(apiBasePath, 'handlers/me/getMe.ts'),
+      serviceName: 'saafsafari-me-get',
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+    table.grantReadData(getMeFn);
+
+    this.addSecuredRoute(
+      '/v1/me',
+      [apigwv2.HttpMethod.GET],
+      new HttpLambdaIntegration('GetMeIntegration', getMeFn),
+    );
+
+    // 3. Update User Profile Handler (PATCH /v1/me)
+    const updateMeFn = new TsLambda(this, 'UpdateMeFunction', {
+      entry: path.join(apiBasePath, 'handlers/me/updateMe.ts'),
+      serviceName: 'saafsafari-me-update',
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+    table.grantReadWriteData(updateMeFn);
+
+    this.addSecuredRoute(
+      '/v1/me',
+      [apigwv2.HttpMethod.PATCH],
+      new HttpLambdaIntegration('UpdateMeIntegration', updateMeFn),
+    );
 
     // CloudFormation Outputs
     new CfnOutput(this, 'HttpApiUrlOutput', {

@@ -104,7 +104,7 @@ describe('AWS CDK Infrastructure Stacks', () => {
     });
   });
 
-  it('ApiStack provisions HTTP API Gateway v2 and Cognito JWT Authorizer', () => {
+  it('ApiStack provisions HTTP API Gateway v2, Cognito JWT Authorizer, and Phase 1 routes', () => {
     const app = new App();
     const dataStack = new DataStack(app, 'TestDataStackForApi', { env });
     const authStack = new AuthStack(app, 'TestAuthStackForApi', { env });
@@ -116,19 +116,6 @@ describe('AWS CDK Infrastructure Stacks', () => {
       userPoolClient: authStack.userPoolClient,
     });
 
-    // Attach a secured test route so authorizer binds to HTTP API
-    const testFn = new lambda.Function(apiStack, 'TestFn', {
-      runtime: lambda.Runtime.NODEJS_22_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromInline('export const handler = async () => ({ statusCode: 200 });'),
-    });
-
-    apiStack.addSecuredRoute(
-      '/v1/test',
-      [apigwv2.HttpMethod.GET],
-      new HttpLambdaIntegration('TestIntegration', testFn),
-    );
-
     const template = Template.fromStack(apiStack);
 
     template.hasResourceProperties('AWS::ApiGatewayV2::Api', {
@@ -139,6 +126,22 @@ describe('AWS CDK Infrastructure Stacks', () => {
     template.hasResourceProperties('AWS::ApiGatewayV2::Authorizer', {
       AuthorizerType: 'JWT',
       Name: 'SaafSafariCognitoAuthorizer',
+    });
+
+    // Check routes
+    template.hasResourceProperties('AWS::ApiGatewayV2::Route', {
+      RouteKey: 'POST /v1/onboarding',
+      AuthorizationType: 'JWT',
+    });
+
+    template.hasResourceProperties('AWS::ApiGatewayV2::Route', {
+      RouteKey: 'GET /v1/me',
+      AuthorizationType: 'JWT',
+    });
+
+    template.hasResourceProperties('AWS::ApiGatewayV2::Route', {
+      RouteKey: 'PATCH /v1/me',
+      AuthorizationType: 'JWT',
     });
   });
 });
