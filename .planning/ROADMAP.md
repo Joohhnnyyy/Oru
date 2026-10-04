@@ -23,9 +23,9 @@ Following a strict **Backend-First Development Strategy** (DEC-11), all cloud in
   3. Cognito User Pool handles passwordless email OTP sign-in and issues valid JWTs.
   4. DynamoDB single-table schema with GSI1, GSI2, and TTL is provisioned.
 **Plans**: 3 plans
-- [ ] 01-01: Monorepo workspace setup, TypeScript configs, pnpm configuration, and shared domain contracts in `packages/shared`.
-- [ ] 01-02: AWS CDK infrastructure stacks (Cognito User Pool, DynamoDB single-table, Amazon Location map/geofence/tracker, API Gateway HTTP API).
-- [ ] 01-03: User authentication and onboarding Lambda handlers with Cognito Email OTP verification.
+- [x] 01-01: Monorepo workspace setup, TypeScript configs, pnpm configuration, and shared domain contracts in `packages/shared`.
+- [x] 01-02: AWS CDK infrastructure stacks (Cognito User Pool, DynamoDB single-table, Amazon Location map/geofence/tracker, API Gateway HTTP API).
+- [x] 01-03: User authentication and onboarding Lambda handlers with Cognito Email OTP verification.
 
 ### Phase 2: Game Engine, Territory Pipeline & Seed Data
 **Goal**: Pure game rules engine in `packages/game-rules` (100% unit-tested), Uber H3 territory generation script, and database seed scripts for territories, QR sources, merchants, and demo users.

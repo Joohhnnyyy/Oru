@@ -7,9 +7,9 @@
 
 ### Authentication & Onboarding
 
-- [ ] **AUTH-01**: User can authenticate passwordlessly via Cognito Email OTP or Google OAuth federation.
-- [ ] **AUTH-02**: User can select language (English or Hindi) and configure notification preferences.
-- [ ] **AUTH-03**: User receives automatic home territory assignment (H3 res-7 cell) based on device GPS coordinates during onboarding.
+- [x] **AUTH-01**: User can authenticate passwordlessly via Cognito Email OTP or Google OAuth federation.
+- [x] **AUTH-02**: User can select language (English or Hindi) and configure notification preferences.
+- [x] **AUTH-03**: User receives automatic home territory assignment (H3 res-7 cell) based on device GPS coordinates during onboarding.
 
 ### Territory Map & Mascots
 
