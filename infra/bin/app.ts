@@ -4,6 +4,8 @@ import { AuthStack } from '../lib/auth-stack';
 import { DataStack } from '../lib/data-stack';
 import { GeoStack } from '../lib/geo-stack';
 import { ApiStack } from '../lib/api-stack';
+import { WorkflowStack } from '../lib/workflow-stack';
+import { SchedulerStack } from '../lib/scheduler-stack';
 
 const app = new App();
 
@@ -42,9 +44,26 @@ const apiStack = new ApiStack(app, 'SaafSafari-ApiStack', {
   trackerArn: geoStack.tracker.attrArn,
 });
 
+// 5. Workflow Stack: Step Functions Multimodal AI Pipeline
+const workflowStack = new WorkflowStack(app, 'SaafSafari-WorkflowStack', {
+  env,
+  description: 'SaafSafari Step Functions Multimodal AI verification workflow',
+  table: dataStack.table,
+  proofsBucket: dataStack.proofsBucket,
+});
+
+// 6. Scheduler Stack: EventBridge Nightly Territory Health Decay
+const schedulerStack = new SchedulerStack(app, 'SaafSafari-SchedulerStack', {
+  env,
+  description: 'SaafSafari EventBridge nightly territory health decay scheduler',
+  table: dataStack.table,
+});
+
 // Explicit dependency ordering
 apiStack.node.addDependency(dataStack);
 apiStack.node.addDependency(authStack);
 apiStack.node.addDependency(geoStack);
+workflowStack.node.addDependency(dataStack);
+schedulerStack.node.addDependency(dataStack);
 
 app.synth();

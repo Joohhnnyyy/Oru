@@ -5,6 +5,8 @@ import { DataStack } from '../lib/data-stack';
 import { AuthStack } from '../lib/auth-stack';
 import { GeoStack } from '../lib/geo-stack';
 import { ApiStack } from '../lib/api-stack';
+import { WorkflowStack } from '../lib/workflow-stack';
+import { SchedulerStack } from '../lib/scheduler-stack';
 
 describe('AWS CDK Infrastructure Stacks', () => {
   const env = { account: '123456789012', region: 'ap-south-1' };
@@ -101,7 +103,7 @@ describe('AWS CDK Infrastructure Stacks', () => {
     });
   });
 
-  it('ApiStack provisions HTTP API Gateway v2, Cognito JWT Authorizer, and all Phase 1-3 routes', () => {
+  it('ApiStack provisions HTTP API Gateway v2, Cognito JWT Authorizer, and all Phase 1-4 routes', () => {
     const app = new App();
     const dataStack = new DataStack(app, 'TestDataStackForApi', { env });
     const authStack = new AuthStack(app, 'TestAuthStackForApi', { env });
@@ -138,6 +140,14 @@ describe('AWS CDK Infrastructure Stacks', () => {
       'POST /v1/scans',
       'GET /v1/wallet',
       'POST /v1/coupons/redeem',
+      'POST /v1/submissions',
+      'GET /v1/submissions/{id}',
+      'POST /v1/hotspots',
+      'GET /v1/admin/territory-overview',
+      'POST /v1/admin/qr-sources',
+      'GET /v1/admin/qr-sources',
+      'GET /v1/admin/review-queue',
+      'POST /v1/admin/review-queue/resolve',
     ];
 
     for (const routeKey of securedRoutes) {
@@ -152,6 +162,7 @@ describe('AWS CDK Infrastructure Stacks', () => {
       'GET /v1/leaderboards',
       'GET /v1/coupons',
       'GET /v1/trucks/live',
+      'GET /v1/hotspots',
     ];
 
     for (const routeKey of publicRoutes) {
@@ -160,5 +171,61 @@ describe('AWS CDK Infrastructure Stacks', () => {
         AuthorizationType: 'NONE',
       });
     }
+  }, 20000);
+
+  it('WorkflowStack provisions Step Functions State Machine with Rekognition and Bedrock permissions', () => {
+    const app = new App();
+    const dataStack = new DataStack(app, 'TestDataStackForWorkflow', { env });
+    const workflowStack = new WorkflowStack(app, 'TestWorkflowStack', {
+      env,
+      table: dataStack.table,
+      proofsBucket: dataStack.proofsBucket,
+    });
+
+    const template = Template.fromStack(workflowStack);
+
+    // Assert State Machine
+    template.hasResourceProperties('AWS::StepFunctions::StateMachine', {
+      StateMachineName: 'saafsafari-ai-verification',
+    });
+
+    // Assert IAM policy for Rekognition and Bedrock
+    template.hasResourceProperties('AWS::IAM::Policy', {
+      PolicyDocument: {
+        Statement: Match.arrayWith([
+          Match.objectLike({
+            Action: ['rekognition:DetectModerationLabels', 'rekognition:DetectLabels'],
+            Effect: 'Allow',
+          }),
+          Match.objectLike({
+            Action: 'bedrock:InvokeModel',
+            Effect: 'Allow',
+          }),
+        ]),
+      },
+    });
+  });
+
+  it('SchedulerStack provisions EventBridge Rule with cron expression targeting nightly health decay Lambda', () => {
+    const app = new App();
+    const dataStack = new DataStack(app, 'TestDataStackForScheduler', { env });
+    const schedulerStack = new SchedulerStack(app, 'TestSchedulerStack', {
+      env,
+      table: dataStack.table,
+    });
+
+    const template = Template.fromStack(schedulerStack);
+
+    // Assert EventBridge Rule
+    template.hasResourceProperties('AWS::Events::Rule', {
+      Name: 'saafsafari-nightly-health-decay',
+      ScheduleExpression: 'cron(0 0 * * ? *)',
+      State: 'ENABLED',
+    });
+
+    // Assert Lambda Function
+    template.hasResourceProperties('AWS::Lambda::Function', {
+      Timeout: 120,
+    });
   });
 });

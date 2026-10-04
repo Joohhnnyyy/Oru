@@ -251,6 +251,142 @@ export class ApiStack extends Stack {
       new HttpLambdaIntegration('GetLiveTrucksIntegration', getLiveTrucksFn),
     );
 
+    // 12. Create Photo Proof Submission Handler (POST /v1/submissions)
+    const createSubmissionFn = new TsLambda(this, 'CreateSubmissionFunction', {
+      entry: path.join(apiBasePath, 'handlers/submissions/createSubmission.ts'),
+      serviceName: 'saafsafari-submissions-create',
+      environment: {
+        TABLE_NAME: table.tableName,
+        PROOFS_BUCKET_NAME: proofsBucket.bucketName,
+      },
+    });
+    table.grantReadWriteData(createSubmissionFn);
+    proofsBucket.grantPut(createSubmissionFn);
+
+    this.addSecuredRoute(
+      '/v1/submissions',
+      [apigwv2.HttpMethod.POST],
+      new HttpLambdaIntegration('CreateSubmissionIntegration', createSubmissionFn),
+    );
+
+    // 13. Get Submission Metadata Handler (GET /v1/submissions/{id})
+    const getSubmissionFn = new TsLambda(this, 'GetSubmissionFunction', {
+      entry: path.join(apiBasePath, 'handlers/submissions/getSubmission.ts'),
+      serviceName: 'saafsafari-submissions-get',
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+    table.grantReadData(getSubmissionFn);
+
+    this.addSecuredRoute(
+      '/v1/submissions/{id}',
+      [apigwv2.HttpMethod.GET],
+      new HttpLambdaIntegration('GetSubmissionIntegration', getSubmissionFn),
+    );
+
+    // 14. Report Civic Hotspot Handler (POST /v1/hotspots)
+    const reportHotspotFn = new TsLambda(this, 'ReportHotspotFunction', {
+      entry: path.join(apiBasePath, 'handlers/hotspots/reportHotspot.ts'),
+      serviceName: 'saafsafari-hotspots-report',
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+    table.grantReadWriteData(reportHotspotFn);
+
+    this.addSecuredRoute(
+      '/v1/hotspots',
+      [apigwv2.HttpMethod.POST],
+      new HttpLambdaIntegration('ReportHotspotIntegration', reportHotspotFn),
+    );
+
+    // 15. Get Civic Hotspots Handler (GET /v1/hotspots)
+    const getHotspotsFn = new TsLambda(this, 'GetHotspotsFunction', {
+      entry: path.join(apiBasePath, 'handlers/hotspots/getHotspots.ts'),
+      serviceName: 'saafsafari-hotspots-get',
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+    table.grantReadData(getHotspotsFn);
+
+    this.addPublicRoute(
+      '/v1/hotspots',
+      [apigwv2.HttpMethod.GET],
+      new HttpLambdaIntegration('GetHotspotsIntegration', getHotspotsFn),
+    );
+
+    // 16. Admin Territory Overview Handler (GET /v1/admin/territory-overview)
+    const getTerritoryOverviewFn = new TsLambda(this, 'GetTerritoryOverviewFunction', {
+      entry: path.join(apiBasePath, 'handlers/admin/getTerritoryOverview.ts'),
+      serviceName: 'saafsafari-admin-territory-overview',
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+    table.grantReadData(getTerritoryOverviewFn);
+
+    this.addSecuredRoute(
+      '/v1/admin/territory-overview',
+      [apigwv2.HttpMethod.GET],
+      new HttpLambdaIntegration('GetTerritoryOverviewIntegration', getTerritoryOverviewFn),
+    );
+
+    // 17. Admin Manage QR Sources Handler (GET & POST /v1/admin/qr-sources)
+    const manageQrSourcesFn = new TsLambda(this, 'ManageQrSourcesFunction', {
+      entry: path.join(apiBasePath, 'handlers/admin/manageQrSources.ts'),
+      serviceName: 'saafsafari-admin-qr-sources',
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+    table.grantReadWriteData(manageQrSourcesFn);
+
+    this.addSecuredRoute(
+      '/v1/admin/qr-sources',
+      [apigwv2.HttpMethod.GET, apigwv2.HttpMethod.POST],
+      new HttpLambdaIntegration('ManageQrSourcesIntegration', manageQrSourcesFn),
+    );
+
+    // 18. Admin Get Review Queue Handler (GET /v1/admin/review-queue)
+    const getReviewQueueFn = new TsLambda(this, 'GetReviewQueueFunction', {
+      entry: path.join(apiBasePath, 'handlers/admin/getReviewQueue.ts'),
+      serviceName: 'saafsafari-admin-review-queue-get',
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+    table.grantReadData(getReviewQueueFn);
+
+    this.addSecuredRoute(
+      '/v1/admin/review-queue',
+      [apigwv2.HttpMethod.GET],
+      new HttpLambdaIntegration('GetReviewQueueIntegration', getReviewQueueFn),
+    );
+
+    // 19. Admin Resolve Review Queue Handler (POST /v1/admin/review-queue/resolve)
+    const resolveReviewQueueFn = new TsLambda(this, 'ResolveReviewQueueFunction', {
+      entry: path.join(apiBasePath, 'handlers/admin/resolveReviewQueue.ts'),
+      serviceName: 'saafsafari-admin-review-queue-resolve',
+      environment: {
+        TABLE_NAME: table.tableName,
+      },
+    });
+    table.grantReadWriteData(resolveReviewQueueFn);
+    resolveReviewQueueFn.addToRolePolicy(
+      new iam.PolicyStatement({
+        actions: ['states:SendTaskSuccess', 'states:SendTaskFailure'],
+        resources: ['*'],
+      }),
+    );
+
+    this.addSecuredRoute(
+      '/v1/admin/review-queue/resolve',
+      [apigwv2.HttpMethod.POST],
+      new HttpLambdaIntegration('ResolveReviewQueueIntegration', resolveReviewQueueFn),
+    );
+
     // CloudFormation Outputs
     new CfnOutput(this, 'HttpApiUrlOutput', {
       value: this.httpApi.url ?? '',

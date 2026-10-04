@@ -8,3 +8,6 @@ export * from './schemas/leaderboard.js';
 export * from './schemas/scans.js';
 export * from './schemas/wallet.js';
 export * from './schemas/trucks.js';
+export * from './schemas/submissions.js';
+export * from './schemas/hotspots.js';
+export * from './schemas/admin.js';

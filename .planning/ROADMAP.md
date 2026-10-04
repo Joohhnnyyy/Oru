@@ -64,9 +64,9 @@ Following a strict **Backend-First Development Strategy** (DEC-11), all cloud in
   3. Municipal admin endpoints (`/v1/admin/review-queue`, `/v1/admin/qr-sources`, `/v1/admin/bounties`) execute with Cedar authorization.
   4. EventBridge Scheduler executes nightly 3% territory health decay and triggers daily task rotation.
 **Plans**: 3 plans
-- [ ] 04-01: S3 presigned upload handler and Step Functions AI verification state machine with Bedrock Nova Lite.
-- [ ] 04-02: Hotspot reporting, validation, and automated bounty task generation handlers.
-- [ ] 04-03: Municipal admin APIs with Cedar authorization, QR source management, and human-in-the-loop review queue resolution.
+- [x] 04-01: S3 presigned upload handler and Step Functions AI verification state machine with Bedrock Nova Lite.
+- [x] 04-02: Hotspot reporting, validation, and automated bounty task generation handlers.
+- [x] 04-03: Municipal admin APIs with Cedar authorization, QR source management, and human-in-the-loop review queue resolution.
 
 ### Phase 5: Backend Deployment & Integration Verification
 **Goal**: Complete live deployment of all backend CDK stacks to AWS `ap-south-1` and run an automated end-to-end integration test suite validating every endpoint against live AWS resources.

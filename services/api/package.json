@@ -10,8 +10,13 @@
   },
   "dependencies": {
     "@aws-lambda-powertools/logger": "^2.16.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.1146.0",
     "@aws-sdk/client-dynamodb": "^3.750.0",
+    "@aws-sdk/client-rekognition": "^3.1146.0",
+    "@aws-sdk/client-s3": "^3.1146.0",
+    "@aws-sdk/client-sfn": "^3.1146.0",
     "@aws-sdk/lib-dynamodb": "^3.750.0",
+    "@aws-sdk/s3-request-presigner": "^3.1146.0",
     "@saafsafari/game-rules": "workspace:*",
     "@saafsafari/shared": "workspace:*",
     "h3-js": "^4.1.0",
