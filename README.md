@@ -52,7 +52,6 @@ Oru-main/
 │   ├── tsconfig.json
 │   └── vite.config.ts
 ├── reference/                  # Upstream reference export (read-only)
-├── scripts/                    # Asset extraction & optimization scripts
 ├── README.md                   # This project guide
 └── SPEC.md                     # Engineering specification & rules
 ```
