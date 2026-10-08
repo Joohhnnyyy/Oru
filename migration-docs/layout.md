@@ -25,4 +25,79 @@ Hero bg `linear-gradient(#D6D6D6 → #FAFAFA)`. Footer bg `#EDEDED`.
 | 14 | FooterMain | Explore, Socials, Resources, Legal; "Copyright © 2026 Butter" | logo | bg #EDEDED, padding 16rem 0 7rem |
 
 ## Verification Notes
-_(filled per section during build)_
+
+### Section 0: Intro Overlay
+- **Layout Match:** PASS. Centered word reveal overlay against pure dark surface.
+- **Animation Match:** PASS. "Add butter." (0.9s) -> "It's a whole new timeline." (2.0s) -> smooth opacity fadeout and element unmount.
+- **Deviations:** None.
+
+### Section 1: HeaderContainer
+- **Layout Match:** PASS. Fixed navbar with 76px height, backdrop blur, logo, link cluster, and CTA buttons.
+- **Animation Match:** PASS. Accessible Product dropdown with hover intent, keyboard focus, and Escape key dismissal.
+- **Deviations:** Added full keyboard navigation and focus restoration for accessibility.
+
+### Section 2: HomeHeroMain
+- **Layout Match:** PASS. Centered headline "Engineered for Creativity", subtitle, "Get Started" button, and hero gradient (#D6D6D6 -> #FAFAFA).
+- **Animation Match:** PASS. 3D R3F Keychain with 7 charms, physical spring-damper inertia (angular damping 2.9, linear damping 2.3 from chunk 6955), chrome materials, and mouse reactivity.
+- **Deviations:** Uses Three.js spring inertia simulation directly in `useFrame` without external Rapier WASM dependency; includes static PNG fallback.
+
+### Section 3: TickerSectionMain
+- **Layout Match:** PASS. All 24 brand logos rendered in uniform grayscale with hover color transitions.
+- **Animation Match:** PASS. 36s infinite linear ticker with gradient edge masking and hover pause.
+- **Deviations:** None.
+
+### Section 4: StatementTimelineMain
+- **Layout Match:** PASS. Full-width statement copy, 4 video preview cards (wild, halftone horses, justified, art dept), timeline editor frame, and orange Nike badge.
+- **Animation Match:** PASS. Card hover scale and tilt effects with responsive stagger.
+- **Deviations:** None.
+
+### Section 5: StoryOneMain (BlocksShowcase)
+- **Layout Match:** PASS. Headline "There's a block for that", "Library | Text Blocks", poppy feature video preview, and 4 effect cards (Inflate, Glow, Focus, Halftone).
+- **Animation Match:** PASS. Interactive card selection updating active block descriptions.
+- **Deviations:** None.
+
+### Section 6: StoryTwoMain (Customizable)
+- **Layout Match:** PASS. Headline "Infinitely customizable.", customizable-editor video, and floating dial + slider GIFs.
+- **Animation Match:** PASS. Gradient border styling and interactive floating control elements.
+- **Deviations:** None.
+
+### Section 7: StoryThreeMain (Toolkit)
+- **Layout Match:** PASS. Headline "Your new creative toolkit.", high-definition toolkit-library video preview.
+- **Animation Match:** PASS. Scroll reveal transitions.
+- **Deviations:** None.
+
+### Section 8: FeatureCardsMain (Features)
+- **Layout Match:** PASS. "Explore features" / "Your new all-in-one video editor.", Import, Edit, Enhance, Ship tabs with media panel.
+- **Animation Match:** PASS. 7-second linear progress bar with automated advance and interactive tab switching.
+- **Deviations:** None.
+
+### Section 9: FeaturesHighlightMain (ThreeWays)
+- **Layout Match:** PASS. "Create in 3 ways": Remix, Describe, Code.
+- **Animation Match:** PASS. Accordion expansion dynamically switching preview frames between template collage, prompt video, and shader code video.
+- **Deviations:** None.
+
+### Section 10: GalleryCarouselMain (Templates)
+- **Layout Match:** PASS. 8 template cards with all 8 dedicated videos (One Platform, Soda's Back, Mix and Match, Running Kit, Fit for Any Forecast, Gentle Exfoliant, Acne Care, Watermelon Rind).
+- **Animation Match:** PASS. Touch and button-driven smooth carousel navigation with card lift transitions.
+- **Deviations:** None.
+
+### Section 11: FeaturesSectionMain (ContentProduction)
+- **Layout Match:** PASS. "Create more, faster" with accelerated production video (`create-more-faster.mp4`).
+- **Animation Match:** PASS. Parallax media zoom and scroll entrance.
+- **Deviations:** None.
+
+### Section 12: DoubleBlockMain (ProductHighlights)
+- **Layout Match:** PASS. "Turn anything into everything" with WebGL video/artwork and "High performance. Totally programmable" with sticker timeline.
+- **Animation Match:** PASS. Clean card elevation and video playback.
+- **Deviations:** None.
+
+### Section 13: BlockHighlightMain (GetTheLook)
+- **Layout Match:** PASS. "Get the look", Dedcool, Sad Wild Thing, Justified Studio, dual-video preview grid.
+- **Animation Match:** PASS. Accordion selection updating the dual video grid.
+- **Deviations:** None.
+
+### Section 14: FooterMain
+- **Layout Match:** PASS. Authentic light gray surface (`#EDEDED`), dark typography, brand logo, Explore/Create/Social/Resources/Legal columns, and copyright statement.
+- **Animation Match:** PASS. Subtle hover link states.
+- **Deviations:** None.
+
