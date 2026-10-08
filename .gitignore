@@ -39,3 +39,9 @@ Thumbs.db
 .temp/
 .tmp/
 .cache/
+
+# AI planning artifacts (dev-only)
+.planning/
+
+# Scraped reference site (dev-only)
+Butter-Video-Online-Video-Editor-Engineered-for-Creativity/
