@@ -4,6 +4,7 @@ import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../context/AuthContext';
 import { AppHeader } from '../../components/AppHeader';
 import { PressableScale } from '../../components/PressableScale';
+import { colors, radii, spacing } from '../../theme/tokens';
 
 export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { user, updateCredits } = useAuth();
@@ -27,7 +28,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         <View style={styles.heroCard}>
           <View style={styles.heroHeader}>
             <View>
-              <Text style={styles.territoryEyebrow}>YOUR HABITAT HEX</Text>
+              <Text style={styles.territoryEyebrow}>TERRITORY STATUS</Text>
               <Text style={styles.territoryName}>{user?.territoryName || 'MCD South 34'}</Text>
               <Text style={styles.mascotLabel}>🐬 Gangetic Dolphin • Recovering</Text>
             </View>
@@ -42,7 +43,9 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           </View>
           <View style={styles.heroFooter}>
             <Text style={styles.heroHint}>+3.4% health gain this week in your hex</Text>
-            <Text style={styles.heroBadge}>Live</Text>
+            <View style={styles.heroBadge}>
+              <Text style={styles.heroBadgeText}>LIVE</Text>
+            </View>
           </View>
         </View>
 
@@ -99,7 +102,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             disabled={streakChecked}
             haptic={streakChecked ? undefined : 'success'}
           >
-            <Text style={styles.checkinBtnText}>
+            <Text style={[styles.checkinBtnText, streakChecked && styles.checkinBtnTextDone]}>
               {streakChecked ? '✓ Completed (+15 GC)' : 'Claim +15 GC'}
             </Text>
           </PressableScale>
@@ -159,7 +162,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <Text style={styles.taskName}>Report Garbage Vulnerable Spot</Text>
             <Text style={styles.taskDesc}>Submit photo of illegal dump spot for bounty</Text>
           </View>
-          <View style={[styles.taskRewardBadge, { backgroundColor: 'rgba(245, 158, 11, 0.15)', borderColor: 'rgba(245, 158, 11, 0.4)' }]}>
+          <View style={[styles.taskRewardBadge, styles.taskRewardBounty]}>
             <Text style={[styles.taskReward, { color: '#FBBF24' }]}>+50 GC</Text>
           </View>
         </PressableScale>
@@ -171,77 +174,77 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0F1D',
+    backgroundColor: colors.surfaceBase,
   },
   scroll: {
-    padding: 16,
-    paddingBottom: 40,
+    padding: spacing.s2,
+    paddingBottom: spacing.s6,
   },
   heroCard: {
-    backgroundColor: '#111A2E',
-    borderRadius: 20,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    padding: 20,
-    marginBottom: 16,
+    borderColor: colors.borderSubtle,
+    padding: spacing.s3,
+    marginBottom: spacing.s2,
   },
   heroHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.s2,
   },
   territoryEyebrow: {
-    color: '#10B981',
+    color: colors.textAccent,
     fontSize: 10,
     fontWeight: '800',
-    letterSpacing: 0.8,
-    marginBottom: 3,
+    letterSpacing: 1.2,
+    marginBottom: 4,
   },
   territoryName: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 20,
     fontWeight: '800',
     marginBottom: 4,
-    letterSpacing: -0.3,
+    letterSpacing: -0.4,
   },
   mascotLabel: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 13,
     fontWeight: '500',
   },
   healthCircle: {
-    width: 62,
-    height: 62,
-    borderRadius: 31,
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    width: 64,
+    height: 64,
+    borderRadius: radii.pill,
+    backgroundColor: colors.surfaceAccentSubtle,
     borderWidth: 2,
-    borderColor: '#10B981',
+    borderColor: colors.borderAccent,
     alignItems: 'center',
     justifyContent: 'center',
   },
   healthNumber: {
-    color: '#34D399',
-    fontSize: 19,
+    color: colors.surfaceRaised,
+    fontSize: 20,
     fontWeight: '800',
   },
   healthSub: {
-    color: '#10B981',
+    color: colors.textAccent,
     fontSize: 9,
     fontWeight: '800',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   progressBarBg: {
-    height: 8,
+    height: 6,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 4,
+    borderRadius: radii.pill,
     overflow: 'hidden',
     marginBottom: 10,
   },
   progressBarFill: {
     height: '100%',
-    backgroundColor: '#10B981',
-    borderRadius: 4,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radii.pill,
   },
   heroFooter: {
     flexDirection: 'row',
@@ -249,61 +252,65 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   heroHint: {
-    color: '#64748B',
+    color: colors.textSecondary,
     fontSize: 12,
     fontWeight: '500',
   },
   heroBadge: {
-    color: '#10B981',
-    fontSize: 10,
-    fontWeight: '800',
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
-    paddingHorizontal: 6,
+    backgroundColor: colors.surfaceAccentSubtle,
+    paddingHorizontal: 8,
     paddingVertical: 2,
-    borderRadius: 6,
-    textTransform: 'uppercase',
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.borderAccentSubtle,
+  },
+  heroBadgeText: {
+    color: colors.textAccent,
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   statsRow: {
     flexDirection: 'row',
     gap: 8,
-    marginBottom: 16,
+    marginBottom: spacing.s2,
   },
   statBox: {
     flex: 1,
-    backgroundColor: '#111A2E',
+    backgroundColor: colors.surfaceCard,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
-    borderRadius: 16,
+    borderColor: colors.borderSubtle,
+    borderRadius: radii.md,
     paddingVertical: 14,
     paddingHorizontal: 8,
     alignItems: 'center',
   },
   statVal: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 16,
     fontWeight: '800',
     marginBottom: 3,
   },
   statLabel: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 11,
     fontWeight: '600',
   },
   truckCard: {
-    backgroundColor: '#111A2E',
+    backgroundColor: colors.surfaceCard,
     borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.35)',
-    borderRadius: 18,
+    borderColor: 'rgba(0, 255, 208, 0.3)',
+    borderRadius: radii.lg,
     padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.s2,
   },
   truckIconBadge: {
-    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+    backgroundColor: colors.surfaceAccentSubtle,
     width: 44,
     height: 44,
-    borderRadius: 12,
+    borderRadius: radii.pill,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -321,7 +328,7 @@ const styles = StyleSheet.create({
     marginBottom: 3,
   },
   truckTitle: {
-    color: '#93C5FD',
+    color: colors.textPrimary,
     fontSize: 13,
     fontWeight: '700',
   },
@@ -329,61 +336,64 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    backgroundColor: '#60A5FA',
+    backgroundColor: colors.surfaceRaised,
   },
   truckMeta: {
-    color: '#64748B',
+    color: colors.textSecondary,
     fontSize: 11,
     fontWeight: '500',
   },
   truckScanBtn: {
-    backgroundColor: '#2563EB',
+    backgroundColor: colors.surfaceRaised,
     paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 10,
+    paddingHorizontal: 16,
+    borderRadius: radii.pill,
   },
   truckScanBtnText: {
-    color: '#FFFFFF',
+    color: colors.textDark,
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   checkinCard: {
-    backgroundColor: '#111A2E',
-    borderRadius: 18,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
-    padding: 16,
-    marginBottom: 20,
-    gap: 12,
+    borderColor: colors.borderSubtle,
+    padding: 18,
+    marginBottom: spacing.s3,
+    gap: 14,
   },
   checkinTextContainer: {
-    gap: 2,
+    gap: 4,
   },
   checkinTitle: {
-    color: '#F8FAFC',
-    fontSize: 15,
-    fontWeight: '700',
+    color: colors.textPrimary,
+    fontSize: 16,
+    fontWeight: '800',
   },
   checkinSubtitle: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
-    lineHeight: 16,
+    lineHeight: 17,
   },
   checkinBtn: {
-    backgroundColor: '#10B981',
-    paddingVertical: 12,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceRaised,
+    paddingVertical: 14,
+    borderRadius: radii.pill,
     alignItems: 'center',
   },
   checkinBtnDone: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: colors.surfaceSubtle,
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.4)',
+    borderColor: colors.borderSubtle,
   },
   checkinBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
+    color: colors.textDark,
+    fontWeight: '800',
     fontSize: 14,
+  },
+  checkinBtnTextDone: {
+    color: colors.textSecondary,
   },
   sectionHeader: {
     flexDirection: 'row',
@@ -392,20 +402,20 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   seeAll: {
-    color: '#10B981',
+    color: colors.textAccent,
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   taskCard: {
-    backgroundColor: '#111A2E',
-    borderRadius: 16,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
+    borderColor: colors.borderSubtle,
     padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
@@ -414,39 +424,43 @@ const styles = StyleSheet.create({
   taskIconBadge: {
     width: 42,
     height: 42,
-    borderRadius: 12,
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    borderRadius: radii.pill,
+    backgroundColor: colors.surfaceAccentSubtle,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
   },
   taskIcon: {
-    fontSize: 22,
+    fontSize: 20,
   },
   taskText: {
     flex: 1,
   },
   taskName: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
     marginBottom: 2,
   },
   taskDesc: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
   },
   taskRewardBadge: {
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    backgroundColor: colors.surfaceAccentSubtle,
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 10,
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
+    borderColor: colors.borderAccentSubtle,
+  },
+  taskRewardBounty: {
+    backgroundColor: 'rgba(245, 158, 11, 0.15)',
+    borderColor: 'rgba(245, 158, 11, 0.4)',
   },
   taskReward: {
-    color: '#34D399',
-    fontWeight: '700',
+    color: colors.textAccent,
+    fontWeight: '800',
     fontSize: 12,
   },
 });

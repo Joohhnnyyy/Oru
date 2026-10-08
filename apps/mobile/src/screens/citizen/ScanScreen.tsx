@@ -4,6 +4,7 @@ import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../context/AuthContext';
 import { AppHeader } from '../../components/AppHeader';
 import { PressableScale } from '../../components/PressableScale';
+import { colors, radii, spacing } from '../../theme/tokens';
 
 export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { updateCredits } = useAuth();
@@ -68,7 +69,7 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Bottom Fast Testing Shortcuts */}
+        {/* Bottom Testing Shortcuts */}
         <View style={styles.scanControls}>
           <Text style={styles.helperText}>Scan dynamic QR on MCD truck or static decal on smart bins</Text>
           
@@ -154,13 +155,13 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0F1D',
+    backgroundColor: colors.surfaceBase,
   },
   cameraBox: {
     flex: 1,
-    backgroundColor: '#050811',
+    backgroundColor: colors.surfaceBase,
     justifyContent: 'space-between',
-    padding: 16,
+    padding: spacing.s2,
   },
   cameraTopBar: {
     flexDirection: 'row',
@@ -171,41 +172,41 @@ const styles = StyleSheet.create({
   gpsPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(17, 26, 46, 0.85)',
+    backgroundColor: colors.surfaceCard,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 16,
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: colors.borderSubtle,
   },
   gpsDot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
-    backgroundColor: '#10B981',
+    borderRadius: radii.pill,
+    backgroundColor: colors.surfaceRaised,
     marginRight: 6,
   },
   gpsText: {
-    color: '#CBD5E1',
+    color: colors.textSecondary,
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   torchBtn: {
-    backgroundColor: 'rgba(17, 26, 46, 0.85)',
-    paddingHorizontal: 12,
+    backgroundColor: colors.surfaceCard,
+    paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 16,
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: colors.borderSubtle,
   },
   torchBtnActive: {
     backgroundColor: '#F59E0B',
     borderColor: '#FBBF24',
   },
   torchText: {
-    color: '#FFFFFF',
+    color: colors.textPrimary,
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   reticleContainer: {
     alignItems: 'center',
@@ -222,7 +223,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 32,
     height: 32,
-    borderColor: '#10B981',
+    borderColor: colors.surfaceRaised,
   },
   topLeft: {
     top: 0,
@@ -249,51 +250,53 @@ const styles = StyleSheet.create({
     borderRightWidth: 4,
   },
   reticleHint: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   scanControls: {
     alignItems: 'center',
-    paddingBottom: 24,
+    paddingBottom: spacing.s4,
   },
   helperText: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.s2,
   },
   testActions: {
     width: '100%',
     gap: 10,
   },
   simulateBtn: {
-    backgroundColor: '#10B981',
+    backgroundColor: colors.surfaceRaised,
     paddingVertical: 14,
-    borderRadius: 14,
+    borderRadius: radii.pill,
     alignItems: 'center',
   },
   binBtn: {
-    backgroundColor: '#2563EB',
+    backgroundColor: colors.surfaceCard,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
   },
   simulateBtnText: {
-    color: '#FFFFFF',
+    color: colors.textDark,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.82)',
+    backgroundColor: 'rgba(0, 0, 0, 0.88)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.s3,
   },
   resultCard: {
-    backgroundColor: '#111A2E',
-    borderRadius: 24,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 24,
+    borderColor: colors.borderSubtle,
+    padding: spacing.s4,
     width: '100%',
     maxWidth: 380,
     alignItems: 'center',
@@ -303,35 +306,35 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   resultTitle: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 20,
     fontWeight: '800',
     marginBottom: 4,
   },
   resultCredits: {
-    color: '#34D399',
-    fontSize: 24,
+    color: colors.surfaceRaised,
+    fontSize: 26,
     fontWeight: '800',
     marginBottom: 4,
   },
   resultSource: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 13,
     textAlign: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.s2,
   },
   breakdownBox: {
     width: '100%',
     backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 14,
+    borderRadius: radii.md,
+    padding: spacing.s2,
+    marginBottom: spacing.s2,
   },
   breakdownTitle: {
-    color: '#64748B',
+    color: colors.textTertiary,
     fontSize: 10,
     fontWeight: '800',
-    letterSpacing: 0.8,
+    letterSpacing: 1,
     marginBottom: 10,
   },
   breakdownRow: {
@@ -340,28 +343,28 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   breakdownLabel: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
   },
   breakdownVal: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 12,
     fontWeight: '700',
   },
   territoryImpact: {
-    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    backgroundColor: colors.surfaceAccentSubtle,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    borderRadius: 10,
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.3)',
-    marginBottom: 18,
+    borderColor: colors.borderAccentSubtle,
+    marginBottom: spacing.s3,
     width: '100%',
   },
   impactText: {
-    color: '#34D399',
+    color: colors.textAccent,
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
     textAlign: 'center',
   },
   modalButtons: {
@@ -369,14 +372,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   modalPrimaryBtn: {
-    backgroundColor: '#10B981',
-    paddingVertical: 12,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceRaised,
+    paddingVertical: 14,
+    borderRadius: radii.pill,
     alignItems: 'center',
   },
   modalPrimaryBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
+    color: colors.textDark,
+    fontWeight: '800',
     fontSize: 14,
   },
   modalSecondaryBtn: {
@@ -384,8 +387,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalSecondaryBtnText: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });

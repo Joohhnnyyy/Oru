@@ -3,6 +3,7 @@ import { View, Text, Modal, StyleSheet, ActivityIndicator } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { useAuth } from '../context/AuthContext';
 import { PressableScale } from './PressableScale';
+import { colors, radii, spacing } from '../theme/tokens';
 
 export const PhotoProofModal: React.FC<{
   visible: boolean;
@@ -90,7 +91,7 @@ export const PhotoProofModal: React.FC<{
 
           {step === 'uploading' && (
             <View style={styles.loadingBox}>
-              <ActivityIndicator size="large" color="#10B981" />
+              <ActivityIndicator size="large" color={colors.surfaceRaised} />
               <Text style={styles.loadingText}>Uploading to S3 & Running AWS Rekognition / Bedrock AI check...</Text>
             </View>
           )}
@@ -115,17 +116,17 @@ export const PhotoProofModal: React.FC<{
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.s3,
   },
   card: {
-    backgroundColor: '#111A2E',
-    borderRadius: 24,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 20,
+    borderColor: colors.borderSubtle,
+    padding: spacing.s3,
     width: '100%',
     maxWidth: 380,
   },
@@ -135,17 +136,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 18,
     fontWeight: '800',
   },
   closeBtn: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 18,
     padding: 4,
   },
   subtitle: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 13,
     marginBottom: 16,
     marginTop: 4,
@@ -155,39 +156,39 @@ const styles = StyleSheet.create({
   },
   rubricBox: {
     backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderRadius: 14,
-    padding: 14,
+    borderRadius: radii.md,
+    padding: spacing.s2,
     gap: 6,
   },
   rubricHeading: {
-    color: '#34D399',
+    color: colors.textAccent,
     fontSize: 10,
     fontWeight: '800',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
     marginBottom: 4,
   },
   rubricItem: {
-    color: '#CBD5E1',
+    color: colors.textSecondary,
     fontSize: 12,
     lineHeight: 18,
   },
   primaryBtn: {
-    backgroundColor: '#10B981',
+    backgroundColor: colors.surfaceRaised,
     paddingVertical: 14,
-    borderRadius: 14,
+    borderRadius: radii.pill,
     alignItems: 'center',
   },
   primaryBtnText: {
-    color: '#FFFFFF',
+    color: colors.textDark,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   cameraPreview: {
     height: 180,
-    backgroundColor: 'rgba(0, 0, 0, 0.4)',
-    borderRadius: 16,
+    backgroundColor: '#050505',
+    borderRadius: radii.md,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    borderColor: colors.borderSubtle,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
@@ -197,20 +198,20 @@ const styles = StyleSheet.create({
     fontSize: 40,
   },
   cameraHint: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
     textAlign: 'center',
   },
   captureBtn: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: colors.surfaceRaised,
     paddingVertical: 14,
-    borderRadius: 14,
+    borderRadius: radii.pill,
     alignItems: 'center',
   },
   captureBtnText: {
-    color: '#FFFFFF',
+    color: colors.textDark,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   buttonsRow: {
     flexDirection: 'row',
@@ -218,21 +219,21 @@ const styles = StyleSheet.create({
   },
   secondaryBtn: {
     flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    backgroundColor: colors.surfaceSubtle,
     paddingVertical: 14,
-    borderRadius: 14,
+    borderRadius: radii.pill,
     alignItems: 'center',
   },
   secondaryBtnText: {
-    color: '#CBD5E1',
+    color: colors.textPrimary,
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   primaryBtnFlex: {
     flex: 2,
-    backgroundColor: '#10B981',
+    backgroundColor: colors.surfaceRaised,
     paddingVertical: 14,
-    borderRadius: 14,
+    borderRadius: radii.pill,
     alignItems: 'center',
   },
   loadingBox: {
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   loadingText: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
     textAlign: 'center',
     lineHeight: 18,
@@ -251,19 +252,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   doneTitle: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 18,
     fontWeight: '800',
     textAlign: 'center',
   },
   doneText: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
     textAlign: 'center',
   },
   doneReward: {
-    color: '#34D399',
-    fontSize: 16,
+    color: colors.surfaceRaised,
+    fontSize: 18,
     fontWeight: '800',
     textAlign: 'center',
   },

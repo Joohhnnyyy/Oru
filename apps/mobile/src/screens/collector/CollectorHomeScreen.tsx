@@ -6,6 +6,7 @@ import { AppHeader } from '../../components/AppHeader';
 import { PressableScale } from '../../components/PressableScale';
 import { generateClientRotatingToken } from '../../utils/totp';
 import { telemetryService, TelemetryPoint } from '../../services/telemetry';
+import { colors, radii, spacing } from '../../theme/tokens';
 
 export const CollectorHomeScreen: React.FC = () => {
   const { user, switchPersona } = useAuth();
@@ -64,7 +65,7 @@ export const CollectorHomeScreen: React.FC = () => {
             haptic={false}
           >
             <View style={[styles.routeDot, isOnRoute ? styles.routeDotActive : null]} />
-            <Text style={styles.routeToggleText}>
+            <Text style={[styles.routeToggleText, isOnRoute ? styles.routeToggleTextActive : null]}>
               {isOnRoute ? 'On Route (Streaming GPS)' : 'Shift Paused'}
             </Text>
           </PressableScale>
@@ -142,11 +143,11 @@ export const CollectorHomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0F1D',
+    backgroundColor: colors.surfaceBase,
   },
   content: {
     flex: 1,
-    padding: 16,
+    padding: spacing.s2,
     justifyContent: 'space-between',
   },
   badgeRow: {
@@ -155,57 +156,60 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   sourceBadge: {
-    color: '#CBD5E1',
+    color: colors.textPrimary,
     fontSize: 14,
     fontWeight: '700',
   },
   routeToggle: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     paddingVertical: 7,
-    borderRadius: 18,
+    borderRadius: radii.pill,
     borderWidth: 1,
   },
   routeActive: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-    borderColor: '#10B981',
+    backgroundColor: colors.surfaceAccentSubtle,
+    borderColor: colors.borderAccent,
   },
   routePaused: {
-    backgroundColor: 'rgba(100, 116, 139, 0.15)',
-    borderColor: '#64748B',
+    backgroundColor: colors.surfaceSubtle,
+    borderColor: colors.borderSubtle,
   },
   routeDot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
-    backgroundColor: '#94A3B8',
+    borderRadius: radii.pill,
+    backgroundColor: colors.textTertiary,
     marginRight: 6,
   },
   routeDotActive: {
-    backgroundColor: '#10B981',
+    backgroundColor: colors.surfaceRaised,
   },
   routeToggleText: {
-    color: '#E2E8F0',
+    color: colors.textSecondary,
     fontSize: 12,
     fontWeight: '700',
   },
+  routeToggleTextActive: {
+    color: colors.textAccent,
+  },
   qrCard: {
-    backgroundColor: '#111A2E',
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.4)',
-    padding: 20,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radii.lg,
+    borderWidth: 1.5,
+    borderColor: colors.borderAccentSubtle,
+    padding: spacing.s3,
     alignItems: 'center',
   },
   qrHindiTitle: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 18,
     fontWeight: '800',
     marginBottom: 2,
   },
   qrEngSub: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
     marginBottom: 16,
   },
@@ -213,7 +217,7 @@ const styles = StyleSheet.create({
     width: 220,
     height: 220,
     backgroundColor: '#FFFFFF',
-    borderRadius: 20,
+    borderRadius: radii.lg,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
@@ -241,26 +245,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   countdownText: {
-    color: '#CBD5E1',
+    color: colors.textSecondary,
     fontSize: 13,
     fontWeight: '600',
     marginBottom: 8,
   },
   countdownSec: {
-    color: '#60A5FA',
+    color: colors.surfaceRaised,
     fontWeight: '800',
   },
   progressTrack: {
     width: '100%',
     height: 6,
     backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 3,
+    borderRadius: radii.pill,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#3B82F6',
-    borderRadius: 3,
+    backgroundColor: colors.surfaceRaised,
+    borderRadius: radii.pill,
   },
   metricsRow: {
     flexDirection: 'row',
@@ -268,46 +272,46 @@ const styles = StyleSheet.create({
   },
   metricBox: {
     flex: 1,
-    backgroundColor: '#111A2E',
+    backgroundColor: colors.surfaceCard,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
-    borderRadius: 18,
-    padding: 16,
+    borderColor: colors.borderSubtle,
+    borderRadius: radii.lg,
+    padding: spacing.s2,
     alignItems: 'center',
   },
   metricVal: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 22,
     fontWeight: '800',
     marginBottom: 2,
   },
   metricLabel: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
     fontWeight: '600',
   },
   simulateScanBtn: {
-    backgroundColor: '#10B981',
+    backgroundColor: colors.surfaceRaised,
     paddingVertical: 14,
-    borderRadius: 14,
+    borderRadius: radii.pill,
     alignItems: 'center',
   },
   simulateScanBtnText: {
-    color: '#FFFFFF',
+    color: colors.textDark,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   switchBtn: {
     backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: colors.borderSubtle,
     paddingVertical: 12,
-    borderRadius: 14,
+    borderRadius: radii.pill,
     alignItems: 'center',
   },
   switchBtnText: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
 });

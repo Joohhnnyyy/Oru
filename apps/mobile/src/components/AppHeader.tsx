@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { PersonaSwitcher } from './PersonaSwitcher';
+import { colors, radii } from '../theme/tokens';
 
 export const AppHeader: React.FC<{ title?: string }> = ({ title }) => {
   const { user, activeRole } = useAuth();
@@ -27,7 +28,7 @@ export const AppHeader: React.FC<{ title?: string }> = ({ title }) => {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#0A0F1D',
+    backgroundColor: colors.surfaceBase,
     paddingTop: 52,
     paddingBottom: 14,
     paddingHorizontal: 16,
@@ -35,19 +36,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.07)',
+    borderBottomColor: colors.borderSubtle,
   },
   titleContainer: {
     flex: 1,
   },
   logo: {
-    color: '#10B981',
-    fontSize: 19,
+    color: colors.surfaceRaised,
+    fontSize: 18,
     fontWeight: '800',
-    letterSpacing: 0.3,
+    letterSpacing: -0.3,
   },
   subtitle: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
     marginTop: 2,
     fontWeight: '500',
@@ -58,16 +59,16 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   creditsBadge: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: colors.surfaceAccentSubtle,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 14,
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.4)',
+    borderColor: colors.borderAccentSubtle,
   },
   creditsText: {
-    color: '#34D399',
+    color: colors.textAccent,
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });

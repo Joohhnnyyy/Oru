@@ -4,6 +4,7 @@ import { AppHeader } from '../../components/AppHeader';
 import { PhotoProofModal } from '../../components/PhotoProofModal';
 import { CivicQuizModal } from '../../components/CivicQuizModal';
 import { PressableScale } from '../../components/PressableScale';
+import { colors, radii, spacing } from '../../theme/tokens';
 
 const TASKS_DATA = {
   daily: [
@@ -47,7 +48,7 @@ export const TasksScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     <View style={styles.container}>
       <AppHeader title="Civic Task Board" />
 
-      {/* Period Tabs */}
+      {/* Period Tabs in Pill Container */}
       <View style={styles.tabsRow}>
         {(['daily', 'weekly', 'monthly', 'bounties'] as const).map((tab) => (
           <PressableScale
@@ -99,7 +100,7 @@ export const TasksScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 disabled={task.progress >= task.max}
                 haptic="light"
               >
-                <Text style={styles.actionBtnText}>
+                <Text style={[styles.actionBtnText, task.progress >= task.max && styles.actionBtnTextDone]}>
                   {task.progress >= task.max ? 'Completed ✓' : 'Start Task →'}
                 </Text>
               </PressableScale>
@@ -127,58 +128,58 @@ export const TasksScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0F1D',
+    backgroundColor: colors.surfaceBase,
   },
   tabsRow: {
     flexDirection: 'row',
-    backgroundColor: '#0E1626',
+    backgroundColor: colors.surfaceCard,
     padding: 6,
     gap: 4,
     borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255, 255, 255, 0.07)',
+    borderBottomColor: colors.borderSubtle,
   },
   tabBtn: {
     flex: 1,
     paddingVertical: 8,
-    borderRadius: 12,
+    borderRadius: radii.pill,
     alignItems: 'center',
   },
   tabBtnActive: {
-    backgroundColor: '#10B981',
+    backgroundColor: colors.surfaceRaised,
   },
   tabBtnText: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
-    fontWeight: '600',
-  },
-  tabBtnTextActive: {
-    color: '#FFFFFF',
     fontWeight: '700',
   },
+  tabBtnTextActive: {
+    color: colors.textDark,
+    fontWeight: '800',
+  },
   scroll: {
-    padding: 16,
-    paddingBottom: 40,
+    padding: spacing.s2,
+    paddingBottom: spacing.s6,
   },
   resetBanner: {
     backgroundColor: 'rgba(245, 158, 11, 0.12)',
     borderWidth: 1,
     borderColor: 'rgba(245, 158, 11, 0.3)',
-    borderRadius: 12,
-    padding: 10,
-    marginBottom: 16,
+    borderRadius: radii.pill,
+    padding: spacing.s1,
+    marginBottom: spacing.s2,
   },
   resetText: {
     color: '#FBBF24',
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: '700',
     textAlign: 'center',
   },
   taskCard: {
-    backgroundColor: '#111A2E',
-    borderRadius: 18,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
-    padding: 16,
+    borderColor: colors.borderSubtle,
+    padding: spacing.s3,
     marginBottom: 12,
   },
   cardHeader: {
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.06)',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 6,
+    borderRadius: radii.pill,
   },
   tierEpic: {
     backgroundColor: 'rgba(236, 72, 153, 0.15)',
@@ -199,20 +200,20 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(236, 72, 153, 0.4)',
   },
   tierText: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   tierTextEpic: {
     color: '#F472B6',
   },
   expiryText: {
-    color: '#64748B',
+    color: colors.textTertiary,
     fontSize: 11,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   taskTitle: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 15,
     fontWeight: '700',
     marginBottom: 10,
@@ -225,12 +226,13 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   methodBadge: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
+    fontWeight: '600',
   },
   rewardText: {
-    color: '#34D399',
-    fontSize: 15,
+    color: colors.surfaceRaised,
+    fontSize: 16,
     fontWeight: '800',
   },
   cardFooter: {
@@ -238,26 +240,29 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.05)',
+    borderTopColor: colors.borderSubtle,
     paddingTop: 12,
   },
   progressText: {
-    color: '#64748B',
+    color: colors.textTertiary,
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   actionBtn: {
-    backgroundColor: '#10B981',
+    backgroundColor: colors.surfaceRaised,
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 10,
+    borderRadius: radii.pill,
   },
   actionBtnDone: {
-    backgroundColor: 'rgba(16, 185, 129, 0.2)',
+    backgroundColor: colors.surfaceSubtle,
   },
   actionBtnText: {
-    color: '#FFFFFF',
+    color: colors.textDark,
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '800',
+  },
+  actionBtnTextDone: {
+    color: colors.textSecondary,
   },
 });

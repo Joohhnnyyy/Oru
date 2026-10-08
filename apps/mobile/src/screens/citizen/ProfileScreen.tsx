@@ -4,6 +4,7 @@ import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../context/AuthContext';
 import { AppHeader } from '../../components/AppHeader';
 import { PressableScale } from '../../components/PressableScale';
+import { colors, radii, spacing } from '../../theme/tokens';
 
 const DEMO_COUPONS = [
   { id: 'c1', merchant: 'Mother Dairy Safal', offer: '₹50 Off Organic Veggies', cost: 100, category: 'Grocery' },
@@ -32,7 +33,7 @@ export const ProfileScreen: React.FC<{ navigation: any }> = () => {
     <View style={styles.container}>
       <AppHeader title="Profile & Rewards" />
 
-      {/* Tab Switcher */}
+      {/* Tab Switcher in Pill Layout */}
       <View style={styles.tabsRow}>
         <PressableScale
           style={[styles.tabBtn, activeTab === 'profile' && styles.tabBtnActive]}
@@ -144,7 +145,7 @@ export const ProfileScreen: React.FC<{ navigation: any }> = () => {
                   disabled={(user?.greenCredits || 0) < coupon.cost}
                   haptic={false}
                 >
-                  <Text style={styles.redeemBtnText}>
+                  <Text style={[styles.redeemBtnText, (user?.greenCredits || 0) < coupon.cost && styles.redeemBtnTextDisabled]}>
                     {(user?.greenCredits || 0) >= coupon.cost ? 'Redeem Voucher' : 'Insufficient Credits'}
                   </Text>
                 </PressableScale>
@@ -175,109 +176,110 @@ export const ProfileScreen: React.FC<{ navigation: any }> = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0F1D',
+    backgroundColor: colors.surfaceBase,
   },
   tabsRow: {
     flexDirection: 'row',
-    backgroundColor: '#0E1626',
+    backgroundColor: colors.surfaceCard,
     padding: 6,
     marginHorizontal: 16,
     marginTop: 12,
-    borderRadius: 14,
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
+    borderColor: colors.borderSubtle,
   },
   tabBtn: {
     flex: 1,
     paddingVertical: 8,
     alignItems: 'center',
-    borderRadius: 10,
+    borderRadius: radii.pill,
   },
   tabBtnActive: {
-    backgroundColor: '#10B981',
+    backgroundColor: colors.surfaceRaised,
   },
   tabBtnText: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
     fontWeight: '700',
   },
   tabBtnTextActive: {
-    color: '#FFFFFF',
+    color: colors.textDark,
+    fontWeight: '800',
   },
   scroll: {
-    padding: 16,
-    paddingBottom: 40,
+    padding: spacing.s2,
+    paddingBottom: spacing.s6,
   },
   userCard: {
-    backgroundColor: '#111A2E',
-    borderRadius: 20,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    padding: 20,
+    borderColor: colors.borderSubtle,
+    padding: spacing.s3,
     alignItems: 'center',
     marginBottom: 16,
   },
   avatarCircle: {
     width: 68,
     height: 68,
-    borderRadius: 34,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: radii.pill,
+    backgroundColor: colors.surfaceElevated,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: colors.borderSubtle,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
   },
   avatarEmoji: {
-    fontSize: 34,
+    fontSize: 32,
   },
   userName: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 18,
     fontWeight: '800',
     marginBottom: 2,
   },
   userEmail: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
     marginBottom: 12,
   },
   rankPill: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    backgroundColor: colors.surfaceAccentSubtle,
     paddingHorizontal: 12,
     paddingVertical: 5,
-    borderRadius: 12,
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.4)',
+    borderColor: colors.borderAccentSubtle,
   },
   rankText: {
-    color: '#34D399',
+    color: colors.textAccent,
     fontSize: 12,
     fontWeight: '700',
   },
   walletCard: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: 'rgba(16, 185, 129, 0.4)',
-    padding: 20,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radii.lg,
+    borderWidth: 1.5,
+    borderColor: colors.borderAccent,
+    padding: spacing.s3,
     marginBottom: 16,
   },
   walletLabel: {
-    color: '#34D399',
+    color: colors.textAccent,
     fontSize: 11,
     fontWeight: '800',
-    letterSpacing: 0.6,
+    letterSpacing: 0.8,
     marginBottom: 4,
   },
   walletBalance: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 28,
     fontWeight: '800',
     marginBottom: 4,
   },
   xpText: {
-    color: '#A7F3D0',
+    color: colors.textSecondary,
     fontSize: 12,
   },
   statsGrid: {
@@ -288,29 +290,29 @@ const styles = StyleSheet.create({
   },
   gridBox: {
     width: '48.5%',
-    backgroundColor: '#111A2E',
+    backgroundColor: colors.surfaceCard,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
-    borderRadius: 16,
+    borderColor: colors.borderSubtle,
+    borderRadius: radii.md,
     padding: 14,
     alignItems: 'center',
   },
   gridVal: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 18,
     fontWeight: '800',
     marginBottom: 2,
   },
   gridLabel: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 11,
     fontWeight: '600',
   },
   switchRoleCard: {
-    backgroundColor: '#111A2E',
+    backgroundColor: colors.surfaceCard,
     borderWidth: 1,
-    borderColor: 'rgba(59, 130, 246, 0.35)',
-    borderRadius: 18,
+    borderColor: colors.borderSubtle,
+    borderRadius: radii.lg,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
@@ -319,45 +321,45 @@ const styles = StyleSheet.create({
   switchIconBadge: {
     width: 44,
     height: 44,
-    borderRadius: 12,
-    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    borderRadius: radii.pill,
+    backgroundColor: colors.surfaceAccentSubtle,
     alignItems: 'center',
     justifyContent: 'center',
   },
   switchIcon: {
-    fontSize: 22,
+    fontSize: 20,
   },
   switchInfo: {
     flex: 1,
   },
   switchTitle: {
-    color: '#93C5FD',
+    color: colors.textPrimary,
     fontSize: 14,
     fontWeight: '700',
     marginBottom: 2,
   },
   switchSub: {
-    color: '#64748B',
+    color: colors.textSecondary,
     fontSize: 11,
     lineHeight: 15,
   },
   switchArrow: {
-    color: '#3B82F6',
+    color: colors.surfaceRaised,
     fontSize: 20,
     fontWeight: '700',
   },
   sectionHeading: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 16,
     fontWeight: '700',
     marginBottom: 12,
   },
   couponCard: {
-    backgroundColor: '#111A2E',
-    borderRadius: 16,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
-    padding: 16,
+    borderColor: colors.borderSubtle,
+    padding: spacing.s3,
     marginBottom: 12,
   },
   couponHeader: {
@@ -367,66 +369,69 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   merchantName: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 15,
     fontWeight: '700',
   },
   couponCost: {
-    color: '#34D399',
+    color: colors.surfaceRaised,
     fontSize: 14,
     fontWeight: '800',
   },
   couponOffer: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 13,
     marginBottom: 14,
   },
   redeemBtn: {
-    backgroundColor: '#10B981',
-    paddingVertical: 10,
-    borderRadius: 12,
+    backgroundColor: colors.surfaceRaised,
+    paddingVertical: 12,
+    borderRadius: radii.pill,
     alignItems: 'center',
   },
   redeemBtnDisabled: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: colors.surfaceSubtle,
   },
   redeemBtnText: {
-    color: '#FFFFFF',
+    color: colors.textDark,
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
+  },
+  redeemBtnTextDisabled: {
+    color: colors.textTertiary,
   },
   voucherCard: {
-    backgroundColor: '#111A2E',
-    borderRadius: 16,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.07)',
-    padding: 18,
+    borderColor: colors.borderSubtle,
+    padding: spacing.s4,
     marginBottom: 12,
     alignItems: 'center',
   },
   voucherMerchant: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 12,
     fontWeight: '600',
     marginBottom: 8,
   },
   codeContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    paddingHorizontal: 20,
+    backgroundColor: colors.surfaceElevated,
+    paddingHorizontal: 22,
     paddingVertical: 10,
-    borderRadius: 12,
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: colors.borderAccentSubtle,
     marginBottom: 8,
   },
   voucherCode: {
-    color: '#34D399',
+    color: colors.surfaceRaised,
     fontSize: 18,
     fontWeight: '800',
     letterSpacing: 2,
   },
   voucherHint: {
-    color: '#64748B',
+    color: colors.textTertiary,
     fontSize: 11,
   },
 });

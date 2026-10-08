@@ -3,6 +3,7 @@ import { View, Text, Modal, StyleSheet } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { useAuth } from '../context/AuthContext';
 import { PressableScale } from './PressableScale';
+import { colors, radii, spacing } from '../theme/tokens';
 
 const QUIZ_QUESTIONS = [
   {
@@ -86,7 +87,7 @@ export const CivicQuizModal: React.FC<{
           {!finished ? (
             <View style={styles.body}>
               <Text style={styles.counter}>
-                Question {qIndex + 1} of {QUIZ_QUESTIONS.length}
+                QUESTION {qIndex + 1} OF {QUIZ_QUESTIONS.length}
               </Text>
               <Text style={styles.questionText}>{currentQ.question}</Text>
 
@@ -109,7 +110,9 @@ export const CivicQuizModal: React.FC<{
                       disabled={showExplanation}
                       haptic={false}
                     >
-                      <Text style={styles.optionText}>{opt}</Text>
+                      <Text style={[styles.optionText, showExplanation && idx === currentQ.correct && styles.optionTextCorrect]}>
+                        {opt}
+                      </Text>
                     </PressableScale>
                   );
                 })}
@@ -132,7 +135,7 @@ export const CivicQuizModal: React.FC<{
               <Text style={styles.doneEmoji}>🏆</Text>
               <Text style={styles.doneTitle}>Quiz Completed!</Text>
               <Text style={styles.doneScore}>Daily Habit Score: 100%</Text>
-              <Text style={styles.doneReward}>+25 Green Credits Added to Wallet</Text>
+              <Text style={styles.doneReward}>+25 Green Credits Added</Text>
               <PressableScale style={styles.finishBtn} onPress={handleClose} haptic="light">
                 <Text style={styles.finishBtnText}>Collect Reward & Close</Text>
               </PressableScale>
@@ -147,17 +150,17 @@ export const CivicQuizModal: React.FC<{
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    backgroundColor: 'rgba(0, 0, 0, 0.9)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.s3,
   },
   card: {
-    backgroundColor: '#111A2E',
-    borderRadius: 24,
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radii.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
-    padding: 22,
+    borderColor: colors.borderSubtle,
+    padding: spacing.s4,
     width: '100%',
     maxWidth: 380,
   },
@@ -168,12 +171,12 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   title: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 18,
     fontWeight: '800',
   },
   closeBtn: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 18,
     padding: 4,
   },
@@ -181,13 +184,13 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   counter: {
-    color: '#10B981',
+    color: colors.textAccent,
     fontSize: 11,
     fontWeight: '800',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   questionText: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 16,
     fontWeight: '700',
     lineHeight: 22,
@@ -197,59 +200,63 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   optionBtn: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: colors.surfaceElevated,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: 14,
+    borderColor: colors.borderSubtle,
+    borderRadius: radii.md,
     padding: 14,
   },
   optionCorrect: {
-    backgroundColor: 'rgba(16, 185, 129, 0.15)',
-    borderWidth: 1,
-    borderColor: '#10B981',
-    borderRadius: 14,
+    backgroundColor: colors.surfaceAccentSubtle,
+    borderWidth: 1.5,
+    borderColor: colors.borderAccent,
+    borderRadius: radii.md,
     padding: 14,
   },
   optionWrong: {
     backgroundColor: 'rgba(239, 68, 68, 0.15)',
-    borderWidth: 1,
-    borderColor: '#EF4444',
-    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: colors.error,
+    borderRadius: radii.md,
     padding: 14,
   },
   optionText: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 14,
     fontWeight: '600',
   },
+  optionTextCorrect: {
+    color: colors.textAccent,
+    fontWeight: '800',
+  },
   tipBox: {
     backgroundColor: 'rgba(255, 255, 255, 0.04)',
-    borderRadius: 14,
-    padding: 14,
+    borderRadius: radii.md,
+    padding: spacing.s2,
     gap: 8,
     marginTop: 6,
   },
   tipLabel: {
     color: '#FBBF24',
     fontSize: 11,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   tipText: {
-    color: '#CBD5E1',
+    color: colors.textSecondary,
     fontSize: 12,
     lineHeight: 18,
   },
   nextBtn: {
-    backgroundColor: '#10B981',
+    backgroundColor: colors.surfaceRaised,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: radii.pill,
     alignItems: 'center',
     marginTop: 4,
   },
   nextBtnText: {
-    color: '#FFFFFF',
+    color: colors.textDark,
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '800',
   },
   doneBody: {
     alignItems: 'center',
@@ -260,31 +267,31 @@ const styles = StyleSheet.create({
     fontSize: 52,
   },
   doneTitle: {
-    color: '#F8FAFC',
+    color: colors.textPrimary,
     fontSize: 20,
     fontWeight: '800',
   },
   doneScore: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 13,
   },
   doneReward: {
-    color: '#34D399',
-    fontSize: 15,
+    color: colors.surfaceRaised,
+    fontSize: 18,
     fontWeight: '800',
   },
   finishBtn: {
-    backgroundColor: '#10B981',
+    backgroundColor: colors.surfaceRaised,
     paddingVertical: 14,
     paddingHorizontal: 24,
-    borderRadius: 14,
+    borderRadius: radii.pill,
     marginTop: 8,
     width: '100%',
     alignItems: 'center',
   },
   finishBtnText: {
-    color: '#FFFFFF',
+    color: colors.textDark,
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: '800',
   },
 });

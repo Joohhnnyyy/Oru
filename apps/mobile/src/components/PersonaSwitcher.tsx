@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { PressableScale } from './PressableScale';
+import { colors, radii } from '../theme/tokens';
 
 export const PersonaSwitcher: React.FC = () => {
   const { activeRole, switchPersona } = useAuth();
@@ -38,21 +39,21 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0F172A',
+    backgroundColor: colors.surfaceCard,
     paddingVertical: 3,
     paddingHorizontal: 6,
-    borderRadius: 24,
+    borderRadius: radii.pill,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.1)',
+    borderColor: colors.borderSubtle,
   },
   label: {
-    color: '#64748B',
-    fontSize: 11,
-    fontWeight: '700',
+    color: colors.textTertiary,
+    fontSize: 10,
+    fontWeight: '800',
     marginRight: 6,
-    marginLeft: 4,
+    marginLeft: 6,
     textTransform: 'uppercase',
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
   buttonsRow: {
     flexDirection: 'row',
@@ -61,19 +62,19 @@ const styles = StyleSheet.create({
   btn: {
     paddingVertical: 5,
     paddingHorizontal: 12,
-    borderRadius: 16,
+    borderRadius: radii.pill,
     backgroundColor: 'transparent',
   },
   activeBtn: {
-    backgroundColor: '#10B981',
+    backgroundColor: colors.surfaceRaised,
   },
   btnText: {
-    color: '#94A3B8',
+    color: colors.textSecondary,
     fontSize: 11,
     fontWeight: '600',
   },
   activeBtnText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
+    color: colors.textDark,
+    fontWeight: '800',
   },
 });
