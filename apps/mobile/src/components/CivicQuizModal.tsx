@@ -27,6 +27,8 @@ const QUIZ_QUESTIONS = [
 ];
 
 import { Icon3D } from './Icon3D';
+import { Blobatar } from './Blobatar';
+import { AvatarAnimationKey } from '../avatar/avatarRuntimeSource';
 
 export const CivicQuizModal: React.FC<{
   visible: boolean;
@@ -38,6 +40,7 @@ export const CivicQuizModal: React.FC<{
   const [showExplanation, setShowExplanation] = useState(false);
   const [, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [avatarAnim, setAvatarAnim] = useState<AvatarAnimationKey>('thinking');
 
   const currentQ = QUIZ_QUESTIONS[qIndex];
 
@@ -46,8 +49,10 @@ export const CivicQuizModal: React.FC<{
     if (idx === currentQ.correct) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       setScore((s) => s + 1);
+      setAvatarAnim('proud');
     } else {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      setAvatarAnim('confused');
     }
     setSelectedOpt(idx);
     setShowExplanation(true);
@@ -59,9 +64,11 @@ export const CivicQuizModal: React.FC<{
     if (qIndex < QUIZ_QUESTIONS.length - 1) {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
       setQIndex(qIndex + 1);
+      setAvatarAnim('thinking');
     } else {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       setFinished(true);
+      setAvatarAnim('celebrate');
       updateCredits(25);
     }
   };
@@ -72,6 +79,7 @@ export const CivicQuizModal: React.FC<{
     setShowExplanation(false);
     setScore(0);
     setFinished(false);
+    setAvatarAnim('thinking');
     onClose();
   };
 
@@ -80,10 +88,35 @@ export const CivicQuizModal: React.FC<{
       <View style={styles.overlay}>
         <View style={styles.card}>
           <View style={styles.headerRow}>
-            <Text style={styles.title}>Civic Waste Segregation Quiz</Text>
+            <Text style={styles.title}>Civic Waste Quiz</Text>
             <PressableScale onPress={handleClose} haptic="light">
               <Text style={styles.closeBtn}>✕</Text>
             </PressableScale>
+          </View>
+
+          {/* Interactive Blobatar Buddy Bar */}
+          <View style={styles.quizBuddyRow}>
+            <View style={styles.quizAvatarBox}>
+              <Blobatar
+                preset="nova"
+                animation={finished ? 'celebrate' : avatarAnim}
+                size={54}
+                interactive={true}
+                onPress={() => setAvatarAnim('laughing')}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.quizBuddyTitle}>Nova • Civic Quiz Companion</Text>
+              <Text style={styles.quizBuddySubtitle}>
+                {finished
+                  ? 'Territory certified! +25 GC unlocked!'
+                  : showExplanation
+                  ? selectedOpt === currentQ.correct
+                    ? 'Spot on! High five!'
+                    : 'Oops! Check the civic tip below.'
+                  : 'Pondering this civic question... Tap me to play!'}
+              </Text>
+            </View>
           </View>
 
           {!finished ? (
@@ -135,7 +168,7 @@ export const CivicQuizModal: React.FC<{
           ) : (
             <View style={styles.doneBody}>
               <View style={{ alignItems: 'center', marginVertical: 8 }}>
-                <Icon3D name="shield" size={60} />
+                <Blobatar preset="nova" animation="celebrate" size={88} interactive={true} />
               </View>
               <Text style={styles.doneTitle}>Quiz Completed!</Text>
               <Text style={styles.doneScore}>Daily Habit Score: 100%</Text>
@@ -177,7 +210,35 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
+  },
+  quizBuddyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceElevated,
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    padding: 10,
+    marginBottom: 14,
+    gap: 12,
+  },
+  quizAvatarBox: {
+    width: 56,
+    height: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quizBuddyTitle: {
+    color: colors.textPrimary,
+    fontSize: 13,
+    fontWeight: '800',
+    marginBottom: 2,
+  },
+  quizBuddySubtitle: {
+    color: colors.textSecondary,
+    fontSize: 11,
+    lineHeight: 15,
   },
   title: {
     color: colors.textPrimary,

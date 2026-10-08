@@ -7,6 +7,7 @@ import { PressableScale } from '../../components/PressableScale';
 import { colors, radii, spacing } from '../../theme/tokens';
 
 import { Icon3D } from '../../components/Icon3D';
+import { Blobatar } from '../../components/Blobatar';
 
 export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { updateCredits } = useAuth();
@@ -71,6 +72,17 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           </View>
         </View>
 
+        {/* Scan Assistant Blobatar */}
+        <View style={styles.scannerBuddyBox}>
+          <Blobatar
+            preset="citrus"
+            animation="searching"
+            size={52}
+            interactive={true}
+          />
+          <Text style={styles.scannerBuddyText}>Citrus is scouting for smart bin & MCD truck QR codes...</Text>
+        </View>
+
         {/* Bottom Testing Shortcuts */}
         <View style={styles.scanControls}>
           <Text style={styles.helperText}>Scan dynamic QR on MCD truck or static decal on smart bins</Text>
@@ -102,7 +114,12 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         <View style={styles.modalOverlay}>
           <View style={styles.resultCard}>
             <View style={styles.celebrateWrapper}>
-              <Icon3D name="credit" size={64} />
+              <Blobatar
+                preset="citrus"
+                animation="celebrate"
+                size={84}
+                interactive={true}
+              />
             </View>
             <Text style={styles.resultTitle}>Action Verified!</Text>
             <Text style={styles.resultCredits}>+{scanResult?.credits} Green Credits</Text>
@@ -313,9 +330,32 @@ const styles = StyleSheet.create({
     elevation: 10,
   },
   celebrateWrapper: {
-    marginBottom: 12,
+    marginBottom: 8,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  scannerBuddyBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surfaceCard,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginHorizontal: 16,
+    gap: 10,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  scannerBuddyText: {
+    flex: 1,
+    color: colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '600',
   },
   resultTitle: {
     color: colors.textPrimary,

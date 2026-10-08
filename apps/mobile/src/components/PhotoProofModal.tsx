@@ -6,6 +6,7 @@ import { PressableScale } from './PressableScale';
 import { colors, radii, spacing } from '../theme/tokens';
 
 import { Icon3D } from './Icon3D';
+import { Blobatar } from './Blobatar';
 
 export const PhotoProofModal: React.FC<{
   visible: boolean;
@@ -93,15 +94,18 @@ export const PhotoProofModal: React.FC<{
 
           {step === 'uploading' && (
             <View style={styles.loadingBox}>
-              <ActivityIndicator size="large" color={colors.surfaceRaised} />
-              <Text style={styles.loadingText}>Uploading to S3 & Running AWS Rekognition / Bedrock AI check...</Text>
+              <View style={{ alignItems: 'center', marginBottom: 12 }}>
+                <Blobatar preset="safari-mint" animation="working" size={72} />
+              </View>
+              <ActivityIndicator size="small" color={colors.surfaceRaised} />
+              <Text style={styles.loadingText}>Uploading to S3 & Running AWS Bedrock AI multimodal audit...</Text>
             </View>
           )}
 
           {step === 'done' && (
             <View style={styles.content}>
               <View style={{ alignItems: 'center', marginVertical: 6 }}>
-                <Icon3D name="credit" size={60} />
+                <Blobatar preset="safari-mint" animation="celebrate" size={84} interactive={true} />
               </View>
               <Text style={styles.doneTitle}>Proof Verified by AI!</Text>
               <Text style={styles.doneText}>Bedrock verified source segregation confidence at 98.4%.</Text>

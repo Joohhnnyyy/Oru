@@ -13,11 +13,43 @@ const DEMO_COUPONS = [
 ];
 
 import { Icon3D } from '../../components/Icon3D';
+import { Blobatar } from '../../components/Blobatar';
+import { AvatarPresetKey, AvatarAnimationKey } from '../../avatar/avatarRuntimeSource';
+
+const PRESET_OPTIONS: { id: AvatarPresetKey; name: string; tag: string }[] = [
+  { id: 'safari-mint', name: 'Safari Mint', tag: 'Eco Guardian' },
+  { id: 'strobi', name: 'Strobi', tag: 'Classic Blue' },
+  { id: 'freddy', name: 'Freddy', tag: 'Warm Orange' },
+  { id: 'citrus', name: 'Citrus', tag: 'Sun Spark' },
+  { id: 'nova', name: 'Nova', tag: 'Teal Byte' },
+  { id: 'kirby', name: 'Kirby', tag: 'Soft Bloom' },
+  { id: 'sunee', name: 'Sunee', tag: 'Amber Glow' },
+  { id: 'cloudee', name: 'Cloudee', tag: 'Mist Feather' },
+  { id: 'cubee', name: 'Cubee', tag: 'Ruby Poly' },
+  { id: 'grok-bot', name: 'Grok Bot', tag: 'Night Scout' },
+  { id: 'onee', name: 'Onee', tag: 'Pale Frost' },
+];
+
+const PLAYFUL_CYCLE: AvatarAnimationKey[] = ['playful', 'excited', 'laughing', 'celebrate', 'proud', 'happy', 'curious'];
 
 export const ProfileScreen: React.FC<{ navigation: any }> = () => {
   const { user, updateCredits, switchPersona } = useAuth();
   const [activeTab, setActiveTab] = useState<'profile' | 'coupons' | 'vouchers'>('profile');
   const [redeemedVouchers, setRedeemedVouchers] = useState<string[]>(['SAFAL-GREEN-9281']);
+  const [selectedPreset, setSelectedPreset] = useState<AvatarPresetKey>('safari-mint');
+  const [avatarAnim, setAvatarAnim] = useState<AvatarAnimationKey>('proud');
+
+  const handleAvatarTap = () => {
+    const nextIdx = (PLAYFUL_CYCLE.indexOf(avatarAnim) + 1) % PLAYFUL_CYCLE.length;
+    setAvatarAnim(PLAYFUL_CYCLE[nextIdx]);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+  };
+
+  const handleSelectPreset = (p: AvatarPresetKey) => {
+    setSelectedPreset(p);
+    setAvatarAnim('excited');
+    Haptics.selectionAsync().catch(() => {});
+  };
 
   const handleRedeem = (coupon: typeof DEMO_COUPONS[0]) => {
     if (!user || user.greenCredits < coupon.cost) {
@@ -71,15 +103,47 @@ export const ProfileScreen: React.FC<{ navigation: any }> = () => {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {activeTab === 'profile' && (
           <>
-            {/* User Info Card */}
+            {/* User Info Card with Blobatar Avatar */}
             <View style={styles.userCard}>
-              <View style={styles.avatarCircle}>
-                <Icon3D name="profile" size={54} />
+              <View style={styles.avatarBlobWrapper}>
+                <Blobatar
+                  preset={selectedPreset}
+                  animation={avatarAnim}
+                  size={100}
+                  interactive={true}
+                  onPress={handleAvatarTap}
+                />
               </View>
+              <Text style={styles.avatarTapHint}>Tap companion to play • Current mood: {avatarAnim}</Text>
               <Text style={styles.userName}>{user?.displayName}</Text>
               <Text style={styles.userEmail}>{user?.email}</Text>
               <View style={styles.rankPill}>
                 <Text style={styles.rankText}>Level {user?.level} • {user?.rankTitle}</Text>
+              </View>
+
+              {/* Horizontal Avatar Preset Selector */}
+              <View style={styles.presetSelectorSection}>
+                <Text style={styles.presetSelectorTitle}>CHOOSE CIVIC COMPANION</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.presetsList}>
+                  {PRESET_OPTIONS.map((item) => {
+                    const isSelected = item.id === selectedPreset;
+                    return (
+                      <PressableScale
+                        key={item.id}
+                        style={[styles.presetChip, isSelected && styles.presetChipActive]}
+                        onPress={() => handleSelectPreset(item.id)}
+                        haptic="light"
+                      >
+                        <Text style={[styles.presetChipName, isSelected && styles.presetChipNameActive]}>
+                          {item.name}
+                        </Text>
+                        <Text style={[styles.presetChipTag, isSelected && styles.presetChipTagActive]}>
+                          {item.tag}
+                        </Text>
+                      </PressableScale>
+                    );
+                  })}
+                </ScrollView>
               </View>
             </View>
 
@@ -234,6 +298,69 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
+  },
+  avatarBlobWrapper: {
+    width: 104,
+    height: 104,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  avatarTapHint: {
+    color: colors.textAccent,
+    fontSize: 11,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  presetSelectorSection: {
+    width: '100%',
+    marginTop: 14,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.borderSubtle,
+  },
+  presetSelectorTitle: {
+    color: colors.textSecondary,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  presetsList: {
+    gap: 8,
+    paddingHorizontal: 4,
+  },
+  presetChip: {
+    backgroundColor: colors.surfaceElevated,
+    borderWidth: 1,
+    borderColor: colors.borderSubtle,
+    borderRadius: radii.md,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+  },
+  presetChipActive: {
+    backgroundColor: colors.surfaceRaised,
+    borderColor: colors.borderAccent,
+  },
+  presetChipName: {
+    color: colors.textPrimary,
+    fontSize: 12,
+    fontWeight: '700',
+  },
+  presetChipNameActive: {
+    color: colors.textDark,
+    fontWeight: '800',
+  },
+  presetChipTag: {
+    color: colors.textSecondary,
+    fontSize: 9,
+    fontWeight: '500',
+  },
+  presetChipTagActive: {
+    color: colors.textDark,
+    fontWeight: '600',
   },
   avatarEmoji: {
     fontSize: 32,

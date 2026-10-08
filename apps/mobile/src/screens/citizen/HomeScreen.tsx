@@ -5,16 +5,20 @@ import { useAuth } from '../../context/AuthContext';
 import { AppHeader } from '../../components/AppHeader';
 import { PressableScale } from '../../components/PressableScale';
 import { Icon3D } from '../../components/Icon3D';
+import { Blobatar } from '../../components/Blobatar';
+import { AvatarAnimationKey } from '../../avatar/avatarRuntimeSource';
 import { colors, radii, spacing } from '../../theme/tokens';
 
 export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { user, updateCredits } = useAuth();
   const [streakChecked, setStreakChecked] = useState(false);
+  const [avatarAnim, setAvatarAnim] = useState<AvatarAnimationKey>('playful');
 
   const handleQuickCheckin = () => {
     if (streakChecked) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     setStreakChecked(true);
+    setAvatarAnim('celebrate');
     updateCredits(15);
   };
 
@@ -28,14 +32,19 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         {/* Territory Hero Card */}
         <View style={styles.heroCard}>
           <View style={styles.heroHeader}>
-            <View>
+            <View style={{ flex: 1 }}>
               <Text style={styles.territoryEyebrow}>TERRITORY STATUS</Text>
               <Text style={styles.territoryName}>{user?.territoryName || 'MCD South 34'}</Text>
-              <Text style={styles.mascotLabel}>Gangetic Dolphin Sanctuary • Recovering</Text>
+              <Text style={styles.mascotLabel}>Ward Eco Companion • Recovering</Text>
             </View>
-            <View style={styles.healthCircle}>
-              <Text style={styles.healthNumber}>72</Text>
-              <Text style={styles.healthSub}>HEALTH</Text>
+            <View style={styles.avatarHeroWrapper}>
+              <Blobatar
+                preset="safari-mint"
+                animation={avatarAnim}
+                size={78}
+                interactive={true}
+                onPress={() => setAvatarAnim('laughing')}
+              />
             </View>
           </View>
 
@@ -222,6 +231,12 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     fontSize: 13,
     fontWeight: '500',
+  },
+  avatarHeroWrapper: {
+    width: 84,
+    height: 84,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   healthCircle: {
     width: 64,
