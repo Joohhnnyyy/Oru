@@ -9,7 +9,7 @@ frontend:
         - pnpm --filter @saafsafari/game-rules build
     build:
       commands:
-        - pnpm --filter @saafsafari/web build
+        - pnpm --filter oru build
   artifacts:
     baseDirectory: apps/web/dist
     files:
