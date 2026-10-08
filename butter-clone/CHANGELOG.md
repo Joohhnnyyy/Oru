@@ -1,0 +1,29 @@
+# Changelog
+
+- 2026-10-08: Fixed the hero's overlapping desktop columns and replaced the incorrect city panorama with the local Butter keychain artwork; adjusted headline sizing to stay on two lines at tablet and desktop widths.
+- Added reduced-motion-aware GSAP hero entrance/float/pointer tilt and one-time staggered section reveals with cleanup.
+- Updated: `src/sections/Hero.tsx`, `src/sections/HeroSection/components/HeroContent.tsx`, `src/sections/HeroSection/components/HeroMedia.tsx`, `src/components/layout/MainContent.tsx`, `src/hooks/useHomeMotion.ts`, `CODER.md`.
+- Validation: `pnpm build` passes; browser check confirms the keychain image loads and is visible, the headline stays two lines on mobile, and the page has no horizontal overflow.
+- 2026-10-08: Configured the `@/` source alias consistently in Vite and TypeScript while preserving Tailwind, `public/`, and existing base behavior.
+- Updated: `vite.config.ts`, `tsconfig.app.json`, `CODER.md`.
+- Pattern: Resolve Vite aliases from `import.meta.url` for ESM compatibility and mirror them with TypeScript `paths`.
+- 2026-10-08: Added strict app-level TypeScript checks from the supplied config while retaining the project's ES2023 target; root tsconfig references already matched.
+- Updated: `tsconfig.app.json`, `CODER.md`.
+- Validation: `pnpm build` passes with strict checking enabled.
+- 2026-10-08: Ported class-based dark mode and radius tokens into Tailwind v4; adapted hover/pause motion styles to current components with reduced-motion handling.
+- Updated: `src/index.css`, `src/components/Navbar.tsx`, `src/sections/TemplatesSection/components/TemplatesCarousel.tsx`, `CODER.md`.
+- Pattern: CSS motion selectors target real app class names and disable transitions/transforms when reduced motion is requested.
+- 2026-10-08: Added four actionable suggestion-chip tasks for asset localization, motion QA, accordion/media synchronization, and SEO/performance.
+- Updated: `TASKS.md`, `CODER.md`.
+- Pattern: Wrap task-chip entries in `<task id="stable-id">` tags; keep user-provided stack snippets distinct from the active app configuration.
+- Note: The pasted Anima starter config targets React 18/Vite 6/Tailwind 3, while this project uses React 19/Vite 8/Tailwind 4.
+- 2026-10-08: Added `DATABASE.md` to capture the project's no-persistence decision for transient UI and animation state.
+- Updated: `DATABASE.md`.
+- Pattern: Keep ephemeral presentation and playback state client-side; do not add database storage without a durable data requirement.
+- 2026-10-08: Added `CODER.md` with verified project structure, import, media, styling, and build conventions.
+- Updated: `CODER.md`.
+- Pattern: Keep newest dated notes first; use local public assets and relative imports in this Vite app.
+- 2026-10-08: Added a responsive, horizontally scrollable Templates carousel with eight local preview clips.
+- Updated: `src/sections/Templates.tsx`, `src/sections/TemplatesSection/components/TemplatesHeader.tsx`, `src/sections/TemplatesSection/components/TemplatesCarousel.tsx`.
+- Preserved the existing “Get the look” gallery as a separate section.
+- Pattern: Reuse `LazyVideo` for local video and respect reduced motion for smooth-scroll controls.

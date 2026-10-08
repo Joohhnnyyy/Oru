@@ -1,0 +1,13 @@
+- Homepage entrance and section reveals are initialized in `src/hooks/useHomeMotion.ts` using the existing GSAP/ScrollTrigger setup; this hook cleans up listeners and animations and skips them when reduced motion is enabled.
+- Hero artwork should use the local keychain image, not `/images/hero/city.jpg` or `/images/hero/hero_fallback.png` (both are city panoramas); hero text and media occupy separate desktop grid columns.
+- Validate hero changes at desktop and mobile widths in the local browser in addition to running `pnpm build`; the 237 MB Screen Sketch recording is not available to the browser/file viewer.
+## 2026-10-08
+- App uses React, TypeScript, Vite, and Tailwind CSS v4; run `pnpm build` for TypeScript and production-build validation.
+- Entry flow: `src/main.tsx` mounts the default `App` from `#root`; `src/App.tsx` renders `PageShell`.
+- Page composition lives in `src/components/layout/MainContent.tsx`; page sections are composed from `src/sections/`.
+- Vite and `tsconfig.app.json` configure `@/` to resolve from `src/`; use it for source imports and root-absolute URLs (for example `/videos/clip.mp4`) for files in `public/`.
+- Use `LazyVideo` for looping local clips; it pauses videos outside the viewport and respects reduced-motion preference.
+- Shared design tokens and global styles are in `src/index.css`; Tailwind theme colors include `butter-black`, `butter-white`, and `butter-charcoal`.
+- Pasted Anima setup snippets describe a different stack (React 18, Vite 6, Tailwind 3, `#app`); do not replace this workspace's React 19, Vite 8, Tailwind 4, `#root`, or Vite Tailwind plugin configuration with them.
+- Tailwind v4 `@custom-variant dark` and `@theme` tokens belong in `src/index.css`; custom browser motion styles should target the app's actual component classes and include reduced-motion overrides.
+- App and Vite-config TypeScript checks enable `strict`, `isolatedModules`, and `noUncheckedSideEffectImports`; keep the established ES2023 target and NodeNext config module resolution.

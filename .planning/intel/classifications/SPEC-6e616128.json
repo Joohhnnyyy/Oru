@@ -1,0 +1,24 @@
+{
+  "source_path": "C:/Users/Asmi/OneDrive/Desktop/oru/SPEC.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "Butter Video Landing Page Clone",
+  "summary": "Rebuild the Butter marketing homepage as a responsive React and TypeScript learning clone with its sections, local media, and motion.",
+  "scope": [
+    "React and TypeScript single-page marketing site",
+    "Responsive homepage layout and section composition",
+    "GSAP and ScrollTrigger animations with reduced-motion support",
+    "Lenis smooth scrolling and viewport-controlled video playback",
+    "Local images, videos, logos, and keychain models",
+    "Project conventions, dependencies, and pre-publication branding requirements"
+  ],
+  "cross_refs": [
+    "migration-docs/layout.md",
+    "migration-docs/animations.md",
+    "migration-docs/assets.md",
+    "migration-docs/design-tokens.md"
+  ],
+  "locked": false,
+  "precedence": 1
+}
