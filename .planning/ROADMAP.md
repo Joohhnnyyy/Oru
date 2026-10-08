@@ -99,9 +99,9 @@ Following a strict **Backend-First Development Strategy** (DEC-11), all cloud in
 **Depends on**: Phase 5 (Backend Complete)
 **Requirements**: AUTH-01, QR-01, QR-02, COL-01, COL-02, TRK-01
 **Plans**: 3 plans
-- [ ] 07-01: Expo mobile app setup, Cognito auth integration, and home territory map screen.
-- [ ] 07-02: Camera QR scanner, task completion flow, and photo proof submission.
-- [ ] 07-03: Collector Mode with rotating HMAC QR generator, Amazon Location background GPS streaming, and EAS APK build.
+- [x] 07-01: Expo mobile app setup, Cognito auth integration, navigation shell, and onboarding flow.
+- [x] 07-02: Citizen mobile experience: Home hero, territory map, camera QR scanner, task board, and wallet/coupons.
+- [x] 07-03: Collector mode with rotating HMAC QR generator, Amazon Location background GPS streaming, and EAS APK build.
 
 ### Phase 8: Demo Rehearsal & Submission Polish
 **Goal**: Full end-to-end rehearsal across mobile, web, and municipal console; recording of the 3-minute demo video; architecture diagram asset generation; and AWS Builder Center blog post draft.

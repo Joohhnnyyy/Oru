@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "SaafSafari",
+    "slug": "saafsafari",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "backgroundColor": "#0F172A"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.saafsafari.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#0F172A"
+      },
+      "package": "com.saafsafari.app",
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE"
+      ]
+    },
+    "extra": {
+      "apiUrl": "https://dp029jx9uf.execute-api.ap-south-1.amazonaws.com",
+      "cognitoUserPoolId": "ap-south-1_KZcMN2CaO",
+      "cognitoClientId": "2g4b36dekkv7f0lu9ad4h4s7oa"
+    }
+  }
+}
