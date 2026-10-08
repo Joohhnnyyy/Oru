@@ -1,12 +1,13 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 
 import { HomeScreen } from '../screens/citizen/HomeScreen';
 import { MapScreen } from '../screens/citizen/MapScreen';
 import { ScanScreen } from '../screens/citizen/ScanScreen';
 import { TasksScreen } from '../screens/citizen/TasksScreen';
 import { ProfileScreen } from '../screens/citizen/ProfileScreen';
+import { Icon3D } from '../components/Icon3D';
 import { colors, radii } from '../theme/tokens';
 
 const Tab = createBottomTabNavigator();
@@ -20,14 +21,19 @@ export const CitizenTabs: React.FC = () => {
         headerShown: false,
         animation: 'none',
         tabBarStyle: {
-          backgroundColor: colors.surfaceBase,
+          backgroundColor: '#FFFFFF',
           borderTopColor: colors.borderSubtle,
           borderTopWidth: 1,
-          height: 70,
-          paddingBottom: 12,
+          height: 72,
+          paddingBottom: 10,
           paddingTop: 8,
+          shadowColor: '#000000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 8,
+          elevation: 6,
         },
-        tabBarActiveTintColor: colors.surfaceRaised,
+        tabBarActiveTintColor: colors.textPrimary,
         tabBarInactiveTintColor: colors.textTertiary,
         tabBarLabelStyle: {
           fontSize: 11,
@@ -40,7 +46,7 @@ export const CitizenTabs: React.FC = () => {
         component={HomeScreen}
         options={{
           tabBarLabel: 'Home',
-          tabBarIcon: () => <Text style={{ fontSize: 18 }}>🏠</Text>,
+          tabBarIcon: () => <Icon3D name="home" size={26} />,
         }}
       />
       <TabScreen
@@ -48,7 +54,7 @@ export const CitizenTabs: React.FC = () => {
         component={MapScreen}
         options={{
           tabBarLabel: 'Map',
-          tabBarIcon: () => <Text style={{ fontSize: 18 }}>🗺️</Text>,
+          tabBarIcon: () => <Icon3D name="map" size={26} />,
         }}
       />
       <TabScreen
@@ -58,7 +64,7 @@ export const CitizenTabs: React.FC = () => {
           tabBarLabel: 'Scan',
           tabBarIcon: () => (
             <View style={styles.scanTabBadge}>
-              <Text style={{ fontSize: 18 }}>📷</Text>
+              <Icon3D name="scan" size={32} />
             </View>
           ),
         }}
@@ -68,7 +74,7 @@ export const CitizenTabs: React.FC = () => {
         component={TasksScreen}
         options={{
           tabBarLabel: 'Tasks',
-          tabBarIcon: () => <Text style={{ fontSize: 18 }}>📋</Text>,
+          tabBarIcon: () => <Icon3D name="tasks" size={26} />,
         }}
       />
       <TabScreen
@@ -76,7 +82,7 @@ export const CitizenTabs: React.FC = () => {
         component={ProfileScreen}
         options={{
           tabBarLabel: 'Profile',
-          tabBarIcon: () => <Text style={{ fontSize: 18 }}>👤</Text>,
+          tabBarIcon: () => <Icon3D name="profile" size={26} />,
         }}
       />
     </TabNavigator>
@@ -85,14 +91,19 @@ export const CitizenTabs: React.FC = () => {
 
 const styles = StyleSheet.create({
   scanTabBadge: {
-    width: 42,
-    height: 42,
+    width: 46,
+    height: 46,
     borderRadius: radii.pill,
-    backgroundColor: colors.surfaceAccentSubtle,
-    borderWidth: 1.5,
-    borderColor: colors.borderAccent,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 2,
+    borderColor: colors.surfaceRaised,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
+    shadowColor: colors.surfaceRaised,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    elevation: 4,
   },
 });

@@ -8,20 +8,20 @@ import { colors, radii, spacing } from '../../theme/tokens';
 
 const TASKS_DATA = {
   daily: [
-    { id: '1', title: 'Morning Wet & Dry Waste Handover', tier: 'Medium', credits: 30, method: '🚛 Rotating QR', progress: 0, max: 1, expires: '14h 22m' },
-    { id: '2', title: 'Home Energy Conservation Check', tier: 'Easy', credits: 15, method: '⚡ Habit Check-in', progress: 1, max: 1, expires: '14h 22m' },
-    { id: '3', title: 'Drop Multi-Layer Plastic at MCD Bin', tier: 'Medium', credits: 20, method: '📦 Static QR', progress: 0, max: 1, expires: '14h 22m' },
-    { id: 'quiz', title: 'Daily Waste Segregation Quiz', tier: 'Easy', credits: 25, method: '🧠 3-Question Quiz', progress: 0, max: 1, expires: '14h 22m' },
+    { id: '1', title: 'Morning Wet & Dry Waste Handover', tier: 'Medium', credits: 30, method: 'Rotating QR', progress: 0, max: 1, expires: '14h 22m' },
+    { id: '2', title: 'Home Energy Conservation Check', tier: 'Easy', credits: 15, method: 'Habit Check-in', progress: 1, max: 1, expires: '14h 22m' },
+    { id: '3', title: 'Drop Multi-Layer Plastic at MCD Bin', tier: 'Medium', credits: 20, method: 'Static QR', progress: 0, max: 1, expires: '14h 22m' },
+    { id: 'quiz', title: 'Daily Waste Segregation Quiz', tier: 'Easy', credits: 25, method: '3-Question Quiz', progress: 0, max: 1, expires: '14h 22m' },
   ],
   weekly: [
-    { id: '4', title: 'Complete 5 Home Waste Segregations', tier: 'Hard', credits: 100, method: '🔥 Streak Check', progress: 3, max: 5, expires: '4 days' },
-    { id: '5', title: 'E-Waste Drop-off at Authorised Center', tier: 'Hard', credits: 80, method: '🔌 Static QR', progress: 0, max: 1, expires: '4 days' },
+    { id: '4', title: 'Complete 5 Home Waste Segregations', tier: 'Hard', credits: 100, method: 'Streak Check', progress: 3, max: 5, expires: '4 days' },
+    { id: '5', title: 'E-Waste Drop-off at Authorised Center', tier: 'Hard', credits: 80, method: 'Static QR', progress: 0, max: 1, expires: '4 days' },
   ],
   monthly: [
-    { id: '6', title: 'Ward 34 Zero Dump Spot Challenge', tier: 'Epic', credits: 250, method: '🌱 Ward Goal', progress: 1420, max: 2000, expires: '21 days' },
+    { id: '6', title: 'Ward 34 Zero Dump Spot Challenge', tier: 'Epic', credits: 250, method: 'Ward Goal', progress: 1420, max: 2000, expires: '21 days' },
   ],
   bounties: [
-    { id: '7', title: 'Clean Up Ring Road Flyover Hotspot', tier: 'Epic', credits: 150, method: '📸 AI Photo Before/After', progress: 0, max: 1, expires: '2 days' },
+    { id: '7', title: 'Clean Up Ring Road Flyover Hotspot', tier: 'Epic', credits: 150, method: 'AI Photo Proof', progress: 0, max: 1, expires: '2 days' },
   ],
 };
 
@@ -161,15 +161,16 @@ const styles = StyleSheet.create({
     paddingBottom: spacing.s6,
   },
   resetBanner: {
-    backgroundColor: 'rgba(245, 158, 11, 0.12)',
+    backgroundColor: 'rgba(217, 119, 6, 0.08)',
     borderWidth: 1,
-    borderColor: 'rgba(245, 158, 11, 0.3)',
+    borderColor: 'rgba(217, 119, 6, 0.25)',
     borderRadius: radii.pill,
-    padding: spacing.s1,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
     marginBottom: spacing.s2,
   },
   resetText: {
-    color: '#FBBF24',
+    color: '#B45309',
     fontSize: 11,
     fontWeight: '700',
     textAlign: 'center',
@@ -181,6 +182,11 @@ const styles = StyleSheet.create({
     borderColor: colors.borderSubtle,
     padding: spacing.s3,
     marginBottom: 12,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -189,23 +195,23 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   tierPill: {
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    paddingHorizontal: 8,
+    backgroundColor: '#F1F5F9',
+    paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: radii.pill,
   },
   tierEpic: {
-    backgroundColor: 'rgba(236, 72, 153, 0.15)',
+    backgroundColor: 'rgba(236, 72, 153, 0.12)',
     borderWidth: 1,
-    borderColor: 'rgba(236, 72, 153, 0.4)',
+    borderColor: 'rgba(236, 72, 153, 0.3)',
   },
   tierText: {
-    color: colors.textSecondary,
+    color: '#475569',
     fontSize: 11,
     fontWeight: '800',
   },
   tierTextEpic: {
-    color: '#F472B6',
+    color: '#BE185D',
   },
   expiryText: {
     color: colors.textTertiary,
@@ -231,7 +237,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   rewardText: {
-    color: colors.surfaceRaised,
+    color: '#0D9488',
     fontSize: 16,
     fontWeight: '800',
   },

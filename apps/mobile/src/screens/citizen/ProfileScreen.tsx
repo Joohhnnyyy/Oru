@@ -12,6 +12,8 @@ const DEMO_COUPONS = [
   { id: 'c3', merchant: 'TrustBasket Home Compost', offer: '25% Off Bokashi Starter Kit', cost: 180, category: 'Compost' },
 ];
 
+import { Icon3D } from '../../components/Icon3D';
+
 export const ProfileScreen: React.FC<{ navigation: any }> = () => {
   const { user, updateCredits, switchPersona } = useAuth();
   const [activeTab, setActiveTab] = useState<'profile' | 'coupons' | 'vouchers'>('profile');
@@ -72,7 +74,7 @@ export const ProfileScreen: React.FC<{ navigation: any }> = () => {
             {/* User Info Card */}
             <View style={styles.userCard}>
               <View style={styles.avatarCircle}>
-                <Text style={styles.avatarEmoji}>👤</Text>
+                <Icon3D name="profile" size={54} />
               </View>
               <Text style={styles.userName}>{user?.displayName}</Text>
               <Text style={styles.userEmail}>{user?.email}</Text>
@@ -84,7 +86,10 @@ export const ProfileScreen: React.FC<{ navigation: any }> = () => {
             {/* Wallet Balance Card */}
             <View style={styles.walletCard}>
               <Text style={styles.walletLabel}>TOTAL GREEN CREDITS BALANCE</Text>
-              <Text style={styles.walletBalance}>✨ {user?.greenCredits} GC</Text>
+              <View style={styles.balanceRow}>
+                <Icon3D name="credit" size={32} />
+                <Text style={styles.walletBalance}>{user?.greenCredits} GC</Text>
+              </View>
               <Text style={styles.xpText}>Lifetime Impact: {user?.lifetimeXp} XP (Rank: Van Rakshak)</Text>
             </View>
 
@@ -115,7 +120,7 @@ export const ProfileScreen: React.FC<{ navigation: any }> = () => {
               haptic="medium"
             >
               <View style={styles.switchIconBadge}>
-                <Text style={styles.switchIcon}>🚛</Text>
+                <Icon3D name="truck" size={34} />
               </View>
               <View style={styles.switchInfo}>
                 <Text style={styles.switchTitle}>Switch to Collector Mode</Text>
@@ -264,19 +269,29 @@ const styles = StyleSheet.create({
     borderColor: colors.borderAccent,
     padding: spacing.s3,
     marginBottom: 16,
+    shadowColor: '#00E5B3',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 3,
   },
   walletLabel: {
     color: colors.textAccent,
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 0.8,
-    marginBottom: 4,
+    marginBottom: 6,
+  },
+  balanceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 6,
   },
   walletBalance: {
     color: colors.textPrimary,
     fontSize: 28,
     fontWeight: '800',
-    marginBottom: 4,
   },
   xpText: {
     color: colors.textSecondary,
@@ -374,7 +389,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   couponCost: {
-    color: colors.surfaceRaised,
+    color: '#0D9488',
     fontSize: 14,
     fontWeight: '800',
   },
@@ -425,7 +440,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   voucherCode: {
-    color: colors.surfaceRaised,
+    color: '#0D9488',
     fontSize: 18,
     fontWeight: '800',
     letterSpacing: 2,

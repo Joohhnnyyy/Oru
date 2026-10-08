@@ -6,6 +6,8 @@ import { AppHeader } from '../../components/AppHeader';
 import { PressableScale } from '../../components/PressableScale';
 import { colors, radii, spacing } from '../../theme/tokens';
 
+import { Icon3D } from '../../components/Icon3D';
+
 export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { updateCredits } = useAuth();
   const [torchOn, setTorchOn] = useState(false);
@@ -54,7 +56,7 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             onPress={toggleTorch}
             haptic={false}
           >
-            <Text style={styles.torchText}>🔦 {torchOn ? 'ON' : 'OFF'}</Text>
+            <Text style={styles.torchText}>Torch: {torchOn ? 'ON' : 'OFF'}</Text>
           </PressableScale>
         </View>
 
@@ -79,7 +81,7 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               onPress={() => handleSimulateScan('truck')}
               haptic={false}
             >
-              <Text style={styles.simulateBtnText}>⚡ Simulate Truck Scan (+30 GC)</Text>
+              <Text style={styles.simulateBtnText}>Simulate Truck Scan (+30 GC)</Text>
             </PressableScale>
 
             <PressableScale
@@ -87,7 +89,9 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               onPress={() => handleSimulateScan('bin')}
               haptic={false}
             >
-              <Text style={styles.simulateBtnText}>📦 Simulate Bin Scan (+20 GC)</Text>
+              <Text style={[styles.simulateBtnText, { color: colors.textPrimary }]}>
+                Simulate Smart Bin Scan (+20 GC)
+              </Text>
             </PressableScale>
           </View>
         </View>
@@ -97,7 +101,9 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       <Modal visible={!!scanResult} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.resultCard}>
-            <Text style={styles.celebrateEmoji}>🎉</Text>
+            <View style={styles.celebrateWrapper}>
+              <Icon3D name="credit" size={64} />
+            </View>
             <Text style={styles.resultTitle}>Action Verified!</Text>
             <Text style={styles.resultCredits}>+{scanResult?.credits} Green Credits</Text>
             <Text style={styles.resultSource}>{scanResult?.source}</Text>
@@ -109,7 +115,7 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 <Text style={styles.breakdownVal}>+{scanResult?.breakdown.base} GC</Text>
               </View>
               <View style={styles.breakdownRow}>
-                <Text style={styles.breakdownLabel}>Active Streak Multiplier (🔥 7 days):</Text>
+                <Text style={styles.breakdownLabel}>Active Streak Multiplier (7 days):</Text>
                 <Text style={styles.breakdownVal}>+{scanResult?.breakdown.streak} GC</Text>
               </View>
               <View style={styles.breakdownRow}>
@@ -123,7 +129,7 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             </View>
 
             <View style={styles.territoryImpact}>
-              <Text style={styles.impactText}>🐬 Dolphin Health: +0.2% towards Thriving state</Text>
+              <Text style={styles.impactText}>Territory Eco-Health: +0.2% towards Thriving state</Text>
             </View>
 
             <View style={styles.modalButtons}>
@@ -286,7 +292,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.88)',
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.s3,
@@ -300,10 +306,16 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 380,
     alignItems: 'center',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 10,
   },
-  celebrateEmoji: {
-    fontSize: 48,
-    marginBottom: 8,
+  celebrateWrapper: {
+    marginBottom: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   resultTitle: {
     color: colors.textPrimary,
@@ -312,7 +324,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   resultCredits: {
-    color: colors.surfaceRaised,
+    color: '#0D9488',
     fontSize: 26,
     fontWeight: '800',
     marginBottom: 4,
@@ -325,7 +337,7 @@ const styles = StyleSheet.create({
   },
   breakdownBox: {
     width: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    backgroundColor: '#F1F5F9',
     borderRadius: radii.md,
     padding: spacing.s2,
     marginBottom: spacing.s2,

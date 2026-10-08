@@ -4,6 +4,7 @@ import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../context/AuthContext';
 import { AppHeader } from '../../components/AppHeader';
 import { PressableScale } from '../../components/PressableScale';
+import { Icon3D } from '../../components/Icon3D';
 import { colors, radii, spacing } from '../../theme/tokens';
 
 export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
@@ -30,7 +31,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <View>
               <Text style={styles.territoryEyebrow}>TERRITORY STATUS</Text>
               <Text style={styles.territoryName}>{user?.territoryName || 'MCD South 34'}</Text>
-              <Text style={styles.mascotLabel}>🐬 Gangetic Dolphin • Recovering</Text>
+              <Text style={styles.mascotLabel}>Gangetic Dolphin Sanctuary • Recovering</Text>
             </View>
             <View style={styles.healthCircle}>
               <Text style={styles.healthNumber}>72</Text>
@@ -52,17 +53,26 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         {/* Status Strip */}
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
-            <Text style={styles.statVal}>✨ {user?.greenCredits || 0}</Text>
+            <View style={styles.statIconWrapper}>
+              <Icon3D name="credit" size={28} />
+            </View>
+            <Text style={styles.statVal}>{user?.greenCredits || 0} GC</Text>
             <Text style={styles.statLabel}>Green Credits</Text>
           </View>
 
           <View style={styles.statBox}>
-            <Text style={styles.statVal}>🔥 {user?.streakDays || 1} Days</Text>
+            <View style={styles.statIconWrapper}>
+              <Icon3D name="flame" size={28} />
+            </View>
+            <Text style={styles.statVal}>{user?.streakDays || 1} Days</Text>
             <Text style={styles.statLabel}>Active Streak</Text>
           </View>
 
           <View style={styles.statBox}>
-            <Text style={styles.statVal}>🛡️ Lvl {user?.level || 1}</Text>
+            <View style={styles.statIconWrapper}>
+              <Icon3D name="shield" size={28} />
+            </View>
+            <Text style={styles.statVal}>Lvl {user?.level || 1}</Text>
             <Text style={styles.statLabel}>{user?.rankTitle || 'Beej'}</Text>
           </View>
         </View>
@@ -74,7 +84,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           haptic="medium"
         >
           <View style={styles.truckIconBadge}>
-            <Text style={styles.truckIcon}>🚛</Text>
+            <Icon3D name="truck" size={40} />
           </View>
           <View style={styles.truckInfo}>
             <View style={styles.truckTitleRow}>
@@ -122,7 +132,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           haptic="light"
         >
           <View style={styles.taskIconBadge}>
-            <Text style={styles.taskIcon}>♻️</Text>
+            <Icon3D name="recycle" size={36} />
           </View>
           <View style={styles.taskText}>
             <Text style={styles.taskName}>Morning Wet & Dry Waste Handover</Text>
@@ -138,8 +148,8 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           onPress={() => navigation.navigate('Scan')}
           haptic="light"
         >
-          <View style={[styles.taskIconBadge, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
-            <Text style={styles.taskIcon}>🧴</Text>
+          <View style={styles.taskIconBadge}>
+            <Icon3D name="bin" size={36} />
           </View>
           <View style={styles.taskText}>
             <Text style={styles.taskName}>Drop Plastic at Smart MCD Bin</Text>
@@ -155,15 +165,15 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           onPress={() => navigation.navigate('Tasks')}
           haptic="light"
         >
-          <View style={[styles.taskIconBadge, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
-            <Text style={styles.taskIcon}>📸</Text>
+          <View style={styles.taskIconBadge}>
+            <Icon3D name="camera" size={36} />
           </View>
           <View style={styles.taskText}>
             <Text style={styles.taskName}>Report Garbage Vulnerable Spot</Text>
             <Text style={styles.taskDesc}>Submit photo of illegal dump spot for bounty</Text>
           </View>
           <View style={[styles.taskRewardBadge, styles.taskRewardBounty]}>
-            <Text style={[styles.taskReward, { color: '#FBBF24' }]}>+50 GC</Text>
+            <Text style={[styles.taskReward, { color: '#B45309' }]}>+50 GC</Text>
           </View>
         </PressableScale>
       </ScrollView>
@@ -236,7 +246,7 @@ const styles = StyleSheet.create({
   },
   progressBarBg: {
     height: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: '#E2E8F0',
     borderRadius: radii.pill,
     overflow: 'hidden',
     marginBottom: 10,
@@ -281,35 +291,49 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.borderSubtle,
     borderRadius: radii.md,
-    paddingVertical: 14,
-    paddingHorizontal: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 6,
     alignItems: 'center',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  statIconWrapper: {
+    marginBottom: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   statVal: {
     color: colors.textPrimary,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '800',
-    marginBottom: 3,
+    marginBottom: 2,
   },
   statLabel: {
     color: colors.textSecondary,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
   },
   truckCard: {
     backgroundColor: colors.surfaceCard,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 255, 208, 0.3)',
+    borderWidth: 1.5,
+    borderColor: colors.borderAccent,
     borderRadius: radii.lg,
     padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: spacing.s2,
+    shadowColor: '#00E5B3',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 3,
   },
   truckIconBadge: {
-    backgroundColor: colors.surfaceAccentSubtle,
-    width: 44,
-    height: 44,
+    width: 48,
+    height: 48,
     borderRadius: radii.pill,
     alignItems: 'center',
     justifyContent: 'center',

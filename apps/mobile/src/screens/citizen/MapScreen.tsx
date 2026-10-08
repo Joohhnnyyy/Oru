@@ -3,14 +3,15 @@ import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { AppHeader } from '../../components/AppHeader';
 import { PressableScale } from '../../components/PressableScale';
+import { Icon3D } from '../../components/Icon3D';
 import { colors, radii, spacing } from '../../theme/tokens';
 
 const DELHI_TERRITORIES = [
-  { id: '1', name: 'MCD South 34 (Lajpat Nagar)', mascot: '🐬 Dolphin', health: 72, mood: 'Recovering', cleanIndex: 7.2, trucks: 2, color: colors.surfaceRaised },
-  { id: '2', name: 'MCD Central 12 (Connaught Place)', mascot: '🦌 Blackbuck', health: 88, mood: 'Thriving', cleanIndex: 8.8, trucks: 3, color: colors.surfaceRaised },
-  { id: '3', name: 'MCD East 45 (Mayur Vihar)', mascot: '🦚 Peacock', health: 64, mood: 'Recovering', cleanIndex: 6.4, trucks: 1, color: '#f59e0b' },
-  { id: '4', name: 'MCD West 23 (Rajouri Garden)', mascot: '🐆 Leopard', health: 48, mood: 'Sick', cleanIndex: 4.8, trucks: 1, color: '#ff4d4f' },
-  { id: '5', name: 'MCD North 08 (Civil Lines)', mascot: '🦌 Nilgai', health: 92, mood: 'Legendary', cleanIndex: 9.2, trucks: 4, color: '#a855f7' },
+  { id: '1', code: 'S34', name: 'MCD South 34 (Lajpat Nagar)', mascot: 'Dolphin Sanctuary', health: 72, mood: 'Recovering', cleanIndex: 7.2, trucks: 2, color: '#0D9488' },
+  { id: '2', code: 'C12', name: 'MCD Central 12 (Connaught Place)', mascot: 'Blackbuck Habitat', health: 88, mood: 'Thriving', cleanIndex: 8.8, trucks: 3, color: '#059669' },
+  { id: '3', code: 'E45', name: 'MCD East 45 (Mayur Vihar)', mascot: 'Peacock Zone', health: 64, mood: 'Recovering', cleanIndex: 6.4, trucks: 1, color: '#D97706' },
+  { id: '4', code: 'W23', name: 'MCD West 23 (Rajouri Garden)', mascot: 'Leopard Ridge', health: 48, mood: 'Critical', cleanIndex: 4.8, trucks: 1, color: '#DC2626' },
+  { id: '5', code: 'N08', name: 'MCD North 08 (Civil Lines)', mascot: 'Nilgai Grove', health: 92, mood: 'Legendary', cleanIndex: 9.2, trucks: 4, color: '#7C3AED' },
 ];
 
 export const MapScreen: React.FC<{ navigation: any }> = () => {
@@ -34,7 +35,7 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
       {/* Simulated Map Canvas */}
       <View style={styles.mapCanvas}>
         <View style={styles.hexGridContainer}>
-          <Text style={styles.mapCanvasBadge}>🗺️ H3 Resolution-7 Hexagonal Grid</Text>
+          <Text style={styles.mapCanvasBadge}>H3 Resolution-7 Hexagonal Grid</Text>
 
           {/* Interactive Territory Nodes */}
           <View style={styles.nodesWrapper}>
@@ -49,7 +50,7 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
                 onPress={() => handleSelectTerritory(t)}
                 haptic={false}
               >
-                <Text style={styles.hexEmoji}>{t.mascot.split(' ')[0]}</Text>
+                <Text style={[styles.hexCode, { color: t.color }]}>{t.code}</Text>
                 <Text style={styles.hexHealth}>{t.health}%</Text>
               </PressableScale>
             ))}
@@ -58,7 +59,7 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
           {/* Live Vehicle Pulse Indicator */}
           <View style={styles.liveTruckIndicator}>
             <View style={styles.pulseDot} />
-            <Text style={styles.liveTruckText}>🚛 2 Sanitation Trucks Broadcasting Live Telemetry</Text>
+            <Text style={styles.liveTruckText}>2 Sanitation Trucks Broadcasting Live Telemetry</Text>
           </View>
         </View>
 
@@ -102,7 +103,7 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
             <Text style={styles.sheetTitle}>{selectedTerritory.name}</Text>
             <Text style={styles.sheetMascot}>{selectedTerritory.mascot}</Text>
           </View>
-          <View style={[styles.moodBadge, { backgroundColor: 'rgba(0, 255, 208, 0.12)' }]}>
+          <View style={[styles.moodBadge, { backgroundColor: 'rgba(0, 229, 179, 0.15)' }]}>
             <Text style={[styles.moodText, { color: selectedTerritory.color }]}>
               {selectedTerritory.mood}
             </Text>
@@ -126,7 +127,9 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
 
         <ScrollView showsVerticalScrollIndicator={false} style={styles.sheetList}>
           <View style={styles.sheetItem}>
-            <Text style={styles.itemEmoji}>🚛</Text>
+            <View style={styles.itemIconBadge}>
+              <Icon3D name="truck" size={30} />
+            </View>
             <View style={styles.itemTextContainer}>
               <Text style={styles.itemTitle}>MCD Sanitation Truck DL-1M-4821</Text>
               <Text style={styles.itemSub}>On Route • 120m away from your location</Text>
@@ -135,7 +138,9 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
           </View>
 
           <View style={styles.sheetItem}>
-            <Text style={styles.itemEmoji}>📦</Text>
+            <View style={styles.itemIconBadge}>
+              <Icon3D name="bin" size={30} />
+            </View>
             <View style={styles.itemTextContainer}>
               <Text style={styles.itemTitle}>Central Market Smart MCD Bin #402</Text>
               <Text style={styles.itemSub}>Static Decal • 350m away</Text>
@@ -155,7 +160,7 @@ const styles = StyleSheet.create({
   },
   mapCanvas: {
     flex: 1,
-    backgroundColor: '#050505',
+    backgroundColor: '#F8FAFC',
     justifyContent: 'space-between',
     padding: spacing.s2,
   },
@@ -174,6 +179,11 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     borderWidth: 1,
     borderColor: colors.borderSubtle,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
   },
   nodesWrapper: {
     flexDirection: 'row',
@@ -186,18 +196,24 @@ const styles = StyleSheet.create({
     width: 66,
     height: 66,
     borderRadius: radii.pill,
-    backgroundColor: colors.surfaceCard,
+    backgroundColor: '#FFFFFF',
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 5,
+    elevation: 2,
   },
   selectedHex: {
     transform: [{ scale: 1.1 }],
-    backgroundColor: colors.surfaceElevated,
-    borderColor: colors.surfaceRaised,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 3,
   },
-  hexEmoji: {
-    fontSize: 22,
+  hexCode: {
+    fontSize: 13,
+    fontWeight: '800',
     marginBottom: 2,
   },
   hexHealth: {
@@ -223,7 +239,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   liveTruckText: {
-    color: colors.textAccent,
+    color: '#0D9488',
     fontSize: 11,
     fontWeight: '700',
   },
@@ -240,6 +256,11 @@ const styles = StyleSheet.create({
     borderRadius: radii.pill,
     borderWidth: 1,
     borderColor: colors.borderSubtle,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.03,
+    shadowRadius: 3,
+    elevation: 1,
   },
   activeFilter: {
     backgroundColor: colors.surfaceRaised,
@@ -261,12 +282,17 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.borderSubtle,
     padding: spacing.s3,
-    maxHeight: 280,
+    maxHeight: 300,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 6,
   },
   sheetHandle: {
     width: 36,
     height: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: '#CBD5E1',
     borderRadius: radii.pill,
     alignSelf: 'center',
     marginBottom: 14,
@@ -299,7 +325,7 @@ const styles = StyleSheet.create({
   sheetStats: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    backgroundColor: '#F1F5F9',
     borderRadius: radii.md,
     paddingVertical: 10,
     marginBottom: 14,
@@ -319,18 +345,19 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   sheetList: {
-    maxHeight: 100,
+    maxHeight: 120,
   },
   sheetItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: colors.borderSubtle,
   },
-  itemEmoji: {
-    fontSize: 18,
+  itemIconBadge: {
     marginRight: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   itemTextContainer: {
     flex: 1,
@@ -338,14 +365,14 @@ const styles = StyleSheet.create({
   itemTitle: {
     color: colors.textPrimary,
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   itemSub: {
-    color: colors.textTertiary,
+    color: colors.textSecondary,
     fontSize: 11,
   },
   itemAction: {
-    color: colors.surfaceRaised,
+    color: '#0D9488',
     fontSize: 11,
     fontWeight: '800',
   },

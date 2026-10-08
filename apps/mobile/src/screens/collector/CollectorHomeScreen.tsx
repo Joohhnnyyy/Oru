@@ -8,6 +8,8 @@ import { generateClientRotatingToken } from '../../utils/totp';
 import { telemetryService, TelemetryPoint } from '../../services/telemetry';
 import { colors, radii, spacing } from '../../theme/tokens';
 
+import { Icon3D } from '../../components/Icon3D';
+
 export const CollectorHomeScreen: React.FC = () => {
   const { user, switchPersona } = useAuth();
   const [isOnRoute, setIsOnRoute] = useState(true);
@@ -56,9 +58,12 @@ export const CollectorHomeScreen: React.FC = () => {
       <View style={styles.content}>
         {/* Source Badge & Status */}
         <View style={styles.badgeRow}>
-          <Text style={styles.sourceBadge}>
-            🚛 {user?.assignedVehicleId || 'DL-1M-4821'} • {user?.territoryName || 'Ward 34'}
-          </Text>
+          <View style={styles.sourceBadgeContainer}>
+            <Icon3D name="truck" size={24} />
+            <Text style={styles.sourceBadge}>
+              {user?.assignedVehicleId || 'DL-1M-4821'} • {user?.territoryName || 'Ward 34'}
+            </Text>
+          </View>
           <PressableScale
             style={[styles.routeToggle, isOnRoute ? styles.routeActive : styles.routePaused]}
             onPress={handleToggleRoute}
@@ -92,7 +97,7 @@ export const CollectorHomeScreen: React.FC = () => {
           {/* Countdown Progress Ring */}
           <View style={styles.countdownContainer}>
             <Text style={styles.countdownText}>
-              🔄 Refreshes in: <Text style={styles.countdownSec}>{tokenData.secondsRemaining}s</Text>
+              Refreshes in: <Text style={styles.countdownSec}>{tokenData.secondsRemaining}s</Text>
             </Text>
             <View style={styles.progressTrack}>
               <View
@@ -113,7 +118,7 @@ export const CollectorHomeScreen: React.FC = () => {
           </View>
 
           <View style={styles.metricBox}>
-            <Text style={styles.metricVal}>+{creditsEarned} GC</Text>
+            <Text style={[styles.metricVal, { color: '#0D9488' }]}>+{creditsEarned} GC</Text>
             <Text style={styles.metricLabel}>Collector Incentive</Text>
           </View>
         </View>
@@ -124,7 +129,7 @@ export const CollectorHomeScreen: React.FC = () => {
           onPress={handleSimulateScanReceived}
           haptic={false}
         >
-          <Text style={styles.simulateScanBtnText}>⚡ Simulate Citizen Handover (+10 GC)</Text>
+          <Text style={styles.simulateScanBtnText}>Simulate Citizen Handover (+10 GC)</Text>
         </PressableScale>
 
         {/* Switch back to citizen mode */}
@@ -154,6 +159,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     marginBottom: 4,
+  },
+  sourceBadgeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   sourceBadge: {
     color: colors.textPrimary,

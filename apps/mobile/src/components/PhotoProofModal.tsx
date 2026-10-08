@@ -5,6 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { PressableScale } from './PressableScale';
 import { colors, radii, spacing } from '../theme/tokens';
 
+import { Icon3D } from './Icon3D';
+
 export const PhotoProofModal: React.FC<{
   visible: boolean;
   taskId?: string;
@@ -38,7 +40,7 @@ export const PhotoProofModal: React.FC<{
       <View style={styles.overlay}>
         <View style={styles.card}>
           <View style={styles.headerRow}>
-            <Text style={styles.title}>📸 AI Photo Verification</Text>
+            <Text style={styles.title}>AI Photo Proof Verification</Text>
             <PressableScale onPress={handleReset} haptic="light">
               <Text style={styles.closeBtn}>✕</Text>
             </PressableScale>
@@ -63,7 +65,7 @@ export const PhotoProofModal: React.FC<{
           {step === 'capture' && (
             <View style={styles.content}>
               <View style={styles.cameraPreview}>
-                <Text style={styles.cameraIcon}>📷</Text>
+                <Icon3D name="camera" size={54} />
                 <Text style={styles.cameraHint}>Ghost outline active: Align waste bins within frame</Text>
               </View>
               <PressableScale style={styles.captureBtn} onPress={handleCapture} haptic={false}>
@@ -75,7 +77,7 @@ export const PhotoProofModal: React.FC<{
           {step === 'review' && (
             <View style={styles.content}>
               <View style={styles.cameraPreview}>
-                <Text style={styles.cameraIcon}>✅</Text>
+                <Icon3D name="shield" size={54} />
                 <Text style={styles.cameraHint}>Photo captured • High quality • GPS attached</Text>
               </View>
               <View style={styles.buttonsRow}>
@@ -98,7 +100,9 @@ export const PhotoProofModal: React.FC<{
 
           {step === 'done' && (
             <View style={styles.content}>
-              <Text style={styles.doneEmoji}>🎉</Text>
+              <View style={{ alignItems: 'center', marginVertical: 6 }}>
+                <Icon3D name="credit" size={60} />
+              </View>
               <Text style={styles.doneTitle}>Proof Verified by AI!</Text>
               <Text style={styles.doneText}>Bedrock verified source segregation confidence at 98.4%.</Text>
               <Text style={styles.doneReward}>+50 Green Credits Awarded</Text>
@@ -116,7 +120,7 @@ export const PhotoProofModal: React.FC<{
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.s3,
@@ -129,6 +133,11 @@ const styles = StyleSheet.create({
     padding: spacing.s3,
     width: '100%',
     maxWidth: 380,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 10,
   },
   headerRow: {
     flexDirection: 'row',
@@ -155,13 +164,13 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   rubricBox: {
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    backgroundColor: '#F1F5F9',
     borderRadius: radii.md,
     padding: spacing.s2,
     gap: 6,
   },
   rubricHeading: {
-    color: colors.textAccent,
+    color: '#0D9488',
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 0.8,
@@ -185,7 +194,7 @@ const styles = StyleSheet.create({
   },
   cameraPreview: {
     height: 180,
-    backgroundColor: '#050505',
+    backgroundColor: '#F8FAFC',
     borderRadius: radii.md,
     borderWidth: 1,
     borderColor: colors.borderSubtle,

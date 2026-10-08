@@ -26,6 +26,8 @@ const QUIZ_QUESTIONS = [
   },
 ];
 
+import { Icon3D } from './Icon3D';
+
 export const CivicQuizModal: React.FC<{
   visible: boolean;
   onClose: () => void;
@@ -78,7 +80,7 @@ export const CivicQuizModal: React.FC<{
       <View style={styles.overlay}>
         <View style={styles.card}>
           <View style={styles.headerRow}>
-            <Text style={styles.title}>🧠 Civic Waste Quiz</Text>
+            <Text style={styles.title}>Civic Waste Segregation Quiz</Text>
             <PressableScale onPress={handleClose} haptic="light">
               <Text style={styles.closeBtn}>✕</Text>
             </PressableScale>
@@ -124,7 +126,7 @@ export const CivicQuizModal: React.FC<{
                   <Text style={styles.tipText}>{currentQ.tip}</Text>
                   <PressableScale style={styles.nextBtn} onPress={handleNext} haptic="light">
                     <Text style={styles.nextBtnText}>
-                      {qIndex < QUIZ_QUESTIONS.length - 1 ? 'Next Question →' : 'Complete Quiz 🎉'}
+                      {qIndex < QUIZ_QUESTIONS.length - 1 ? 'Next Question →' : 'Complete Quiz →'}
                     </Text>
                   </PressableScale>
                 </View>
@@ -132,7 +134,9 @@ export const CivicQuizModal: React.FC<{
             </View>
           ) : (
             <View style={styles.doneBody}>
-              <Text style={styles.doneEmoji}>🏆</Text>
+              <View style={{ alignItems: 'center', marginVertical: 8 }}>
+                <Icon3D name="shield" size={60} />
+              </View>
               <Text style={styles.doneTitle}>Quiz Completed!</Text>
               <Text style={styles.doneScore}>Daily Habit Score: 100%</Text>
               <Text style={styles.doneReward}>+25 Green Credits Added</Text>
@@ -150,7 +154,7 @@ export const CivicQuizModal: React.FC<{
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.9)',
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.s3,
@@ -163,6 +167,11 @@ const styles = StyleSheet.create({
     padding: spacing.s4,
     width: '100%',
     maxWidth: 380,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 10,
   },
   headerRow: {
     flexDirection: 'row',
@@ -184,7 +193,7 @@ const styles = StyleSheet.create({
     gap: 14,
   },
   counter: {
-    color: colors.textAccent,
+    color: '#0D9488',
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 0.8,
@@ -226,18 +235,18 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   optionTextCorrect: {
-    color: colors.textAccent,
+    color: '#0D9488',
     fontWeight: '800',
   },
   tipBox: {
-    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    backgroundColor: '#F1F5F9',
     borderRadius: radii.md,
     padding: spacing.s2,
     gap: 8,
     marginTop: 6,
   },
   tipLabel: {
-    color: '#FBBF24',
+    color: '#B45309',
     fontSize: 11,
     fontWeight: '800',
   },
@@ -276,7 +285,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   doneReward: {
-    color: colors.surfaceRaised,
+    color: '#0D9488',
     fontSize: 18,
     fontWeight: '800',
   },
