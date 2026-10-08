@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, StyleSheet, Modal } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../context/AuthContext';
 import { AppHeader } from '../../components/AppHeader';
+import { PressableScale } from '../../components/PressableScale';
 
 export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { updateCredits } = useAuth();
@@ -12,7 +14,13 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     breakdown: { base: number; streak: number; explorer: number; territoryNeed: number };
   } | null>(null);
 
+  const toggleTorch = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    setTorchOn(!torchOn);
+  };
+
   const handleSimulateScan = (type: 'truck' | 'bin') => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     const credits = type === 'truck' ? 30 : 20;
     const result = {
       credits,
@@ -40,12 +48,13 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             <View style={styles.gpsDot} />
             <Text style={styles.gpsText}>GPS ±4m Accuracy (In Range)</Text>
           </View>
-          <TouchableOpacity
+          <PressableScale
             style={[styles.torchBtn, torchOn && styles.torchBtnActive]}
-            onPress={() => setTorchOn(!torchOn)}
+            onPress={toggleTorch}
+            haptic={false}
           >
             <Text style={styles.torchText}>🔦 {torchOn ? 'ON' : 'OFF'}</Text>
-          </TouchableOpacity>
+          </PressableScale>
         </View>
 
         {/* Viewfinder Reticle */}
@@ -64,25 +73,27 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           <Text style={styles.helperText}>Scan dynamic QR on MCD truck or static decal on smart bins</Text>
           
           <View style={styles.testActions}>
-            <TouchableOpacity
+            <PressableScale
               style={styles.simulateBtn}
               onPress={() => handleSimulateScan('truck')}
+              haptic={false}
             >
               <Text style={styles.simulateBtnText}>⚡ Simulate Truck Scan (+30 GC)</Text>
-            </TouchableOpacity>
+            </PressableScale>
 
-            <TouchableOpacity
+            <PressableScale
               style={[styles.simulateBtn, styles.binBtn]}
               onPress={() => handleSimulateScan('bin')}
+              haptic={false}
             >
               <Text style={styles.simulateBtnText}>📦 Simulate Bin Scan (+20 GC)</Text>
-            </TouchableOpacity>
+            </PressableScale>
           </View>
         </View>
       </View>
 
-      {/* Result Modal Sheet (B4.2) */}
-      <Modal visible={!!scanResult} transparent animationType="slide">
+      {/* Result Modal Sheet */}
+      <Modal visible={!!scanResult} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.resultCard}>
             <Text style={styles.celebrateEmoji}>🎉</Text>
@@ -115,21 +126,23 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             </View>
 
             <View style={styles.modalButtons}>
-              <TouchableOpacity
+              <PressableScale
                 style={styles.modalPrimaryBtn}
                 onPress={() => {
                   setScanResult(null);
                   navigation.navigate('Home');
                 }}
+                haptic="light"
               >
                 <Text style={styles.modalPrimaryBtnText}>Back to Home</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
+              </PressableScale>
+              <PressableScale
                 style={styles.modalSecondaryBtn}
                 onPress={() => setScanResult(null)}
+                haptic="light"
               >
                 <Text style={styles.modalSecondaryBtnText}>Scan Again</Text>
-              </TouchableOpacity>
+              </PressableScale>
             </View>
           </View>
         </View>
@@ -141,11 +154,11 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#0A0F1D',
   },
   cameraBox: {
     flex: 1,
-    backgroundColor: '#090D16',
+    backgroundColor: '#050811',
     justifyContent: 'space-between',
     padding: 16,
   },
@@ -158,12 +171,12 @@ const styles = StyleSheet.create({
   gpsPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1E293B',
+    backgroundColor: 'rgba(17, 26, 46, 0.85)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   gpsDot: {
     width: 8,
@@ -178,15 +191,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   torchBtn: {
-    backgroundColor: '#1E293B',
+    backgroundColor: 'rgba(17, 26, 46, 0.85)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   torchBtnActive: {
     backgroundColor: '#F59E0B',
+    borderColor: '#FBBF24',
   },
   torchText: {
     color: '#FFFFFF',
@@ -260,115 +274,118 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   binBtn: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#2563EB',
   },
   simulateBtnText: {
     color: '#FFFFFF',
-    fontWeight: '700',
     fontSize: 14,
+    fontWeight: '700',
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.75)',
-    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.82)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   resultCard: {
-    backgroundColor: '#1E293B',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
+    backgroundColor: '#111A2E',
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     padding: 24,
+    width: '100%',
+    maxWidth: 380,
     alignItems: 'center',
-    borderTopWidth: 1,
-    borderTopColor: '#334155',
   },
   celebrateEmoji: {
-    fontSize: 52,
+    fontSize: 48,
     marginBottom: 8,
   },
   resultTitle: {
     color: '#F8FAFC',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '800',
     marginBottom: 4,
   },
   resultCredits: {
-    color: '#10B981',
-    fontSize: 26,
+    color: '#34D399',
+    fontSize: 24,
     fontWeight: '800',
     marginBottom: 4,
   },
   resultSource: {
     color: '#94A3B8',
     fontSize: 13,
-    marginBottom: 18,
     textAlign: 'center',
+    marginBottom: 16,
   },
   breakdownBox: {
     width: '100%',
-    backgroundColor: '#0F172A',
-    padding: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
     borderRadius: 14,
+    padding: 14,
     marginBottom: 14,
   },
   breakdownTitle: {
     color: '#64748B',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '800',
-    letterSpacing: 1,
-    marginBottom: 8,
+    letterSpacing: 0.8,
+    marginBottom: 10,
   },
   breakdownRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   breakdownLabel: {
-    color: '#CBD5E1',
+    color: '#94A3B8',
     fontSize: 12,
   },
   breakdownVal: {
-    color: '#10B981',
+    color: '#F8FAFC',
     fontSize: 12,
     fontWeight: '700',
   },
   territoryImpact: {
-    backgroundColor: '#064E3B',
-    paddingHorizontal: 12,
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     paddingVertical: 8,
-    borderRadius: 12,
-    marginBottom: 20,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+    marginBottom: 18,
     width: '100%',
   },
   impactText: {
-    color: '#6EE7B7',
+    color: '#34D399',
     fontSize: 12,
-    textAlign: 'center',
     fontWeight: '600',
+    textAlign: 'center',
   },
   modalButtons: {
     width: '100%',
-    gap: 10,
+    gap: 8,
   },
   modalPrimaryBtn: {
     backgroundColor: '#10B981',
-    paddingVertical: 14,
-    borderRadius: 14,
+    paddingVertical: 12,
+    borderRadius: 12,
     alignItems: 'center',
   },
   modalPrimaryBtnText: {
     color: '#FFFFFF',
     fontWeight: '700',
-    fontSize: 15,
+    fontSize: 14,
   },
   modalSecondaryBtn: {
-    backgroundColor: '#334155',
-    paddingVertical: 14,
-    borderRadius: 14,
+    paddingVertical: 10,
     alignItems: 'center',
   },
   modalSecondaryBtnText: {
-    color: '#E2E8F0',
+    color: '#94A3B8',
+    fontSize: 13,
     fontWeight: '600',
-    fontSize: 14,
   },
 });

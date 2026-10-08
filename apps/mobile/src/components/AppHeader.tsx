@@ -27,24 +27,24 @@ export const AppHeader: React.FC<{ title?: string }> = ({ title }) => {
 
 const styles = StyleSheet.create({
   header: {
-    backgroundColor: '#0F172A',
-    paddingTop: 48,
-    paddingBottom: 12,
+    backgroundColor: '#0A0F1D',
+    paddingTop: 52,
+    paddingBottom: 14,
     paddingHorizontal: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#1E293B',
+    borderBottomColor: 'rgba(255, 255, 255, 0.07)',
   },
   titleContainer: {
     flex: 1,
   },
   logo: {
     color: '#10B981',
-    fontSize: 18,
+    fontSize: 19,
     fontWeight: '800',
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
   },
   subtitle: {
     color: '#94A3B8',
@@ -58,16 +58,15 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   creditsBadge: {
-    backgroundColor: '#064E3B',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#10B981',
-    marginRight: 6,
+    borderColor: 'rgba(16, 185, 129, 0.4)',
   },
   creditsText: {
-    color: '#6EE7B7',
+    color: '#34D399',
     fontSize: 12,
     fontWeight: '700',
   },

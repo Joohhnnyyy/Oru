@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { AppHeader } from '../../components/AppHeader';
 import { PhotoProofModal } from '../../components/PhotoProofModal';
 import { CivicQuizModal } from '../../components/CivicQuizModal';
+import { PressableScale } from '../../components/PressableScale';
 
 const TASKS_DATA = {
   daily: [
@@ -49,19 +50,20 @@ export const TasksScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       {/* Period Tabs */}
       <View style={styles.tabsRow}>
         {(['daily', 'weekly', 'monthly', 'bounties'] as const).map((tab) => (
-          <TouchableOpacity
+          <PressableScale
             key={tab}
             style={[styles.tabBtn, activeTab === tab && styles.tabBtnActive]}
             onPress={() => setActiveTab(tab)}
+            haptic="light"
           >
             <Text style={[styles.tabBtnText, activeTab === tab && styles.tabBtnTextActive]}>
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </Text>
-          </TouchableOpacity>
+          </PressableScale>
         ))}
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {/* Reset Countdown Pill */}
         <View style={styles.resetBanner}>
           <Text style={styles.resetText}>⏳ Resets at 00:00 IST • Daily Completion Bonus: 1/3 (Claim +25 GC at 3/3)</Text>
@@ -71,8 +73,8 @@ export const TasksScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         {tasks.map((task: any) => (
           <View key={task.id} style={styles.taskCard}>
             <View style={styles.cardHeader}>
-              <View style={styles.tierPill}>
-                <Text style={styles.tierText}>{task.tier}</Text>
+              <View style={[styles.tierPill, task.tier === 'Epic' && styles.tierEpic]}>
+                <Text style={[styles.tierText, task.tier === 'Epic' && styles.tierTextEpic]}>{task.tier}</Text>
               </View>
               <Text style={styles.expiryText}>Expires in {task.expires}</Text>
             </View>
@@ -88,34 +90,35 @@ export const TasksScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               <Text style={styles.progressText}>
                 Progress: {task.progress}/{task.max}
               </Text>
-              <TouchableOpacity
+              <PressableScale
                 style={[
                   styles.actionBtn,
                   task.progress >= task.max && styles.actionBtnDone,
                 ]}
                 onPress={() => handleStartTask(task)}
                 disabled={task.progress >= task.max}
+                haptic="light"
               >
                 <Text style={styles.actionBtnText}>
                   {task.progress >= task.max ? 'Completed ✓' : 'Start Task →'}
                 </Text>
-              </TouchableOpacity>
+              </PressableScale>
             </View>
           </View>
         ))}
       </ScrollView>
 
-      {/* Integrated Modals */}
-      <PhotoProofModal
-        visible={photoModalVisible}
-        taskId="task-proof-01"
-        taskTitle={activeTaskTitle}
-        onClose={() => setPhotoModalVisible(false)}
-      />
-
+      {/* B7 Civic Quiz Modal */}
       <CivicQuizModal
         visible={quizModalVisible}
         onClose={() => setQuizModalVisible(false)}
+      />
+
+      {/* B6 Photo Proof Upload Modal */}
+      <PhotoProofModal
+        visible={photoModalVisible}
+        onClose={() => setPhotoModalVisible(false)}
+        taskTitle={activeTaskTitle}
       />
     </View>
   );
@@ -124,23 +127,21 @@ export const TasksScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#0A0F1D',
   },
   tabsRow: {
     flexDirection: 'row',
-    backgroundColor: '#1E293B',
+    backgroundColor: '#0E1626',
     padding: 6,
-    marginHorizontal: 16,
-    marginTop: 12,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#334155',
+    gap: 4,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.07)',
   },
   tabBtn: {
     flex: 1,
     paddingVertical: 8,
+    borderRadius: 12,
     alignItems: 'center',
-    borderRadius: 10,
   },
   tabBtnActive: {
     backgroundColor: '#10B981',
@@ -148,34 +149,35 @@ const styles = StyleSheet.create({
   tabBtnText: {
     color: '#94A3B8',
     fontSize: 12,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   tabBtnTextActive: {
     color: '#FFFFFF',
+    fontWeight: '700',
   },
   scroll: {
     padding: 16,
-    paddingBottom: 32,
+    paddingBottom: 40,
   },
   resetBanner: {
-    backgroundColor: '#1E293B',
-    padding: 10,
-    borderRadius: 12,
-    marginBottom: 14,
+    backgroundColor: 'rgba(245, 158, 11, 0.12)',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: 'rgba(245, 158, 11, 0.3)',
+    borderRadius: 12,
+    padding: 10,
+    marginBottom: 16,
   },
   resetText: {
-    color: '#CBD5E1',
+    color: '#FBBF24',
     fontSize: 11,
+    fontWeight: '600',
     textAlign: 'center',
-    fontWeight: '500',
   },
   taskCard: {
-    backgroundColor: '#1E293B',
-    borderRadius: 16,
+    backgroundColor: '#111A2E',
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: 'rgba(255, 255, 255, 0.07)',
     padding: 16,
     marginBottom: 12,
   },
@@ -183,29 +185,38 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   tierPill: {
-    backgroundColor: '#334155',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 8,
+    borderRadius: 6,
+  },
+  tierEpic: {
+    backgroundColor: 'rgba(236, 72, 153, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(236, 72, 153, 0.4)',
   },
   tierText: {
     color: '#94A3B8',
-    fontSize: 10,
-    fontWeight: '800',
-    textTransform: 'uppercase',
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  tierTextEpic: {
+    color: '#F472B6',
   },
   expiryText: {
     color: '#64748B',
     fontSize: 11,
+    fontWeight: '500',
   },
   taskTitle: {
     color: '#F8FAFC',
     fontSize: 15,
     fontWeight: '700',
     marginBottom: 10,
+    lineHeight: 20,
   },
   metaRow: {
     flexDirection: 'row',
@@ -214,13 +225,12 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   methodBadge: {
-    color: '#93C5FD',
+    color: '#94A3B8',
     fontSize: 12,
-    fontWeight: '600',
   },
   rewardText: {
-    color: '#10B981',
-    fontSize: 14,
+    color: '#34D399',
+    fontSize: 15,
     fontWeight: '800',
   },
   cardFooter: {
@@ -228,25 +238,26 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     borderTopWidth: 1,
-    borderTopColor: '#334155',
+    borderTopColor: 'rgba(255, 255, 255, 0.05)',
     paddingTop: 12,
   },
   progressText: {
-    color: '#94A3B8',
+    color: '#64748B',
     fontSize: 12,
+    fontWeight: '500',
   },
   actionBtn: {
     backgroundColor: '#10B981',
-    paddingHorizontal: 14,
     paddingVertical: 8,
+    paddingHorizontal: 16,
     borderRadius: 10,
   },
   actionBtnDone: {
-    backgroundColor: '#064E3B',
+    backgroundColor: 'rgba(16, 185, 129, 0.2)',
   },
   actionBtnText: {
     color: '#FFFFFF',
-    fontWeight: '700',
     fontSize: 12,
+    fontWeight: '700',
   },
 });

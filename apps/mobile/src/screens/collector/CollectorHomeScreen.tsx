@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../context/AuthContext';
 import { AppHeader } from '../../components/AppHeader';
+import { PressableScale } from '../../components/PressableScale';
 import { generateClientRotatingToken } from '../../utils/totp';
 import { telemetryService, TelemetryPoint } from '../../services/telemetry';
 
@@ -13,9 +15,8 @@ export const CollectorHomeScreen: React.FC = () => {
   const [tokenData, setTokenData] = useState(() =>
     generateClientRotatingToken(user?.assignedSourceId || 'truck-dl1m-4821'),
   );
-  const [lastCoord, setLastCoord] = useState<TelemetryPoint | null>(null);
+  const [, setLastCoord] = useState<TelemetryPoint | null>(null);
 
-  // Synchronized 1-second interval tracking token expiry
   useEffect(() => {
     const timer = setInterval(() => {
       setTokenData(generateClientRotatingToken(user?.assignedSourceId || 'truck-dl1m-4821'));
@@ -24,7 +25,6 @@ export const CollectorHomeScreen: React.FC = () => {
     return () => clearInterval(timer);
   }, [user?.assignedSourceId]);
 
-  // Telemetry streaming
   useEffect(() => {
     if (isOnRoute) {
       telemetryService.startBroadcasting(user?.assignedVehicleId || 'DL-1M-4821', (pt) => {
@@ -37,7 +37,13 @@ export const CollectorHomeScreen: React.FC = () => {
     return () => telemetryService.stopBroadcasting();
   }, [isOnRoute, user?.assignedVehicleId]);
 
+  const handleToggleRoute = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    setIsOnRoute(!isOnRoute);
+  };
+
   const handleSimulateScanReceived = () => {
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     setScansCount((c) => c + 1);
     setCreditsEarned((g) => g + 10);
   };
@@ -52,18 +58,19 @@ export const CollectorHomeScreen: React.FC = () => {
           <Text style={styles.sourceBadge}>
             🚛 {user?.assignedVehicleId || 'DL-1M-4821'} • {user?.territoryName || 'Ward 34'}
           </Text>
-          <TouchableOpacity
+          <PressableScale
             style={[styles.routeToggle, isOnRoute ? styles.routeActive : styles.routePaused]}
-            onPress={() => setIsOnRoute(!isOnRoute)}
+            onPress={handleToggleRoute}
+            haptic={false}
           >
             <View style={[styles.routeDot, isOnRoute ? styles.routeDotActive : null]} />
             <Text style={styles.routeToggleText}>
               {isOnRoute ? 'On Route (Streaming GPS)' : 'Shift Paused'}
             </Text>
-          </TouchableOpacity>
+          </PressableScale>
         </View>
 
-        {/* Big Rotating QR Frame (B7.1: ~70% screen width) */}
+        {/* Big Rotating QR Frame (~70% screen width) */}
         <View style={styles.qrCard}>
           <Text style={styles.qrHindiTitle}>नागरिक कचरा सत्यापन क्यूआर</Text>
           <Text style={styles.qrEngSub}>Citizen Verification QR (Scan to award credits)</Text>
@@ -111,20 +118,22 @@ export const CollectorHomeScreen: React.FC = () => {
         </View>
 
         {/* Quick simulation for demonstration */}
-        <TouchableOpacity
+        <PressableScale
           style={styles.simulateScanBtn}
           onPress={handleSimulateScanReceived}
+          haptic={false}
         >
           <Text style={styles.simulateScanBtnText}>⚡ Simulate Citizen Handover (+10 GC)</Text>
-        </TouchableOpacity>
+        </PressableScale>
 
         {/* Switch back to citizen mode */}
-        <TouchableOpacity
+        <PressableScale
           style={styles.switchBtn}
           onPress={() => switchPersona('citizen')}
+          haptic="light"
         >
           <Text style={styles.switchBtnText}>← Switch Back to Citizen Mode</Text>
-        </TouchableOpacity>
+        </PressableScale>
       </View>
     </View>
   );
@@ -154,16 +163,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 16,
+    paddingVertical: 7,
+    borderRadius: 18,
     borderWidth: 1,
   },
   routeActive: {
-    backgroundColor: '#064E3B',
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
     borderColor: '#10B981',
   },
   routePaused: {
-    backgroundColor: '#334155',
+    backgroundColor: 'rgba(100, 116, 139, 0.15)',
     borderColor: '#64748B',
   },
   routeDot: {
@@ -182,11 +191,11 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   qrCard: {
-    backgroundColor: '#131D33',
+    backgroundColor: '#111A2E',
     borderRadius: 24,
-    borderWidth: 2,
-    borderColor: '#3B82F6',
-    padding: 18,
+    borderWidth: 1,
+    borderColor: 'rgba(59, 130, 246, 0.4)',
+    padding: 20,
     alignItems: 'center',
   },
   qrHindiTitle: {
@@ -198,7 +207,7 @@ const styles = StyleSheet.create({
   qrEngSub: {
     color: '#94A3B8',
     fontSize: 12,
-    marginBottom: 14,
+    marginBottom: 16,
   },
   qrBox: {
     width: 220,
@@ -208,7 +217,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
-    marginBottom: 14,
+    marginBottom: 16,
   },
   qrPattern: {
     alignItems: 'center',
@@ -235,7 +244,7 @@ const styles = StyleSheet.create({
     color: '#CBD5E1',
     fontSize: 13,
     fontWeight: '600',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   countdownSec: {
     color: '#60A5FA',
@@ -244,13 +253,14 @@ const styles = StyleSheet.create({
   progressTrack: {
     width: '100%',
     height: 6,
-    backgroundColor: '#1E293B',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 3,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     backgroundColor: '#3B82F6',
+    borderRadius: 3,
   },
   metricsRow: {
     flexDirection: 'row',
@@ -258,12 +268,12 @@ const styles = StyleSheet.create({
   },
   metricBox: {
     flex: 1,
-    backgroundColor: '#1E293B',
-    borderRadius: 16,
-    padding: 14,
-    alignItems: 'center',
+    backgroundColor: '#111A2E',
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: 'rgba(255, 255, 255, 0.07)',
+    borderRadius: 18,
+    padding: 16,
+    alignItems: 'center',
   },
   metricVal: {
     color: '#F8FAFC',
@@ -273,33 +283,31 @@ const styles = StyleSheet.create({
   },
   metricLabel: {
     color: '#94A3B8',
-    fontSize: 11,
-    textAlign: 'center',
+    fontSize: 12,
+    fontWeight: '600',
   },
   simulateScanBtn: {
-    backgroundColor: '#064E3B',
-    borderWidth: 1,
-    borderColor: '#10B981',
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  simulateScanBtnText: {
-    color: '#6EE7B7',
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  switchBtn: {
-    backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#475569',
+    backgroundColor: '#10B981',
     paddingVertical: 14,
     borderRadius: 14,
     alignItems: 'center',
   },
-  switchBtnText: {
-    color: '#E2E8F0',
+  simulateScanBtnText: {
+    color: '#FFFFFF',
     fontSize: 14,
+    fontWeight: '700',
+  },
+  switchBtn: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    paddingVertical: 12,
+    borderRadius: 14,
+    alignItems: 'center',
+  },
+  switchBtnText: {
+    color: '#94A3B8',
+    fontSize: 13,
     fontWeight: '600',
   },
 });

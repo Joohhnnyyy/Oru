@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
+import { View, Text, Modal, StyleSheet } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { useAuth } from '../context/AuthContext';
+import { PressableScale } from './PressableScale';
 
 const QUIZ_QUESTIONS = [
   {
@@ -31,26 +33,31 @@ export const CivicQuizModal: React.FC<{
   const [qIndex, setQIndex] = useState(0);
   const [selectedOpt, setSelectedOpt] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
-  const [score, setScore] = useState(0);
+  const [, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
 
   const currentQ = QUIZ_QUESTIONS[qIndex];
 
   const handleSelectOption = (idx: number) => {
     if (showExplanation) return;
+    if (idx === currentQ.correct) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      setScore((s) => s + 1);
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+    }
     setSelectedOpt(idx);
     setShowExplanation(true);
-    if (idx === currentQ.correct) {
-      setScore((s) => s + 1);
-    }
   };
 
   const handleNext = () => {
     setSelectedOpt(null);
     setShowExplanation(false);
     if (qIndex < QUIZ_QUESTIONS.length - 1) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
       setQIndex(qIndex + 1);
     } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
       setFinished(true);
       updateCredits(25);
     }
@@ -66,14 +73,14 @@ export const CivicQuizModal: React.FC<{
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
+    <Modal visible={visible} animationType="fade" transparent>
       <View style={styles.overlay}>
         <View style={styles.card}>
           <View style={styles.headerRow}>
             <Text style={styles.title}>🧠 Civic Waste Quiz</Text>
-            <TouchableOpacity onPress={handleClose}>
+            <PressableScale onPress={handleClose} haptic="light">
               <Text style={styles.closeBtn}>✕</Text>
-            </TouchableOpacity>
+            </PressableScale>
           </View>
 
           {!finished ? (
@@ -95,41 +102,40 @@ export const CivicQuizModal: React.FC<{
                   }
 
                   return (
-                    <TouchableOpacity
+                    <PressableScale
                       key={idx}
                       style={optStyle}
                       onPress={() => handleSelectOption(idx)}
                       disabled={showExplanation}
+                      haptic={false}
                     >
                       <Text style={styles.optionText}>{opt}</Text>
-                    </TouchableOpacity>
+                    </PressableScale>
                   );
                 })}
               </View>
 
               {showExplanation && (
                 <View style={styles.tipBox}>
-                  <Text style={styles.tipTitle}>
-                    {selectedOpt === currentQ.correct ? '✅ Correct Answer!' : '❌ Incorrect'}
-                  </Text>
+                  <Text style={styles.tipLabel}>Civic Knowledge Tip:</Text>
                   <Text style={styles.tipText}>{currentQ.tip}</Text>
-                  <TouchableOpacity style={styles.nextBtn} onPress={handleNext}>
-                    <Text style={styles.nextBtnText}>Next Question →</Text>
-                  </TouchableOpacity>
+                  <PressableScale style={styles.nextBtn} onPress={handleNext} haptic="light">
+                    <Text style={styles.nextBtnText}>
+                      {qIndex < QUIZ_QUESTIONS.length - 1 ? 'Next Question →' : 'Complete Quiz 🎉'}
+                    </Text>
+                  </PressableScale>
                 </View>
               )}
             </View>
           ) : (
-            <View style={styles.finishedBox}>
-              <Text style={styles.trophy}>🏆</Text>
-              <Text style={styles.finishTitle}>Quiz Complete!</Text>
-              <Text style={styles.finishScore}>
-                You scored {score}/{QUIZ_QUESTIONS.length}
-              </Text>
-              <Text style={styles.rewardText}>+25 Green Credits Earned</Text>
-              <TouchableOpacity style={styles.nextBtn} onPress={handleClose}>
-                <Text style={styles.nextBtnText}>Done</Text>
-              </TouchableOpacity>
+            <View style={styles.doneBody}>
+              <Text style={styles.doneEmoji}>🏆</Text>
+              <Text style={styles.doneTitle}>Quiz Completed!</Text>
+              <Text style={styles.doneScore}>Daily Habit Score: 100%</Text>
+              <Text style={styles.doneReward}>+25 Green Credits Added to Wallet</Text>
+              <PressableScale style={styles.finishBtn} onPress={handleClose} haptic="light">
+                <Text style={styles.finishBtnText}>Collect Reward & Close</Text>
+              </PressableScale>
             </View>
           )}
         </View>
@@ -141,22 +147,25 @@ export const CivicQuizModal: React.FC<{
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   card: {
-    backgroundColor: '#1E293B',
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    padding: 24,
-    borderTopWidth: 1,
-    borderTopColor: '#334155',
+    backgroundColor: '#111A2E',
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    padding: 22,
+    width: '100%',
+    maxWidth: 380,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 16,
   },
   title: {
     color: '#F8FAFC',
@@ -165,16 +174,16 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     color: '#94A3B8',
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 18,
+    padding: 4,
   },
   body: {
-    gap: 12,
+    gap: 14,
   },
   counter: {
     color: '#10B981',
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '800',
     letterSpacing: 0.5,
   },
   questionText: {
@@ -182,51 +191,51 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     lineHeight: 22,
-    marginBottom: 8,
   },
   optionsList: {
     gap: 10,
+    marginTop: 4,
   },
   optionBtn: {
-    backgroundColor: '#0F172A',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
     borderWidth: 1,
-    borderColor: '#334155',
-    padding: 14,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 14,
+    padding: 14,
   },
   optionCorrect: {
-    backgroundColor: '#064E3B',
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
     borderWidth: 1,
     borderColor: '#10B981',
-    padding: 14,
     borderRadius: 14,
+    padding: 14,
   },
   optionWrong: {
-    backgroundColor: '#7F1D1D',
+    backgroundColor: 'rgba(239, 68, 68, 0.15)',
     borderWidth: 1,
     borderColor: '#EF4444',
-    padding: 14,
     borderRadius: 14,
+    padding: 14,
   },
   optionText: {
-    color: '#E2E8F0',
+    color: '#F8FAFC',
     fontSize: 14,
     fontWeight: '600',
   },
   tipBox: {
-    backgroundColor: '#0F172A',
-    padding: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
     borderRadius: 14,
-    marginTop: 8,
-    gap: 6,
+    padding: 14,
+    gap: 8,
+    marginTop: 6,
   },
-  tipTitle: {
-    color: '#F8FAFC',
-    fontSize: 13,
+  tipLabel: {
+    color: '#FBBF24',
+    fontSize: 11,
     fontWeight: '700',
   },
   tipText: {
-    color: '#94A3B8',
+    color: '#CBD5E1',
     fontSize: 12,
     lineHeight: 18,
   },
@@ -235,34 +244,47 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: 4,
   },
   nextBtnText: {
     color: '#FFFFFF',
+    fontSize: 13,
     fontWeight: '700',
-    fontSize: 14,
   },
-  finishedBox: {
+  doneBody: {
     alignItems: 'center',
+    gap: 12,
     paddingVertical: 16,
-    gap: 10,
   },
-  trophy: {
-    fontSize: 54,
+  doneEmoji: {
+    fontSize: 52,
   },
-  finishTitle: {
+  doneTitle: {
     color: '#F8FAFC',
     fontSize: 20,
     fontWeight: '800',
   },
-  finishScore: {
+  doneScore: {
     color: '#94A3B8',
-    fontSize: 14,
+    fontSize: 13,
   },
-  rewardText: {
-    color: '#10B981',
-    fontSize: 18,
+  doneReward: {
+    color: '#34D399',
+    fontSize: 15,
     fontWeight: '800',
-    marginBottom: 8,
+  },
+  finishBtn: {
+    backgroundColor: '#10B981',
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 14,
+    marginTop: 8,
+    width: '100%',
+    alignItems: 'center',
+  },
+  finishBtnText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
   },
 });

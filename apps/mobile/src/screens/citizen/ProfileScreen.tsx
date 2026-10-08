@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../context/AuthContext';
 import { AppHeader } from '../../components/AppHeader';
+import { PressableScale } from '../../components/PressableScale';
 
 const DEMO_COUPONS = [
   { id: 'c1', merchant: 'Mother Dairy Safal', offer: '₹50 Off Organic Veggies', cost: 100, category: 'Grocery' },
@@ -15,7 +17,11 @@ export const ProfileScreen: React.FC<{ navigation: any }> = () => {
   const [redeemedVouchers, setRedeemedVouchers] = useState<string[]>(['SAFAL-GREEN-9281']);
 
   const handleRedeem = (coupon: typeof DEMO_COUPONS[0]) => {
-    if (!user || user.greenCredits < coupon.cost) return;
+    if (!user || user.greenCredits < coupon.cost) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      return;
+    }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     updateCredits(-coupon.cost);
     const code = `${coupon.merchant.split(' ')[0].toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`;
     setRedeemedVouchers([code, ...redeemedVouchers]);
@@ -28,35 +34,38 @@ export const ProfileScreen: React.FC<{ navigation: any }> = () => {
 
       {/* Tab Switcher */}
       <View style={styles.tabsRow}>
-        <TouchableOpacity
+        <PressableScale
           style={[styles.tabBtn, activeTab === 'profile' && styles.tabBtnActive]}
           onPress={() => setActiveTab('profile')}
+          haptic="light"
         >
           <Text style={[styles.tabBtnText, activeTab === 'profile' && styles.tabBtnTextActive]}>
             Overview
           </Text>
-        </TouchableOpacity>
+        </PressableScale>
 
-        <TouchableOpacity
+        <PressableScale
           style={[styles.tabBtn, activeTab === 'coupons' && styles.tabBtnActive]}
           onPress={() => setActiveTab('coupons')}
+          haptic="light"
         >
           <Text style={[styles.tabBtnText, activeTab === 'coupons' && styles.tabBtnTextActive]}>
             Coupons ({DEMO_COUPONS.length})
           </Text>
-        </TouchableOpacity>
+        </PressableScale>
 
-        <TouchableOpacity
+        <PressableScale
           style={[styles.tabBtn, activeTab === 'vouchers' && styles.tabBtnActive]}
           onPress={() => setActiveTab('vouchers')}
+          haptic="light"
         >
           <Text style={[styles.tabBtnText, activeTab === 'vouchers' && styles.tabBtnTextActive]}>
-            My Vouchers ({redeemedVouchers.length})
+            Vouchers ({redeemedVouchers.length})
           </Text>
-        </TouchableOpacity>
+        </PressableScale>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         {activeTab === 'profile' && (
           <>
             {/* User Info Card */}
@@ -99,17 +108,20 @@ export const ProfileScreen: React.FC<{ navigation: any }> = () => {
             </View>
 
             {/* Quick Switch to Collector Mode */}
-            <TouchableOpacity
+            <PressableScale
               style={styles.switchRoleCard}
               onPress={() => switchPersona('collector')}
+              haptic="medium"
             >
-              <Text style={styles.switchIcon}>🚛</Text>
+              <View style={styles.switchIconBadge}>
+                <Text style={styles.switchIcon}>🚛</Text>
+              </View>
               <View style={styles.switchInfo}>
                 <Text style={styles.switchTitle}>Switch to Collector Mode</Text>
                 <Text style={styles.switchSub}>Display rotating 30s QR code and stream route location</Text>
               </View>
               <Text style={styles.switchArrow}>→</Text>
-            </TouchableOpacity>
+            </PressableScale>
           </>
         )}
 
@@ -123,18 +135,19 @@ export const ProfileScreen: React.FC<{ navigation: any }> = () => {
                   <Text style={styles.couponCost}>{coupon.cost} GC</Text>
                 </View>
                 <Text style={styles.couponOffer}>{coupon.offer}</Text>
-                <TouchableOpacity
+                <PressableScale
                   style={[
                     styles.redeemBtn,
                     (user?.greenCredits || 0) < coupon.cost && styles.redeemBtnDisabled,
                   ]}
                   onPress={() => handleRedeem(coupon)}
                   disabled={(user?.greenCredits || 0) < coupon.cost}
+                  haptic={false}
                 >
                   <Text style={styles.redeemBtnText}>
                     {(user?.greenCredits || 0) >= coupon.cost ? 'Redeem Voucher' : 'Insufficient Credits'}
                   </Text>
-                </TouchableOpacity>
+                </PressableScale>
               </View>
             ))}
           </>
@@ -162,17 +175,17 @@ export const ProfileScreen: React.FC<{ navigation: any }> = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#0A0F1D',
   },
   tabsRow: {
     flexDirection: 'row',
-    backgroundColor: '#1E293B',
+    backgroundColor: '#0E1626',
     padding: 6,
     marginHorizontal: 16,
     marginTop: 12,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: 'rgba(255, 255, 255, 0.07)',
   },
   tabBtn: {
     flex: 1,
@@ -193,28 +206,30 @@ const styles = StyleSheet.create({
   },
   scroll: {
     padding: 16,
-    paddingBottom: 32,
+    paddingBottom: 40,
   },
   userCard: {
-    backgroundColor: '#1E293B',
+    backgroundColor: '#111A2E',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     padding: 20,
     alignItems: 'center',
     marginBottom: 16,
   },
   avatarCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#0F172A',
+    width: 68,
+    height: 68,
+    borderRadius: 34,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
   },
   avatarEmoji: {
-    fontSize: 32,
+    fontSize: 34,
   },
   userName: {
     color: '#F8FAFC',
@@ -225,41 +240,41 @@ const styles = StyleSheet.create({
   userEmail: {
     color: '#94A3B8',
     fontSize: 12,
-    marginBottom: 10,
+    marginBottom: 12,
   },
   rankPill: {
-    backgroundColor: '#064E3B',
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
     paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingVertical: 5,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#10B981',
+    borderColor: 'rgba(16, 185, 129, 0.4)',
   },
   rankText: {
-    color: '#6EE7B7',
+    color: '#34D399',
     fontSize: 12,
     fontWeight: '700',
   },
   walletCard: {
-    backgroundColor: '#064E3B',
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
     borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#10B981',
+    borderColor: 'rgba(16, 185, 129, 0.4)',
     padding: 20,
     marginBottom: 16,
   },
   walletLabel: {
-    color: '#6EE7B7',
+    color: '#34D399',
     fontSize: 11,
     fontWeight: '800',
-    letterSpacing: 1,
-    marginBottom: 6,
+    letterSpacing: 0.6,
+    marginBottom: 4,
   },
   walletBalance: {
-    color: '#FFFFFF',
-    fontSize: 32,
+    color: '#F8FAFC',
+    fontSize: 28,
     fontWeight: '800',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   xpText: {
     color: '#A7F3D0',
@@ -272,11 +287,11 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   gridBox: {
-    width: '48%',
-    backgroundColor: '#1E293B',
+    width: '48.5%',
+    backgroundColor: '#111A2E',
     borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 14,
+    borderColor: 'rgba(255, 255, 255, 0.07)',
+    borderRadius: 16,
     padding: 14,
     alignItems: 'center',
   },
@@ -289,19 +304,28 @@ const styles = StyleSheet.create({
   gridLabel: {
     color: '#94A3B8',
     fontSize: 11,
+    fontWeight: '600',
   },
   switchRoleCard: {
-    backgroundColor: '#1E293B',
+    backgroundColor: '#111A2E',
     borderWidth: 1,
-    borderColor: '#3B82F6',
-    borderRadius: 16,
+    borderColor: 'rgba(59, 130, 246, 0.35)',
+    borderRadius: 18,
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 12,
+  },
+  switchIconBadge: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   switchIcon: {
-    fontSize: 28,
-    marginRight: 12,
+    fontSize: 22,
   },
   switchInfo: {
     flex: 1,
@@ -315,94 +339,94 @@ const styles = StyleSheet.create({
   switchSub: {
     color: '#64748B',
     fontSize: 11,
+    lineHeight: 15,
   },
   switchArrow: {
-    color: '#93C5FD',
-    fontSize: 18,
+    color: '#3B82F6',
+    fontSize: 20,
     fontWeight: '700',
   },
   sectionHeading: {
     color: '#F8FAFC',
     fontSize: 16,
-    fontWeight: '800',
-    marginBottom: 14,
+    fontWeight: '700',
+    marginBottom: 12,
   },
   couponCard: {
-    backgroundColor: '#1E293B',
+    backgroundColor: '#111A2E',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: 'rgba(255, 255, 255, 0.07)',
     padding: 16,
     marginBottom: 12,
   },
   couponHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 6,
   },
   merchantName: {
-    color: '#94A3B8',
-    fontSize: 13,
-    fontWeight: '600',
+    color: '#F8FAFC',
+    fontSize: 15,
+    fontWeight: '700',
   },
   couponCost: {
-    color: '#10B981',
-    fontWeight: '800',
+    color: '#34D399',
     fontSize: 14,
+    fontWeight: '800',
   },
   couponOffer: {
-    color: '#F8FAFC',
-    fontSize: 16,
-    fontWeight: '700',
+    color: '#94A3B8',
+    fontSize: 13,
     marginBottom: 14,
   },
   redeemBtn: {
     backgroundColor: '#10B981',
     paddingVertical: 10,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: 'center',
   },
   redeemBtnDisabled: {
-    backgroundColor: '#334155',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
   redeemBtnText: {
     color: '#FFFFFF',
-    fontWeight: '700',
     fontSize: 13,
+    fontWeight: '700',
   },
   voucherCard: {
-    backgroundColor: '#1E293B',
+    backgroundColor: '#111A2E',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#10B981',
-    padding: 20,
-    alignItems: 'center',
+    borderColor: 'rgba(255, 255, 255, 0.07)',
+    padding: 18,
     marginBottom: 12,
+    alignItems: 'center',
   },
   voucherMerchant: {
     color: '#94A3B8',
     fontSize: 12,
     fontWeight: '600',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   codeContainer: {
-    backgroundColor: '#0F172A',
-    paddingVertical: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
     paddingHorizontal: 20,
+    paddingVertical: 10,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#334155',
-    marginBottom: 10,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    marginBottom: 8,
   },
   voucherCode: {
-    color: '#10B981',
-    fontSize: 20,
+    color: '#34D399',
+    fontSize: 18,
     fontWeight: '800',
     letterSpacing: 2,
   },
   voucherHint: {
     color: '#64748B',
     fontSize: 11,
-    textAlign: 'center',
   },
 });

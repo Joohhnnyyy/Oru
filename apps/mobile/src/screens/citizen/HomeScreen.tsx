@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../context/AuthContext';
 import { AppHeader } from '../../components/AppHeader';
+import { PressableScale } from '../../components/PressableScale';
 
 export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { user, updateCredits } = useAuth();
@@ -9,6 +11,7 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   const handleQuickCheckin = () => {
     if (streakChecked) return;
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
     setStreakChecked(true);
     updateCredits(15);
   };
@@ -16,11 +19,15 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <AppHeader />
-      <ScrollView contentContainerStyle={styles.scroll}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
         {/* Territory Hero Card */}
         <View style={styles.heroCard}>
           <View style={styles.heroHeader}>
             <View>
+              <Text style={styles.territoryEyebrow}>YOUR HABITAT HEX</Text>
               <Text style={styles.territoryName}>{user?.territoryName || 'MCD South 34'}</Text>
               <Text style={styles.mascotLabel}>🐬 Gangetic Dolphin • Recovering</Text>
             </View>
@@ -33,7 +40,10 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           <View style={styles.progressBarBg}>
             <View style={[styles.progressBarFill, { width: '72%' }]} />
           </View>
-          <Text style={styles.heroHint}>+3.4% health gain this week in your hex</Text>
+          <View style={styles.heroFooter}>
+            <Text style={styles.heroHint}>+3.4% health gain this week in your hex</Text>
+            <Text style={styles.heroBadge}>Live</Text>
+          </View>
         </View>
 
         {/* Status Strip */}
@@ -54,83 +64,105 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Live Incoming Truck Card (B2 Section 4) */}
-        <View style={styles.truckCard}>
+        {/* Live Incoming Truck Card */}
+        <PressableScale
+          style={styles.truckCard}
+          onPress={() => navigation.navigate('Scan')}
+          haptic="medium"
+        >
           <View style={styles.truckIconBadge}>
             <Text style={styles.truckIcon}>🚛</Text>
           </View>
           <View style={styles.truckInfo}>
-            <Text style={styles.truckTitle}>MCD Sanitation Truck Approaching</Text>
-            <Text style={styles.truckMeta}>Vehicle DL-1M-4821 • 120m away (ETA ~3 min)</Text>
+            <View style={styles.truckTitleRow}>
+              <Text style={styles.truckTitle}>MCD Sanitation Truck Approaching</Text>
+              <View style={styles.pulseDot} />
+            </View>
+            <Text style={styles.truckMeta}>DL-1M-4821 • 120m away (ETA ~3 min)</Text>
           </View>
-          <TouchableOpacity
-            style={styles.truckScanBtn}
-            onPress={() => navigation.navigate('Scan')}
-          >
+          <View style={styles.truckScanBtn}>
             <Text style={styles.truckScanBtnText}>Scan</Text>
-          </TouchableOpacity>
-        </View>
+          </View>
+        </PressableScale>
 
         {/* Daily Habit Segregation Check-In */}
         <View style={styles.checkinCard}>
-          <View>
+          <View style={styles.checkinTextContainer}>
             <Text style={styles.checkinTitle}>Daily Segregation Check-In</Text>
-            <Text style={styles.checkinSubtitle}>I separated wet, dry and hazardous waste today</Text>
+            <Text style={styles.checkinSubtitle}>
+              I separated wet, dry and hazardous waste at home today
+            </Text>
           </View>
-          <TouchableOpacity
+          <PressableScale
             style={[styles.checkinBtn, streakChecked && styles.checkinBtnDone]}
             onPress={handleQuickCheckin}
             disabled={streakChecked}
+            haptic={streakChecked ? undefined : 'success'}
           >
             <Text style={styles.checkinBtnText}>
               {streakChecked ? '✓ Completed (+15 GC)' : 'Claim +15 GC'}
             </Text>
-          </TouchableOpacity>
+          </PressableScale>
         </View>
 
         {/* Today's Tasks */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Today's Verified Tasks</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Tasks')}>
-            <Text style={styles.seeAll}>See All</Text>
-          </TouchableOpacity>
+          <PressableScale onPress={() => navigation.navigate('Tasks')}>
+            <Text style={styles.seeAll}>See All →</Text>
+          </PressableScale>
         </View>
 
-        <TouchableOpacity
+        <PressableScale
           style={styles.taskCard}
           onPress={() => navigation.navigate('Scan')}
+          haptic="light"
         >
-          <Text style={styles.taskIcon}>♻️</Text>
+          <View style={styles.taskIconBadge}>
+            <Text style={styles.taskIcon}>♻️</Text>
+          </View>
           <View style={styles.taskText}>
             <Text style={styles.taskName}>Morning Wet & Dry Waste Handover</Text>
             <Text style={styles.taskDesc}>Handover to MCD truck driver or kabadiwala</Text>
           </View>
-          <Text style={styles.taskReward}>+30 GC</Text>
-        </TouchableOpacity>
+          <View style={styles.taskRewardBadge}>
+            <Text style={styles.taskReward}>+30 GC</Text>
+          </View>
+        </PressableScale>
 
-        <TouchableOpacity
+        <PressableScale
           style={styles.taskCard}
           onPress={() => navigation.navigate('Scan')}
+          haptic="light"
         >
-          <Text style={styles.taskIcon}>🧴</Text>
+          <View style={[styles.taskIconBadge, { backgroundColor: 'rgba(59, 130, 246, 0.15)' }]}>
+            <Text style={styles.taskIcon}>🧴</Text>
+          </View>
           <View style={styles.taskText}>
             <Text style={styles.taskName}>Drop Plastic at Smart MCD Bin</Text>
             <Text style={styles.taskDesc}>Scan decal at Central Market dustbin</Text>
           </View>
-          <Text style={styles.taskReward}>+20 GC</Text>
-        </TouchableOpacity>
+          <View style={styles.taskRewardBadge}>
+            <Text style={styles.taskReward}>+20 GC</Text>
+          </View>
+        </PressableScale>
 
-        <TouchableOpacity
+        <PressableScale
           style={styles.taskCard}
           onPress={() => navigation.navigate('Tasks')}
+          haptic="light"
         >
-          <Text style={styles.taskIcon}>📸</Text>
+          <View style={[styles.taskIconBadge, { backgroundColor: 'rgba(245, 158, 11, 0.15)' }]}>
+            <Text style={styles.taskIcon}>📸</Text>
+          </View>
           <View style={styles.taskText}>
             <Text style={styles.taskName}>Report Garbage Vulnerable Spot</Text>
             <Text style={styles.taskDesc}>Submit photo of illegal dump spot for bounty</Text>
           </View>
-          <Text style={styles.taskReward}>+50 GC</Text>
-        </TouchableOpacity>
+          <View style={[styles.taskRewardBadge, { backgroundColor: 'rgba(245, 158, 11, 0.15)', borderColor: 'rgba(245, 158, 11, 0.4)' }]}>
+            <Text style={[styles.taskReward, { color: '#FBBF24' }]}>+50 GC</Text>
+          </View>
+        </PressableScale>
       </ScrollView>
     </View>
   );
@@ -139,17 +171,17 @@ export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#0A0F1D',
   },
   scroll: {
     padding: 16,
-    paddingBottom: 32,
+    paddingBottom: 40,
   },
   heroCard: {
-    backgroundColor: '#1E293B',
+    backgroundColor: '#111A2E',
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     padding: 20,
     marginBottom: 16,
   },
@@ -159,11 +191,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
+  territoryEyebrow: {
+    color: '#10B981',
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    marginBottom: 3,
+  },
   territoryName: {
     color: '#F8FAFC',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '800',
     marginBottom: 4,
+    letterSpacing: -0.3,
   },
   mascotLabel: {
     color: '#94A3B8',
@@ -171,39 +211,57 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   healthCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: '#064E3B',
+    width: 62,
+    height: 62,
+    borderRadius: 31,
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
     borderWidth: 2,
     borderColor: '#10B981',
     alignItems: 'center',
     justifyContent: 'center',
   },
   healthNumber: {
-    color: '#6EE7B7',
-    fontSize: 18,
+    color: '#34D399',
+    fontSize: 19,
     fontWeight: '800',
   },
   healthSub: {
     color: '#10B981',
     fontSize: 9,
-    fontWeight: '700',
+    fontWeight: '800',
+    letterSpacing: 0.5,
   },
   progressBarBg: {
     height: 8,
-    backgroundColor: '#334155',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 4,
     overflow: 'hidden',
-    marginBottom: 8,
+    marginBottom: 10,
   },
   progressBarFill: {
     height: '100%',
     backgroundColor: '#10B981',
+    borderRadius: 4,
+  },
+  heroFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   heroHint: {
     color: '#64748B',
     fontSize: 12,
+    fontWeight: '500',
+  },
+  heroBadge: {
+    color: '#10B981',
+    fontSize: 10,
+    fontWeight: '800',
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    textTransform: 'uppercase',
   },
   statsRow: {
     flexDirection: 'row',
@@ -212,64 +270,77 @@ const styles = StyleSheet.create({
   },
   statBox: {
     flex: 1,
-    backgroundColor: '#1E293B',
+    backgroundColor: '#111A2E',
     borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 14,
-    padding: 12,
+    borderColor: 'rgba(255, 255, 255, 0.07)',
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
     alignItems: 'center',
   },
   statVal: {
     color: '#F8FAFC',
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: '800',
-    marginBottom: 2,
+    marginBottom: 3,
   },
   statLabel: {
     color: '#94A3B8',
     fontSize: 11,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   truckCard: {
-    backgroundColor: '#1E293B',
+    backgroundColor: '#111A2E',
     borderWidth: 1,
-    borderColor: '#3B82F6',
-    borderRadius: 16,
-    padding: 12,
+    borderColor: 'rgba(59, 130, 246, 0.35)',
+    borderRadius: 18,
+    padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
   },
   truckIconBadge: {
-    backgroundColor: '#1E3A8A',
-    width: 40,
-    height: 40,
-    borderRadius: 10,
+    backgroundColor: 'rgba(59, 130, 246, 0.2)',
+    width: 44,
+    height: 44,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 10,
+    marginRight: 12,
   },
   truckIcon: {
-    fontSize: 20,
+    fontSize: 22,
   },
   truckInfo: {
     flex: 1,
+  },
+  truckTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 3,
   },
   truckTitle: {
     color: '#93C5FD',
     fontSize: 13,
     fontWeight: '700',
-    marginBottom: 2,
+  },
+  pulseDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#60A5FA',
   },
   truckMeta: {
     color: '#64748B',
     fontSize: 11,
+    fontWeight: '500',
   },
   truckScanBtn: {
-    backgroundColor: '#3B82F6',
+    backgroundColor: '#2563EB',
     paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+    paddingHorizontal: 14,
+    borderRadius: 10,
   },
   truckScanBtnText: {
     color: '#FFFFFF',
@@ -277,23 +348,26 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   checkinCard: {
-    backgroundColor: '#1E293B',
-    borderRadius: 16,
+    backgroundColor: '#111A2E',
+    borderRadius: 18,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: 'rgba(255, 255, 255, 0.07)',
     padding: 16,
     marginBottom: 20,
     gap: 12,
+  },
+  checkinTextContainer: {
+    gap: 2,
   },
   checkinTitle: {
     color: '#F8FAFC',
     fontSize: 15,
     fontWeight: '700',
-    marginBottom: 2,
   },
   checkinSubtitle: {
     color: '#94A3B8',
     fontSize: 12,
+    lineHeight: 16,
   },
   checkinBtn: {
     backgroundColor: '#10B981',
@@ -302,7 +376,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkinBtnDone: {
-    backgroundColor: '#064E3B',
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.4)',
   },
   checkinBtnText: {
     color: '#FFFFFF',
@@ -323,21 +399,29 @@ const styles = StyleSheet.create({
   seeAll: {
     color: '#10B981',
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: '700',
   },
   taskCard: {
-    backgroundColor: '#1E293B',
-    borderRadius: 14,
+    backgroundColor: '#111A2E',
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: 'rgba(255, 255, 255, 0.07)',
     padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 10,
   },
-  taskIcon: {
-    fontSize: 24,
+  taskIconBadge: {
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 12,
+  },
+  taskIcon: {
+    fontSize: 22,
   },
   taskText: {
     flex: 1,
@@ -352,9 +436,17 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     fontSize: 12,
   },
+  taskRewardBadge: {
+    backgroundColor: 'rgba(16, 185, 129, 0.12)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.3)',
+  },
   taskReward: {
-    color: '#10B981',
+    color: '#34D399',
     fontWeight: '700',
-    fontSize: 13,
+    fontSize: 12,
   },
 });

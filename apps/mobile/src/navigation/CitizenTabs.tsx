@@ -1,6 +1,6 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 
 import { HomeScreen } from '../screens/citizen/HomeScreen';
 import { MapScreen } from '../screens/citizen/MapScreen';
@@ -17,15 +17,21 @@ export const CitizenTabs: React.FC = () => {
     <TabNavigator
       screenOptions={{
         headerShown: false,
+        animation: 'none', // Emil Kowalski rule: Tabs are peers, not a hierarchy; tab switches never slide
         tabBarStyle: {
-          backgroundColor: '#0F172A',
-          borderTopColor: '#1E293B',
-          height: 64,
-          paddingBottom: 10,
+          backgroundColor: '#0A0F1D',
+          borderTopColor: 'rgba(255, 255, 255, 0.07)',
+          borderTopWidth: 1,
+          height: 68,
+          paddingBottom: 12,
           paddingTop: 8,
         },
         tabBarActiveTintColor: '#10B981',
         tabBarInactiveTintColor: '#64748B',
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+        },
       }}
     >
       <TabScreen
@@ -33,7 +39,7 @@ export const CitizenTabs: React.FC = () => {
         component={HomeScreen}
         options={{
           tabBarLabel: 'Home',
-          tabBarIcon: () => <Text style={{ fontSize: 20 }}>🏠</Text>,
+          tabBarIcon: () => <Text style={{ fontSize: 19 }}>🏠</Text>,
         }}
       />
       <TabScreen
@@ -41,7 +47,7 @@ export const CitizenTabs: React.FC = () => {
         component={MapScreen}
         options={{
           tabBarLabel: 'Map',
-          tabBarIcon: () => <Text style={{ fontSize: 20 }}>🗺️</Text>,
+          tabBarIcon: () => <Text style={{ fontSize: 19 }}>🗺️</Text>,
         }}
       />
       <TabScreen
@@ -49,7 +55,11 @@ export const CitizenTabs: React.FC = () => {
         component={ScanScreen}
         options={{
           tabBarLabel: 'Scan',
-          tabBarIcon: () => <Text style={{ fontSize: 24 }}>📷</Text>,
+          tabBarIcon: () => (
+            <View style={styles.scanTabBadge}>
+              <Text style={{ fontSize: 18 }}>📷</Text>
+            </View>
+          ),
         }}
       />
       <TabScreen
@@ -57,7 +67,7 @@ export const CitizenTabs: React.FC = () => {
         component={TasksScreen}
         options={{
           tabBarLabel: 'Tasks',
-          tabBarIcon: () => <Text style={{ fontSize: 20 }}>📋</Text>,
+          tabBarIcon: () => <Text style={{ fontSize: 19 }}>📋</Text>,
         }}
       />
       <TabScreen
@@ -65,9 +75,23 @@ export const CitizenTabs: React.FC = () => {
         component={ProfileScreen}
         options={{
           tabBarLabel: 'Profile',
-          tabBarIcon: () => <Text style={{ fontSize: 20 }}>👤</Text>,
+          tabBarIcon: () => <Text style={{ fontSize: 19 }}>👤</Text>,
         }}
       />
     </TabNavigator>
   );
 };
+
+const styles = StyleSheet.create({
+  scanTabBadge: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(16, 185, 129, 0.15)',
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 2,
+  },
+});

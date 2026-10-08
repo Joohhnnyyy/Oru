@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { AppHeader } from '../../components/AppHeader';
+import { PressableScale } from '../../components/PressableScale';
 
 const DELHI_TERRITORIES = [
   { id: '1', name: 'MCD South 34 (Lajpat Nagar)', mascot: '🐬 Dolphin', health: 72, mood: 'Recovering', cleanIndex: 7.2, trucks: 2, color: '#F59E0B' },
@@ -14,6 +16,16 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
   const [selectedTerritory, setSelectedTerritory] = useState(DELHI_TERRITORIES[0]);
   const [activeFilter, setActiveFilter] = useState<'all' | 'trucks' | 'drop_points'>('all');
 
+  const handleSelectTerritory = (t: typeof DELHI_TERRITORIES[0]) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    setSelectedTerritory(t);
+  };
+
+  const handleSelectFilter = (f: 'all' | 'trucks' | 'drop_points') => {
+    Haptics.selectionAsync().catch(() => {});
+    setActiveFilter(f);
+  };
+
   return (
     <View style={styles.container}>
       <AppHeader title="Delhi NCR Territory Map" />
@@ -26,18 +38,19 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
           {/* Interactive Territory Nodes */}
           <View style={styles.nodesWrapper}>
             {DELHI_TERRITORIES.map((t) => (
-              <TouchableOpacity
+              <PressableScale
                 key={t.id}
                 style={[
                   styles.territoryHex,
                   { borderColor: t.color },
                   selectedTerritory.id === t.id && styles.selectedHex,
                 ]}
-                onPress={() => setSelectedTerritory(t)}
+                onPress={() => handleSelectTerritory(t)}
+                haptic={false}
               >
                 <Text style={styles.hexEmoji}>{t.mascot.split(' ')[0]}</Text>
                 <Text style={styles.hexHealth}>{t.health}%</Text>
-              </TouchableOpacity>
+              </PressableScale>
             ))}
           </View>
 
@@ -50,30 +63,33 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
 
         {/* Filter Pills */}
         <View style={styles.filterBar}>
-          <TouchableOpacity
+          <PressableScale
             style={[styles.filterPill, activeFilter === 'all' && styles.activeFilter]}
-            onPress={() => setActiveFilter('all')}
+            onPress={() => handleSelectFilter('all')}
+            haptic={false}
           >
             <Text style={[styles.filterText, activeFilter === 'all' && styles.activeFilterText]}>
               All Layers
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </PressableScale>
+          <PressableScale
             style={[styles.filterPill, activeFilter === 'trucks' && styles.activeFilter]}
-            onPress={() => setActiveFilter('trucks')}
+            onPress={() => handleSelectFilter('trucks')}
+            haptic={false}
           >
             <Text style={[styles.filterText, activeFilter === 'trucks' && styles.activeFilterText]}>
               Live Trucks
             </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
+          </PressableScale>
+          <PressableScale
             style={[styles.filterPill, activeFilter === 'drop_points' && styles.activeFilter]}
-            onPress={() => setActiveFilter('drop_points')}
+            onPress={() => handleSelectFilter('drop_points')}
+            haptic={false}
           >
             <Text style={[styles.filterText, activeFilter === 'drop_points' && styles.activeFilterText]}>
               Smart Bins
             </Text>
-          </TouchableOpacity>
+          </PressableScale>
         </View>
       </View>
 
@@ -98,14 +114,34 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
             <Text style={styles.sheetStatLabel}>Health Index</Text>
           </View>
           <View style={styles.sheetStatItem}>
-            <Text style={styles.sheetStatVal}>{selectedTerritory.cleanIndex} ★</Text>
-            <Text style={styles.sheetStatLabel}>Clean Rating</Text>
+            <Text style={styles.sheetStatVal}>{selectedTerritory.cleanIndex}/10</Text>
+            <Text style={styles.sheetStatLabel}>Clean Index</Text>
           </View>
           <View style={styles.sheetStatItem}>
-            <Text style={styles.sheetStatVal}>{selectedTerritory.trucks} Trucks</Text>
-            <Text style={styles.sheetStatLabel}>Active Today</Text>
+            <Text style={styles.sheetStatVal}>{selectedTerritory.trucks} Active</Text>
+            <Text style={styles.sheetStatLabel}>MCD Trucks</Text>
           </View>
         </View>
+
+        <ScrollView showsVerticalScrollIndicator={false} style={styles.sheetList}>
+          <View style={styles.sheetItem}>
+            <Text style={styles.itemEmoji}>🚛</Text>
+            <View style={styles.itemTextContainer}>
+              <Text style={styles.itemTitle}>MCD Sanitation Truck DL-1M-4821</Text>
+              <Text style={styles.itemSub}>On Route • 120m away from your location</Text>
+            </View>
+            <Text style={styles.itemAction}>Live</Text>
+          </View>
+
+          <View style={styles.sheetItem}>
+            <Text style={styles.itemEmoji}>📦</Text>
+            <View style={styles.itemTextContainer}>
+              <Text style={styles.itemTitle}>Central Market Smart MCD Bin #402</Text>
+              <Text style={styles.itemSub}>Static Decal • 350m away</Text>
+            </View>
+            <Text style={styles.itemAction}>Nav →</Text>
+          </View>
+        </ScrollView>
       </View>
     </View>
   );
@@ -114,90 +150,94 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0F172A',
+    backgroundColor: '#0A0F1D',
   },
   mapCanvas: {
     flex: 1,
-    backgroundColor: '#090D16',
+    backgroundColor: '#070C18',
     justifyContent: 'space-between',
     padding: 16,
   },
   hexGridContainer: {
-    flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
+    gap: 16,
+    paddingTop: 8,
   },
   mapCanvasBadge: {
     color: '#64748B',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
-    marginBottom: 24,
-    letterSpacing: 0.5,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.07)',
   },
   nodesWrapper: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 16,
-    width: '100%',
+    gap: 12,
+    marginVertical: 12,
   },
   territoryHex: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    backgroundColor: '#1E293B',
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#111A2E',
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
   selectedHex: {
-    backgroundColor: '#334155',
     transform: [{ scale: 1.1 }],
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   hexEmoji: {
-    fontSize: 28,
+    fontSize: 22,
+    marginBottom: 2,
   },
   hexHealth: {
     color: '#F8FAFC',
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '800',
-    marginTop: 2,
   },
   liveTruckIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1E293B',
+    backgroundColor: 'rgba(59, 130, 246, 0.15)',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 16,
-    marginTop: 32,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#3B82F6',
+    borderColor: 'rgba(59, 130, 246, 0.35)',
   },
   pulseDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#3B82F6',
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#60A5FA',
     marginRight: 8,
   },
   liveTruckText: {
     color: '#93C5FD',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
   },
   filterBar: {
     flexDirection: 'row',
     gap: 8,
-    alignSelf: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
   },
   filterPill: {
-    backgroundColor: '#1E293B',
+    backgroundColor: '#111A2E',
+    paddingVertical: 7,
     paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 16,
+    borderRadius: 14,
     borderWidth: 1,
-    borderColor: '#334155',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
   },
   activeFilter: {
     backgroundColor: '#10B981',
@@ -213,64 +253,97 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   detailSheet: {
-    backgroundColor: '#1E293B',
+    backgroundColor: '#111A2E',
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#334155',
+    borderTopColor: 'rgba(255, 255, 255, 0.08)',
+    padding: 18,
+    maxHeight: 280,
   },
   sheetHandle: {
-    width: 40,
+    width: 36,
     height: 4,
-    backgroundColor: '#475569',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 2,
     alignSelf: 'center',
-    marginBottom: 12,
+    marginBottom: 14,
   },
   sheetHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 14,
   },
   sheetTitle: {
     color: '#F8FAFC',
     fontSize: 16,
     fontWeight: '800',
-    marginBottom: 2,
   },
   sheetMascot: {
     color: '#94A3B8',
-    fontSize: 13,
+    fontSize: 12,
+    marginTop: 2,
   },
   moodBadge: {
     paddingHorizontal: 10,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 8,
   },
   moodText: {
-    fontWeight: '700',
-    fontSize: 12,
+    fontSize: 11,
+    fontWeight: '800',
   },
   sheetStats: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    backgroundColor: '#0F172A',
-    padding: 12,
-    borderRadius: 14,
+    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+    borderRadius: 12,
+    paddingVertical: 10,
+    marginBottom: 14,
   },
   sheetStatItem: {
     alignItems: 'center',
   },
   sheetStatVal: {
     color: '#F8FAFC',
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '800',
-    marginBottom: 2,
   },
   sheetStatLabel: {
     color: '#64748B',
+    fontSize: 10,
+    marginTop: 2,
+  },
+  sheetList: {
+    maxHeight: 100,
+  },
+  sheetItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.05)',
+  },
+  itemEmoji: {
+    fontSize: 18,
+    marginRight: 10,
+  },
+  itemTextContainer: {
+    flex: 1,
+  },
+  itemTitle: {
+    color: '#F8FAFC',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  itemSub: {
+    color: '#64748B',
     fontSize: 11,
+  },
+  itemAction: {
+    color: '#10B981',
+    fontSize: 11,
+    fontWeight: '700',
   },
 });
