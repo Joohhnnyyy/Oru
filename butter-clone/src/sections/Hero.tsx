@@ -6,20 +6,22 @@ export default function Hero() {
     <section
       id="hero"
       aria-label="Butter creative editor"
-      className="relative isolate overflow-hidden bg-butter-white min-h-[min(920px,calc(100svh-76px))] flex flex-col items-center justify-between pt-12 pb-6 md:pt-16 md:pb-12"
+      className="relative isolate overflow-hidden bg-butter-white min-h-[min(960px,100svh)] flex flex-col items-center justify-start pt-20 md:pt-24 pb-16"
     >
       {/* Authentic butter.video hero background gradient (#D6D6D6 -> #FAFAFA) */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-gradient-to-b from-[#D6D6D6]/60 via-[#EAEAEA]/40 to-butter-white"
+        className="absolute inset-0 -z-10 bg-gradient-to-b from-[#D6D6D6]/70 via-[#EAEAEA]/50 to-butter-white"
       />
 
-      <div className="relative z-20 w-full max-w-[1440px] px-6 md:px-12">
-        <HeroContent />
+      {/* 3D Keychain hanging down from top */}
+      <div className="relative z-10 w-full max-w-3xl mx-auto -mt-6 md:-mt-8">
+        <HeroMedia />
       </div>
 
-      <div className="relative z-10 w-full mt-4 md:mt-2">
-        <HeroMedia />
+      {/* Hero Headline, Subhead & CTA button */}
+      <div className="relative z-20 w-full max-w-[1440px] px-6 md:px-12 mt-2 md:mt-4">
+        <HeroContent />
       </div>
     </section>
   )

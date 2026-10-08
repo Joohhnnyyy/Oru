@@ -30,7 +30,7 @@ export function HeroMedia({
   return (
     <div
       data-hero-media
-      className="relative mx-auto h-[420px] w-full max-w-[680px] md:h-[540px] lg:h-[620px] flex items-center justify-center overflow-visible"
+      className="relative mx-auto h-[300px] sm:h-[360px] md:h-[400px] w-full max-w-[680px] flex items-center justify-center overflow-visible"
     >
       {shouldRender3D ? (
         <div className="absolute inset-0 z-10">

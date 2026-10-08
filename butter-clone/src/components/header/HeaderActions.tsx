@@ -5,7 +5,7 @@ export function HeaderActions() {
         href="https://app.butter.video/login"
         className="rounded-full px-4 py-2.5 text-sm font-medium text-butter-black transition-colors hover:bg-butter-light-grey focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-butter-black"
       >
-        Log in
+        Login
       </a>
       <a
         href="https://app.butter.video/register"
