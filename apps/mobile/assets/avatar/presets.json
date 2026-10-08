@@ -1745,8 +1745,6 @@
       },
       "nodes": [
         {
-          "id": "shape-1089630b-c718-4abb-9891-aa817d0a26c0",
-          "name": "Sphère 1",
           "surface": {
             "type": "sphere",
             "width": 81.60000000000001,
@@ -1766,8 +1764,6 @@
           ]
         },
         {
-          "id": "shape-6c5a8bdd-04b7-4581-8889-cf8e1af5246e",
-          "name": "Sphère 2",
           "surface": {
             "type": "sphere",
             "width": 81.60000000000001,
@@ -1787,8 +1783,6 @@
           ]
         },
         {
-          "id": "shape-68a52731-6b5b-487d-8508-dd3c6cebf781",
-          "name": "Cylindre 3",
           "surface": {
             "type": "cylinder",
             "width": 59.483593750000004,
@@ -8741,8 +8735,6 @@
       },
       "nodes": [
         {
-          "id": "shape-38130162-a15b-4fa8-a58b-9c74b07e1a25",
-          "name": "Sphère 1",
           "surface": {
             "type": "sphere",
             "width": 60,
@@ -8762,8 +8754,6 @@
           ]
         },
         {
-          "id": "shape-f987c6e1-02e3-4256-9053-655414890a3c",
-          "name": "Sphère 1 copie",
           "surface": {
             "type": "sphere",
             "width": 59.57851562500001,
@@ -8783,8 +8773,6 @@
           ]
         },
         {
-          "id": "shape-0f31bd3d-2d53-4c9d-a5e0-d587d6ef9b8c",
-          "name": "Sphère 1 copie copie",
           "surface": {
             "type": "sphere",
             "width": 81.60000000000001,
@@ -8804,8 +8792,6 @@
           ]
         },
         {
-          "id": "shape-9a17a167-46fb-4871-9252-24abbb80b1ca",
-          "name": "Sphère 1 copie copie copie",
           "surface": {
             "type": "sphere",
             "width": 70.12148437500001,
@@ -8825,8 +8811,6 @@
           ]
         },
         {
-          "id": "shape-e6574431-f8b6-482f-89d0-c280a327461f",
-          "name": "Sphère 1 copie copie copie copie",
           "surface": {
             "type": "sphere",
             "width": 61.89843750000001,
@@ -8846,8 +8830,6 @@
           ]
         },
         {
-          "id": "shape-5bc8f568-1cbb-4419-84bc-ce264b218a02",
-          "name": "Sphère 1 copie copie copie copie copie",
           "surface": {
             "type": "sphere",
             "width": 61.11328125000001,
@@ -8867,8 +8849,6 @@
           ]
         },
         {
-          "id": "shape-405e86d3-93c9-4de8-a15e-9ae1ba33c88c",
-          "name": "Sphère 1 copie copie copie copie copie copie",
           "surface": {
             "type": "sphere",
             "width": 61.726171875000006,
@@ -8888,8 +8868,6 @@
           ]
         },
         {
-          "id": "shape-0abdf33f-450d-4125-9354-b02842084138",
-          "name": "Sphère 1 copie copie copie copie copie copie copie",
           "surface": {
             "type": "sphere",
             "width": 64.116796875,
@@ -10642,8 +10620,6 @@
       },
       "nodes": [
         {
-          "id": "shape-2f26b4c0-61de-4fde-ae09-c4595cdaab59",
-          "name": "Sphère 1",
           "surface": {
             "type": "sphere",
             "width": 108.11015625000002,
@@ -10663,8 +10639,6 @@
           ]
         },
         {
-          "id": "shape-3cd1a09e-b9a8-4271-95b1-4c21a09a6580",
-          "name": "Sphère 1 copie",
           "surface": {
             "type": "sphere",
             "width": 108.11015625000002,
@@ -12417,8 +12391,6 @@
       },
       "nodes": [
         {
-          "id": "shape-3e98b39e-4765-4895-9309-3d0dd55bd316",
-          "name": "Sphère 1",
           "surface": {
             "type": "sphere",
             "width": 81.60000000000001,
@@ -12438,8 +12410,6 @@
           ]
         },
         {
-          "id": "shape-52d58f1c-c8da-4077-8d29-454907ad8847",
-          "name": "Sphère 1 copie",
           "surface": {
             "type": "sphere",
             "width": 108.64140625000002,
@@ -12459,8 +12429,6 @@
           ]
         },
         {
-          "id": "shape-d4b4e8ad-8625-488d-920c-c497da226f9f",
-          "name": "Sphère 1 copie copie",
           "surface": {
             "type": "sphere",
             "width": 97.79101562500003,
@@ -12480,8 +12448,6 @@
           ]
         },
         {
-          "id": "shape-56ea10ed-1202-4b78-9968-96f870f633f7",
-          "name": "Sphère 1 copie",
           "surface": {
             "type": "sphere",
             "width": 94.34892531002268,
@@ -17702,8 +17668,8 @@
       "nodes": []
     },
     "colors": {
-      "body": "#00E5B3",
-      "eyes": "#0A0F1D"
+      "body": "#00e5b3",
+      "eyes": "#0a0f1d"
     },
     "expressions": {
       "neutral": {

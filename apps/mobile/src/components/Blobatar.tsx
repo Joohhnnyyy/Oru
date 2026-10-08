@@ -52,6 +52,15 @@ export const Blobatar: React.FC<BlobatarProps> = ({
     const clone = JSON.parse(JSON.stringify(base));
     if (bodyColor) clone.colors.body = bodyColor;
     if (eyeColor) clone.colors.eyes = eyeColor;
+    if (clone.colors?.body) clone.colors.body = clone.colors.body.toLowerCase();
+    if (clone.colors?.eyes) clone.colors.eyes = clone.colors.eyes.toLowerCase();
+    if (clone.expressions) {
+      Object.keys(clone.expressions).forEach((k) => {
+        const exp = clone.expressions[k];
+        if (exp.colors?.body) exp.colors.body = exp.colors.body.toLowerCase();
+        if (exp.colors?.eyes) exp.colors.eyes = exp.colors.eyes.toLowerCase();
+      });
+    }
     return clone;
   }, [preset, bodyColor, eyeColor]);
 
@@ -127,7 +136,21 @@ export const Blobatar: React.FC<BlobatarProps> = ({
     }
   </style>
   <script>
-    ${AVATAR_STANDALONE_BUNDLE}
+    window.onerror = function(msg, url, line) {
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage("JS Error: " + msg + " at " + line);
+      }
+    };
+    try {
+      ${AVATAR_STANDALONE_BUNDLE}
+      if (typeof AvatarWeb !== 'undefined') {
+        window.AvatarWeb = AvatarWeb;
+      }
+    } catch (e) {
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage("Bundle eval error: " + e.message);
+      }
+    }
   </script>
 </head>
 <body>
@@ -138,20 +161,29 @@ export const Blobatar: React.FC<BlobatarProps> = ({
 
     function mount() {
       var root = document.getElementById('avatar-root');
-      if (!window.AvatarWeb || !window.AvatarWeb.createAvatar) {
-        setTimeout(mount, 30);
+      var lib = window.AvatarWeb || (typeof AvatarWeb !== 'undefined' ? AvatarWeb : null);
+      if (!lib || !lib.createAvatar) {
+        if (window.ReactNativeWebView) {
+          window.ReactNativeWebView.postMessage("Waiting for AvatarWeb... type=" + (typeof AvatarWeb));
+        }
+        setTimeout(mount, 50);
         return;
       }
       root.innerHTML = '';
       try {
-        controller = window.AvatarWeb.createAvatar(root, {
+        controller = lib.createAvatar(root, {
           definition: definition,
           defaultAnimation: "${animation}",
           autoplay: true,
           size: "${size}px",
         });
+        if (window.ReactNativeWebView) {
+          window.ReactNativeWebView.postMessage("Avatar mounted! HTML: " + root.innerHTML.slice(0, 300));
+        }
       } catch (err) {
-        console.error("Mount error:", err);
+        if (window.ReactNativeWebView) {
+          window.ReactNativeWebView.postMessage("Mount error: " + (err ? (err.message || err.toString()) : "unknown"));
+        }
       }
     }
 
@@ -166,7 +198,7 @@ export const Blobatar: React.FC<BlobatarProps> = ({
 </body>
 </html>
     `;
-  }, [definition, size]);
+  }, [definition, size, animation, preset]);
 
   return (
     <TouchableOpacity
@@ -178,7 +210,9 @@ export const Blobatar: React.FC<BlobatarProps> = ({
       <RNWebView
         ref={webViewRef}
         source={{ html: htmlContent }}
-        style={styles.webView}
+        style={{ width: size, height: size, backgroundColor: 'transparent' }}
+        containerStyle={{ width: size, height: size, backgroundColor: 'transparent' }}
+        androidLayerType="hardware"
         originWhitelist={['*']}
         javaScriptEnabled={true}
         domStorageEnabled={true}
@@ -187,6 +221,9 @@ export const Blobatar: React.FC<BlobatarProps> = ({
         showsVerticalScrollIndicator={false}
         overScrollMode="never"
         pointerEvents={interactive ? 'none' : 'auto'}
+        onMessage={(event: any) => {
+          console.log('[Blobatar WebView Log]', event.nativeEvent.data);
+        }}
       />
     </TouchableOpacity>
   );
