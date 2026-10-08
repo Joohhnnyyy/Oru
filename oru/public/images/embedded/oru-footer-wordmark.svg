@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 320" fill="none">
+  <!-- Monumental architectural lowercase 'oru' wordmark -->
+  <g fill="#1E1E1E">
+    <!-- Massive 'o' -->
+    <path d="M 160 30 C 70 30 0 95 0 175 C 0 255 70 320 160 320 C 250 320 320 255 320 175 C 320 95 250 30 160 30 Z M 160 98 C 205 98 245 130 245 175 C 245 220 205 252 160 252 C 115 252 75 220 75 175 C 75 130 115 98 160 98 Z" />
+    
+    <!-- Massive 'r' -->
+    <path d="M 385 45 H 460 V 105 C 485 62 535 35 605 45 V 125 C 530 115 460 145 460 215 V 315 H 385 V 45 Z" />
+    
+    <!-- Massive 'u' -->
+    <path d="M 675 45 H 750 V 205 C 750 245 780 255 815 255 C 850 255 880 245 880 205 V 45 H 955 V 315 H 880 V 268 C 855 305 805 322 755 320 C 690 320 675 272 675 218 V 45 Z" />
+    
+    <!-- Geometric accent block -->
+    <rect x="975" y="275" width="25" height="40" rx="6" fill="#4DC5E5" />
+  </g>
+</svg>

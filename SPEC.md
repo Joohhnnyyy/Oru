@@ -1,16 +1,17 @@
-# SPEC.md — Butter Video Landing Page Clone
+# SPEC.md — Oru Landing Page
 
 > Read this file at the start of every session. Update it when decisions change.
 
 ## 1. Goal
-Rebuild the Butter (butter.video) marketing homepage as a clean React + TypeScript project, matching the original's layout, feel and animations. This is a learning/portfolio clone, so all branding must be replaced before publishing (see section 9).
+Rebuild the marketing homepage as a clean React + TypeScript project under the **Oru** brand identity, with smooth layout, interactive feel, and fluid animations. Inspired by Butter (butter.video) with all branding and package identity migrated to Oru.
 
 ## 2. Folder layout
 ```
-my-project/
+oru-main/
 ├── reference/        ← unzipped original export. READ-ONLY. Never edit.
 ├── SPEC.md           ← this file
-└── butter-clone/     ← the new app (all work happens here)
+├── .planning/        ← GSD project planning & state tracking
+└── oru/              ← the application (all work happens here)
 ```
 - To view the original: open `reference/index.html` in a browser, or run `python3 server.py` inside `reference/` (serves on port 8080).
 - `reference/index.html` is ~37 MB because videos and images are embedded as base64. **Do not open or paste it into the AI context.** Use screenshots of the original instead.
@@ -128,13 +129,13 @@ Copy from `reference/` into `butter-clone/public/`:
 10. I will commit to git after each working section. Do not rewrite files that already work unless I ask.
 
 ## 9. Before this is published (replace everything that isn't mine)
-- [ ] Brand name "Butter" → my own name
-- [ ] All headline and body copy rewritten in my own words
-- [ ] Client logos (Netflix, Airbnb, SpaceX, etc.) → my own placeholder or logos I have rights to
-- [ ] Keychain 3D models → my own model, or remove the 3D scene
-- [ ] Fonts → free fonts only (already planned)
-- [ ] Template names (Justified Studio, Dedcool, Kiel Dangler) → my own examples
-- [ ] Footer note: "Design inspired by Butter"
+- [x] Brand name "Butter" → Oru
+- [x] All headline and body copy updated to Oru branding
+- [ ] Client logos (Netflix, Airbnb, SpaceX, etc.) → custom placeholders or licensed logos
+- [ ] Keychain 3D models → custom models or procedural shapes
+- [x] Fonts → free fonts only (Space Grotesk + Inter + JetBrains Mono)
+- [ ] Template names (Justified Studio, Dedcool, Kiel Dangler) → custom examples
+- [x] Footer note: "Design inspired by Butter"
 
 ## 10. Build order
 1. Project setup, tokens, folder structure, copy assets
