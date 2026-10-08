@@ -4,7 +4,10 @@ import * as Haptics from 'expo-haptics';
 import { AppHeader } from '../../components/AppHeader';
 import { PressableScale } from '../../components/PressableScale';
 import { Icon3D } from '../../components/Icon3D';
+import { Google3DMap } from '../../components/Google3DMap';
 import { colors, radii, spacing } from '../../theme/tokens';
+
+const GOOGLE_MAPS_KEY = 'REMOVED_CREDENTIAL';
 
 const DELHI_TERRITORIES = [
   { id: '1', code: 'S34', name: 'MCD South 34 (Lajpat Nagar)', mascot: 'Dolphin Sanctuary', health: 72, mood: 'Recovering', cleanIndex: 7.2, trucks: 2, color: '#0D9488' },
@@ -23,6 +26,13 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
     setSelectedTerritory(t);
   };
 
+  const handleSelectTerritoryById = (id: string) => {
+    const found = DELHI_TERRITORIES.find((t) => t.id === id);
+    if (found) {
+      handleSelectTerritory(found);
+    }
+  };
+
   const handleSelectFilter = (f: 'all' | 'trucks' | 'drop_points') => {
     Haptics.selectionAsync().catch(() => {});
     setActiveFilter(f);
@@ -32,13 +42,18 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
     <View style={styles.container}>
       <AppHeader title="Delhi NCR Territory Map" />
 
-      {/* Simulated Map Canvas */}
+      {/* Photorealistic Google 3D Map Viewport */}
       <View style={styles.mapCanvas}>
-        <View style={styles.hexGridContainer}>
-          <Text style={styles.mapCanvasBadge}>H3 Resolution-7 Hexagonal Grid</Text>
+        <Google3DMap
+          apiKey={GOOGLE_MAPS_KEY}
+          selectedTerritoryId={selectedTerritory.id}
+          onSelectTerritory={handleSelectTerritoryById}
+          activeFilter={activeFilter}
+        />
 
-          {/* Interactive Territory Nodes */}
-          <View style={styles.nodesWrapper}>
+        {/* Floating Territory Node Selector */}
+        <View style={styles.floatingOverlay}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.nodesWrapper}>
             {DELHI_TERRITORIES.map((t) => (
               <PressableScale
                 key={t.id}
@@ -54,44 +69,38 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
                 <Text style={styles.hexHealth}>{t.health}%</Text>
               </PressableScale>
             ))}
-          </View>
+          </ScrollView>
 
-          {/* Live Vehicle Pulse Indicator */}
-          <View style={styles.liveTruckIndicator}>
-            <View style={styles.pulseDot} />
-            <Text style={styles.liveTruckText}>2 Sanitation Trucks Broadcasting Live Telemetry</Text>
+          {/* Filter Bar in Butter Style */}
+          <View style={styles.filterBar}>
+            <PressableScale
+              style={[styles.filterPill, activeFilter === 'all' && styles.activeFilter]}
+              onPress={() => handleSelectFilter('all')}
+              haptic={false}
+            >
+              <Text style={[styles.filterText, activeFilter === 'all' && styles.activeFilterText]}>
+                All Layers
+              </Text>
+            </PressableScale>
+            <PressableScale
+              style={[styles.filterPill, activeFilter === 'trucks' && styles.activeFilter]}
+              onPress={() => handleSelectFilter('trucks')}
+              haptic={false}
+            >
+              <Text style={[styles.filterText, activeFilter === 'trucks' && styles.activeFilterText]}>
+                Live Trucks
+              </Text>
+            </PressableScale>
+            <PressableScale
+              style={[styles.filterPill, activeFilter === 'drop_points' && styles.activeFilter]}
+              onPress={() => handleSelectFilter('drop_points')}
+              haptic={false}
+            >
+              <Text style={[styles.filterText, activeFilter === 'drop_points' && styles.activeFilterText]}>
+                Smart Bins
+              </Text>
+            </PressableScale>
           </View>
-        </View>
-
-        {/* Filter Pills in Butter Style */}
-        <View style={styles.filterBar}>
-          <PressableScale
-            style={[styles.filterPill, activeFilter === 'all' && styles.activeFilter]}
-            onPress={() => handleSelectFilter('all')}
-            haptic={false}
-          >
-            <Text style={[styles.filterText, activeFilter === 'all' && styles.activeFilterText]}>
-              All Layers
-            </Text>
-          </PressableScale>
-          <PressableScale
-            style={[styles.filterPill, activeFilter === 'trucks' && styles.activeFilter]}
-            onPress={() => handleSelectFilter('trucks')}
-            haptic={false}
-          >
-            <Text style={[styles.filterText, activeFilter === 'trucks' && styles.activeFilterText]}>
-              Live Trucks
-            </Text>
-          </PressableScale>
-          <PressableScale
-            style={[styles.filterPill, activeFilter === 'drop_points' && styles.activeFilter]}
-            onPress={() => handleSelectFilter('drop_points')}
-            haptic={false}
-          >
-            <Text style={[styles.filterText, activeFilter === 'drop_points' && styles.activeFilterText]}>
-              Smart Bins
-            </Text>
-          </PressableScale>
         </View>
       </View>
 
@@ -160,41 +169,26 @@ const styles = StyleSheet.create({
   },
   mapCanvas: {
     flex: 1,
+    position: 'relative',
     backgroundColor: '#F8FAFC',
-    justifyContent: 'space-between',
-    padding: spacing.s2,
   },
-  hexGridContainer: {
-    alignItems: 'center',
-    gap: 16,
-    paddingTop: 8,
-  },
-  mapCanvasBadge: {
-    color: colors.textSecondary,
-    fontSize: 11,
-    fontWeight: '700',
-    backgroundColor: colors.surfaceCard,
-    paddingHorizontal: 14,
-    paddingVertical: 5,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
-    elevation: 1,
+  floatingOverlay: {
+    position: 'absolute',
+    bottom: 8,
+    left: 8,
+    right: 8,
+    gap: 8,
+    zIndex: 10,
   },
   nodesWrapper: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    gap: 12,
-    marginVertical: 12,
+    gap: 8,
+    paddingVertical: 2,
+    paddingHorizontal: 4,
   },
   territoryHex: {
-    width: 66,
-    height: 66,
+    width: 62,
+    height: 62,
     borderRadius: radii.pill,
     backgroundColor: '#FFFFFF',
     borderWidth: 2,
@@ -202,17 +196,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     shadowColor: '#000000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
+    shadowOpacity: 0.1,
     shadowRadius: 5,
-    elevation: 2,
+    elevation: 3,
   },
   selectedHex: {
-    transform: [{ scale: 1.1 }],
+    transform: [{ scale: 1.08 }],
     backgroundColor: '#FFFFFF',
     borderWidth: 3,
   },
   hexCode: {
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: '800',
     marginBottom: 2,
   },
@@ -220,28 +214,6 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 10,
     fontWeight: '800',
-  },
-  liveTruckIndicator: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surfaceAccentSubtle,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.borderAccentSubtle,
-  },
-  pulseDot: {
-    width: 6,
-    height: 6,
-    borderRadius: radii.pill,
-    backgroundColor: colors.surfaceRaised,
-    marginRight: 8,
-  },
-  liveTruckText: {
-    color: '#0D9488',
-    fontSize: 11,
-    fontWeight: '700',
   },
   filterBar: {
     flexDirection: 'row',

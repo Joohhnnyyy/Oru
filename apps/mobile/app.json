@@ -4,9 +4,9 @@
     "slug": "saafsafari",
     "version": "1.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "light",
     "splash": {
-      "backgroundColor": "#0F172A"
+      "backgroundColor": "#FFFFFF"
     },
     "ios": {
       "supportsTablet": true,
@@ -14,6 +14,11 @@
     },
     "android": {
       "package": "com.saafsafari.app",
+      "config": {
+        "googleMaps": {
+          "apiKey": "REMOVED_CREDENTIAL"
+        }
+      },
       "permissions": [
         "CAMERA",
         "ACCESS_FINE_LOCATION",
@@ -25,7 +30,8 @@
     "extra": {
       "apiUrl": "https://dp029jx9uf.execute-api.ap-south-1.amazonaws.com",
       "cognitoUserPoolId": "ap-south-1_KZcMN2CaO",
-      "cognitoClientId": "2g4b36dekkv7f0lu9ad4h4s7oa"
+      "cognitoClientId": "2g4b36dekkv7f0lu9ad4h4s7oa",
+      "googleMapsApiKey": "REMOVED_CREDENTIAL"
     }
   }
 }
