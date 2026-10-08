@@ -1,5 +1,6 @@
 import React from 'react';
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar } from 'react-native';
+import { registerRootComponent } from 'expo';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { AuthProvider } from './src/context/AuthContext';
@@ -12,10 +13,13 @@ export default function App() {
     <SafeAreaProvider>
       <AuthProvider>
         <NavContainer>
-          <StatusBar style="light" />
+          <StatusBar barStyle="light-content" backgroundColor="#0A0F1D" />
           <RootNavigator />
         </NavContainer>
       </AuthProvider>
     </SafeAreaProvider>
   );
 }
+
+registerRootComponent(App);
+

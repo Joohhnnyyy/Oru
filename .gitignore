@@ -7,11 +7,17 @@ dist/
 build/
 cdk.out/
 *.tsbuildinfo
+.expo/
 
 # Environment & local files
 .env
+.env.*
 .env.local
 .env.*.local
+*.env
+**/.env
+**/.env.*
+cdk-outputs.json
 *.log
 
 # IDE & OS

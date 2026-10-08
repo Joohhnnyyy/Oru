@@ -4,7 +4,6 @@
     "slug": "saafsafari",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
       "backgroundColor": "#0F172A"
@@ -14,9 +13,6 @@
       "bundleIdentifier": "com.saafsafari.app"
     },
     "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#0F172A"
-      },
       "package": "com.saafsafari.app",
       "permissions": [
         "CAMERA",
