@@ -53,3 +53,7 @@ playwright-report/
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Web build intermediates
+.ssr/
+dist-analyze/

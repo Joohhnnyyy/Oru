@@ -1,0 +1,4 @@
+# The legacy `oru/` marketing app keeps its own lockfile and is not part of the workspace.
+packages:
+  - apps/*
+  - packages/*

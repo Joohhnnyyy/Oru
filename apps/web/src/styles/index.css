@@ -1,0 +1,360 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------
+   Soft Meadow tokens. Bright colours are fills/accents only;
+   text always uses --ink / --muted (or --on-accent on bright fills).
+   --------------------------------------------------------------- */
+:root {
+  --bg: #f5faf2;
+  --surface: #ffffff;
+  --surface-2: #e9f4e4;
+  --ink: #12332a;
+  --muted: #4b6358;
+  --primary: #14532d;
+  --waste: #4ade80;
+  --heat: #ff7a59;
+  --energy: #ffc93c;
+  --water: #2dd4df;
+  --on-accent: #12332a;
+  --line: #12332a;
+  --outline: #12332a; /* sticker outlines stay dark in both themes */
+  --sticker: #ffffff;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --shadow: 0 8px 24px rgba(18, 51, 42, 0.08);
+  --shadow-press: 0 3px 0 var(--line);
+  --header-h: 112px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1f19;
+    --surface: #172b23;
+    --surface-2: #1f3a2f;
+    --ink: #e8f3ec;
+    --muted: #a9c2b5;
+    --primary: #86efac;
+    --waste: #4ade80;
+    --heat: #ff8f73;
+    --energy: #ffd25e;
+    --water: #45dde6;
+    --line: #a9c2b5;
+    --sticker: #f5faf2;
+    --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --header-h: 76px;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-waste: var(--waste);
+  --color-heat: var(--heat);
+  --color-energy: var(--energy);
+  --color-water: var(--water);
+  --color-on-accent: var(--on-accent);
+  --color-line: var(--line);
+
+  --radius-card: var(--radius);
+  --radius-chip: var(--radius-sm);
+  --shadow-soft: var(--shadow);
+
+  --font-sans: 'Noto Sans', 'Noto Sans Devanagari', system-ui, -apple-system, 'Segoe UI', Roboto,
+    'Nirmala UI', 'Mangal', sans-serif;
+
+  /* Type scale: 16px base, ~1.25 ratio, nothing below 14px. */
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.65;
+  --text-lg: 1.1875rem;
+  --text-lg--line-height: 1.6;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 1.3;
+  --text-2xl: 1.875rem;
+  --text-2xl--line-height: 1.2;
+  --text-3xl: 2.375rem;
+  --text-3xl--line-height: 1.1;
+}
+
+/* ---------------------------------------------------------------
+   Base
+   --------------------------------------------------------------- */
+html {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+:lang(hi) {
+  line-height: 1.75;
+}
+
+section[id] {
+  scroll-margin-top: calc(var(--header-h) + 12px);
+}
+
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: var(--waste);
+  color: var(--on-accent);
+}
+
+.sr-only-focusable:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------
+   Sticker art: shapes are drawn twice; the back copy becomes the
+   white die-cut border, the front copy gets the thick dark outline.
+   --------------------------------------------------------------- */
+.art {
+  stroke: var(--outline);
+  stroke-width: 4;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.sticker-back,
+.sticker-back * {
+  fill: var(--sticker);
+  stroke: var(--sticker);
+  stroke-width: 16px;
+}
+
+.art .thin {
+  stroke-width: 3;
+}
+
+/* ---------------------------------------------------------------
+   Buttons: bright fill + dark text + dark outline (sticker style).
+   --------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 48px;
+  padding: 0.625rem 1.25rem;
+  border: 2.5px solid var(--outline);
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: var(--on-accent);
+  text-decoration: none;
+  box-shadow: 0 3px 0 var(--outline);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+  cursor: pointer;
+}
+
+.btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 var(--outline);
+}
+
+.btn-play {
+  background: var(--waste);
+}
+
+.btn-quiet {
+  background: var(--surface);
+  color: var(--ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  .btn-quiet {
+    border-color: var(--line);
+    box-shadow: 0 3px 0 var(--line);
+  }
+}
+
+/* ---------------------------------------------------------------
+   Hero headline: "spread wide" letters spread to the full measure.
+   --------------------------------------------------------------- */
+.spread {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ---------------------------------------------------------------
+   Day / chapter stamp
+   --------------------------------------------------------------- */
+.stamp {
+  transform: rotate(-8deg);
+}
+
+/* ---------------------------------------------------------------
+   Flip cards
+   --------------------------------------------------------------- */
+.flip {
+  perspective: 1000px;
+}
+
+.flip-inner {
+  position: relative;
+  display: grid;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 280ms cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+
+.flip[aria-pressed='true'] .flip-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-face {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-back {
+  transform: rotateY(180deg);
+}
+
+/* ---------------------------------------------------------------
+   Scroll motion (enabled only once JS has booted: html.js)
+   --------------------------------------------------------------- */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 280ms ease-out, transform 280ms ease-out;
+}
+
+.js .reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+.timeline-fill {
+  transform-origin: top;
+  transform: scaleY(var(--progress, 1));
+}
+
+.js .timeline-fill {
+  transform: scaleY(var(--progress, 0));
+}
+
+.tile-new {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.js .stage .tile-new {
+  transform: scale(0);
+  transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: calc(var(--i, 0) * 30ms);
+}
+
+.js .stage.is-in .tile-new {
+  transform: scale(1);
+}
+
+/* ---------------------------------------------------------------
+   Map regions
+   --------------------------------------------------------------- */
+.region {
+  cursor: pointer;
+  outline: none;
+}
+
+.region rect {
+  rx: 2.5px;
+  transition: opacity 160ms ease;
+}
+
+.region-map[data-selected] .region:not([aria-pressed='true']) rect {
+  opacity: 0.45;
+}
+
+.region[aria-pressed='true'] rect {
+  stroke: var(--outline);
+  stroke-width: 1.5;
+}
+
+.region:focus-visible rect,
+.region:hover rect {
+  stroke: var(--primary);
+  stroke-width: 2.5;
+}
+
+/* ---------------------------------------------------------------
+   Reduced motion: no animation anywhere, everything visible.
+   --------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .js .reveal,
+  .js .stage .tile-new {
+    opacity: 1;
+    transform: none;
+  }
+
+  .js .timeline-fill {
+    transform: scaleY(1);
+  }
+
+  .btn:active {
+    transform: none;
+  }
+
+  .flip-inner,
+  .flip[aria-pressed='true'] .flip-inner {
+    transform: none;
+  }
+
+  .flip-face {
+    backface-visibility: visible;
+  }
+
+  .flip-back {
+    transform: none;
+  }
+
+  .flip[aria-pressed='false'] .flip-back,
+  .flip[aria-pressed='true'] .flip-front {
+    visibility: hidden;
+  }
+}

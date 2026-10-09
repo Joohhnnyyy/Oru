@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Oru: grow small. spread wide.</title>
+    <meta
+      name="description"
+      content="Oru is a climate-habit game for India. Log small things you really did for waste, heat, energy and water, grow a pixel city, and wake your region's guardian animal."
+    />
+    <link rel="canonical" href="%VITE_SITE_URL%/" />
+    <meta name="theme-color" content="#f5faf2" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1f19" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Oru" />
+    <meta property="og:title" content="Oru: grow small. spread wide." />
+    <meta
+      property="og:description"
+      content="A climate-habit game for India. Log small real actions, grow a pixel city and wake your region's guardian animal."
+    />
+    <meta property="og:url" content="%VITE_SITE_URL%/" />
+    <meta property="og:image" content="%VITE_SITE_URL%/icons/icon-512.png" />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:locale:alternate" content="hi_IN" />
+    <meta name="twitter:card" content="summary" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Oru",
+        "url": "%VITE_SITE_URL%/",
+        "description": "A climate-habit game for India. Log small real actions for waste, heat, energy and water, grow a pixel city and wake your region's guardian animal.",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Android, iOS, Windows, macOS, Linux (any modern browser)",
+        "browserRequirements": "Requires JavaScript. Installable as a PWA.",
+        "inLanguage": ["en-IN", "hi-IN"],
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"><!--app-html--></div>
+    <noscript><p style="padding:16px">Oru needs JavaScript for the language switch and the game. The story above still reads without it.</p></noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
