@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { Sparrow, type EyeState } from './Guardians';
 
 export type StageId = 'seed' | 'sprout' | 'patch' | 'grove' | 'forest';
 
@@ -7,12 +6,13 @@ export type StageId = 'seed' | 'sprout' | 'patch' | 'grove' | 'forest';
  * 6x6 pixel plots, one per stage.
  * . soil  g grass  e seed  s sprout  t tree  h house  w water  p path  f flower
  */
-export const STAGES: { id: StageId; day: number; eyes: EyeState; grid: string[] }[] = [
-  { id: 'seed', day: 1, eyes: 'closed', grid: ['......', '......', '..e...', '......', '......', '......'] },
-  { id: 'sprout', day: 3, eyes: 'closed', grid: ['......', '..g...', '.gsg..', '..gs..', '......', '......'] },
-  { id: 'patch', day: 7, eyes: 'half', grid: ['......', '.ggg..', 'ggsgg.', '.gtsg.', '..gg..', '......'] },
-  { id: 'grove', day: 14, eyes: 'open', grid: ['..g...', '.gtgw.', 'ggshww', 'pppppp', '.gtgh.', '..gt..'] },
-  { id: 'forest', day: 30, eyes: 'open', grid: ['tgtgwt', 'gtgtww', 'gfshwt', 'pppppp', 'tgtght', 'ftgtgf'] },
+/** `awake` drives how the guardian is shown next to the plot: 0 asleep, 1 stirring, 2 awake. */
+export const STAGES: { id: StageId; day: number; awake: 0 | 1 | 2; grid: string[] }[] = [
+  { id: 'seed', day: 1, awake: 0, grid: ['......', '......', '..e...', '......', '......', '......'] },
+  { id: 'sprout', day: 3, awake: 0, grid: ['......', '..g...', '.gsg..', '..gs..', '......', '......'] },
+  { id: 'patch', day: 7, awake: 1, grid: ['......', '.ggg..', 'ggsgg.', '.gtsg.', '..gg..', '......'] },
+  { id: 'grove', day: 14, awake: 2, grid: ['..g...', '.gtgw.', 'ggshww', 'pppppp', '.gtgh.', '..gt..'] },
+  { id: 'forest', day: 30, awake: 2, grid: ['tgtgwt', 'gtgtww', 'gfshwt', 'pppppp', 'tgtght', 'ftgtgf'] },
 ];
 
 const T = 30; // tile size
@@ -77,7 +77,7 @@ interface PlotProps {
 export function Plot({ stage, previous, label }: PlotProps) {
   let n = 0;
   return (
-    <svg viewBox="-6 -6 312 196" width={312} height={196} className="art h-auto w-full" role="img" aria-label={label}>
+    <svg viewBox="-6 -6 192 192" width={192} height={192} className="art h-auto w-full" role="img" aria-label={label}>
       <rect x={-2} y={-2} width={6 * T + 4} height={6 * T + 4} rx={10} fill="#ffffff" />
       {stage.grid.map((row, r) =>
         [...row].map((c, i) => {
@@ -94,14 +94,6 @@ export function Plot({ stage, previous, label }: PlotProps) {
         }),
       )}
       <rect x={-2} y={-2} width={6 * T + 4} height={6 * T + 4} rx={10} fill="none" />
-      <g transform="translate(190 30) scale(0.62)">
-        <Sparrow eyes={stage.eyes} />
-      </g>
-      {stage.id === 'forest' && (
-        <g className="tile-new thin" style={{ '--i': n } as CSSProperties}>
-          <path d="M236 22 q6 -8 12 0 M256 12 q6 -8 12 0" fill="none" />
-        </g>
-      )}
     </svg>
   );
 }

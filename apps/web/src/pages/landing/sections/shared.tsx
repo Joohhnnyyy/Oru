@@ -1,39 +1,30 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { env } from '../../../config/env';
+import type { MediaSlot as MediaSlotData } from '../../../content/media';
 import { useInstallPrompt } from '../../../hooks/useInstallPrompt';
-import { useInViewOnce } from '../../../hooks/useInView';
-import { CHAPTERS, type ChapterKey } from '../chapters';
-import { Stamp } from '../svg/Icons';
+import { useReducedMotion } from '../../../hooks/useReducedMotion';
+import { setLanguage } from '../../../i18n';
+
+export const NAV = [
+  { href: '#day-1', key: 'how' },
+  { href: '#guardians', key: 'guardians' },
+  { href: '#growth', key: 'grow' },
+  { href: '#places', key: 'places' },
+  { href: '#impact', key: 'impact' },
+] as const;
+
+export const NAV_IDS: readonly string[] = NAV.map((n) => n.href.slice(1));
 
 export function Container({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`mx-auto w-full max-w-[1120px] px-4 sm:px-6 lg:px-8 ${className}`}>{children}</div>;
+  return <div className={`mx-auto w-full max-w-[1240px] px-4 sm:px-6 lg:px-10 ${className}`}>{children}</div>;
 }
 
-/** Fades and slides its content in the first time it scrolls into view. */
-export function Reveal({ children, className = '' }: { children: ReactNode; className?: string }) {
-  const [ref, inView] = useInViewOnce<HTMLDivElement>();
+export function ArrowIcon({ size = 20 }: { size?: number }) {
   return (
-    <div ref={ref} className={`reveal ${inView ? 'is-in' : ''} ${className}`}>
-      {children}
-    </div>
-  );
-}
-
-export function ChapterHeading({ chapter, id, lead }: { chapter: ChapterKey; id: string; lead?: string }) {
-  const { t } = useTranslation();
-  const n = CHAPTERS.findIndex((c) => c.key === chapter) + 1;
-  return (
-    <div className="mb-8 flex items-start gap-4 sm:mb-10 sm:gap-6">
-      <Stamp n={n} />
-      <div className="max-w-[44rem]">
-        <p className="text-sm font-semibold text-muted">
-          {t('chapter.word')} {n}: {t(`chapter.${chapter}.sub`)}
-        </p>
-        <h2 id={id} className="mt-1 text-2xl font-extrabold tracking-tight sm:text-3xl">{t(`chapter.${chapter}.title`)}</h2>
-        {lead && <p className="mt-3 text-lg text-muted">{lead}</p>}
-      </div>
-    </div>
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" focusable="false">
+      <path d="M5 12h13m-5-5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
   );
 }
 
@@ -57,5 +48,88 @@ export function InstallButton({ className = '' }: { className?: string }) {
       </svg>
       {t('cta.install')}
     </button>
+  );
+}
+
+export function LangSwitch({ className = '' }: { className?: string }) {
+  const { t, i18n } = useTranslation();
+  const next = i18n.language === 'hi' ? 'en' : 'hi';
+  return (
+    <button
+      type="button"
+      onClick={() => void setLanguage(next)}
+      aria-label={t('a11y.switchLang')}
+      className={`inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-4 font-semibold text-ink shadow-soft ${className}`}
+    >
+      <svg viewBox="0 0 24 24" width={18} height={18} aria-hidden="true" focusable="false">
+        <circle cx={12} cy={12} r={9} fill="none" stroke="currentColor" strokeWidth={1.8} />
+        <path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18" fill="none" stroke="currentColor" strokeWidth={1.8} />
+      </svg>
+      <span lang={next}>{t('a11y.langName')}</span>
+    </button>
+  );
+}
+
+/**
+ * An image-or-video slot. With `media.video` set it plays a muted loop while on screen
+ * (paused for reduced motion); without it, the poster shows with a "Video coming soon" tag.
+ * Paths live in src/content/media.ts.
+ */
+export function MediaSlot({
+  media,
+  alt,
+  className = '',
+  width,
+  height,
+}: {
+  media: MediaSlotData;
+  alt: string;
+  className?: string;
+  width: number;
+  height: number;
+}) {
+  const { t } = useTranslation();
+  const reduced = useReducedMotion();
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || reduced) return;
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry?.isIntersecting) void el.play().catch(() => undefined);
+      else el.pause();
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [reduced]);
+
+  if (media.video) {
+    return (
+      <video
+        ref={ref}
+        className={`h-full w-full object-cover ${className}`}
+        src={media.video}
+        poster={media.poster}
+        muted
+        loop
+        playsInline
+        preload="none"
+        aria-label={t('video.label', { title: alt })}
+        width={width}
+        height={height}
+      />
+    );
+  }
+
+  return (
+    <div className={`relative h-full w-full ${className}`}>
+      <img src={media.poster} alt={alt} loading="lazy" decoding="async" width={width} height={height} className="h-full w-full object-cover" />
+      <span className="absolute top-3 left-3 inline-flex items-center gap-1.5 rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-ink">
+        <svg viewBox="0 0 24 24" width={14} height={14} aria-hidden="true" focusable="false">
+          <path d="M8 5v14l11-7Z" fill="currentColor" />
+        </svg>
+        {t('video.soon')}
+      </span>
+    </div>
   );
 }

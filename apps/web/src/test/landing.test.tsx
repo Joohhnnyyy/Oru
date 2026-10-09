@@ -4,10 +4,10 @@ import { describe, expect, it } from 'vitest';
 import '../i18n';
 import en from '../i18n/en.json';
 import hi from '../i18n/hi.json';
-import { CHAPTER_IDS } from '../pages/landing/chapters';
 import { LandingPage } from '../pages/landing/LandingPage';
-import { FlipCard } from '../pages/landing/sections/Guardians';
-import { Places } from '../pages/landing/sections/Places';
+import { FlipCard, GUARDIANS } from '../pages/landing/sections/Guardians';
+import { NAV_IDS } from '../pages/landing/sections/shared';
+import { SplitCards } from '../pages/landing/sections/SplitCards';
 
 type Tree = { [key: string]: string | Tree };
 
@@ -37,28 +37,52 @@ describe('i18n bundles', () => {
 });
 
 describe('LandingPage', () => {
-  it('has one h1, a skip link and every chapter section', () => {
+  it('has one h1, a skip link and every nav target', () => {
     const { container } = render(<LandingPage />);
     expect(container.querySelectorAll('h1')).toHaveLength(1);
     expect(screen.getByRole('link', { name: 'Skip to content' })).toHaveAttribute('href', '#main');
-    for (const id of CHAPTER_IDS) expect(container.querySelector(`section#${id}`), id).not.toBeNull();
+    for (const id of [...NAV_IDS, 'next', 'mission', 'about']) expect(container.querySelector(`#${id}`), id).not.toBeNull();
   });
 
-  it('labels every meaningful image', () => {
+  it('gives every image an alt attribute and every svg a label or aria-hidden', () => {
     const { container } = render(<LandingPage />);
+    for (const img of container.querySelectorAll('img')) expect(img.hasAttribute('alt'), img.outerHTML.slice(0, 100)).toBe(true);
     for (const svg of container.querySelectorAll('svg')) {
-      const labelled = svg.getAttribute('role') === 'img' && svg.hasAttribute('aria-label');
+      const labelled = (svg.getAttribute('role') === 'img' || svg.getAttribute('role') === 'group') && svg.hasAttribute('aria-label');
       const decorative = svg.closest('[aria-hidden="true"]') !== null;
-      const group = svg.getAttribute('role') === 'group' && svg.hasAttribute('aria-label');
-      expect(labelled || decorative || group, svg.outerHTML.slice(0, 120)).toBe(true);
+      expect(labelled || decorative, svg.outerHTML.slice(0, 100)).toBe(true);
     }
+  });
+
+  it('steps through hero highlights with the carousel buttons', async () => {
+    const user = userEvent.setup();
+    render(<LandingPage />);
+    const highlights = screen.getByRole('complementary', { name: 'Highlights' });
+    expect(within(highlights).getByText('Your first day takes about a minute')).toBeInTheDocument();
+    await user.click(within(highlights).getByRole('button', { name: 'Pause highlights' }));
+    await user.click(within(highlights).getByRole('button', { name: 'Next highlight' }));
+    expect(await within(highlights).findByText('Six guardians are waiting to wake up')).toBeInTheDocument();
+  });
+
+  it('opens the impact and roadmap pills in place', async () => {
+    const user = userEvent.setup();
+    render(<LandingPage />);
+    const impact = screen.getByRole('button', { name: /Oru in numbers/ });
+    expect(impact).toHaveAttribute('aria-expanded', 'false');
+    await user.click(impact);
+    expect(impact).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText('guardians to wake')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /What comes next/ }));
+    expect(await screen.findByText('A pilot in one city')).toBeInTheDocument();
   });
 });
 
 describe('FlipCard', () => {
   it('flips with Enter and Space and only exposes the visible face', async () => {
     const user = userEvent.setup();
-    render(<FlipCard id="crane" />);
+    const crane = GUARDIANS.find((g) => g.id === 'crane');
+    if (!crane) throw new Error('crane missing');
+    render(<FlipCard {...crane} />);
     const card = screen.getByRole('button', { name: /Sarus crane/ });
     expect(card).toHaveAttribute('aria-pressed', 'false');
 
@@ -74,21 +98,32 @@ describe('FlipCard', () => {
   });
 });
 
-describe('Places', () => {
-  it('updates the panel from the list and from the map with the keyboard', async () => {
+describe('Split cards', () => {
+  it('updates the places panel from the list and from the map with the keyboard', async () => {
     const user = userEvent.setup();
-    render(<Places />);
-    const list = screen.getByRole('heading', { name: 'Regions' }).nextElementSibling as HTMLElement;
+    render(<SplitCards />);
+    const places = document.getElementById('places') as HTMLElement;
+    const list = within(places).getByRole('heading', { name: 'Regions' }).nextElementSibling as HTMLElement;
 
     await user.click(within(list).getByRole('button', { name: 'Coasts and islands' }));
-    expect(screen.getByRole('heading', { level: 3, name: 'Coasts and islands' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Meet the Sea turtle' })).toHaveAttribute('href', '#guardian-turtle');
+    expect(within(places).getByRole('heading', { level: 3, name: 'Coasts and islands' })).toBeInTheDocument();
+    expect(within(places).getByRole('link', { name: 'Meet the Sea turtle' })).toHaveAttribute('href', '#guardian-turtle');
 
-    const map = screen.getByRole('group', { name: /pixel map of India/ });
+    const map = within(places).getByRole('group', { name: /pixel map of India/ });
     const mountains = within(map).getByRole('button', { name: 'High mountains' });
     mountains.focus();
     await user.keyboard('{Enter}');
     expect(mountains).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByText('Guardian: Snow leopard')).toBeInTheDocument();
+    expect(within(places).getByText('Guardian: Snow leopard')).toBeInTheDocument();
+  });
+
+  it('lets people pick a growth stage', async () => {
+    const user = userEvent.setup();
+    render(<SplitCards />);
+    const growth = document.getElementById('growth') as HTMLElement;
+    const forest = within(growth).getByRole('button', { name: 'Forest' });
+    await user.click(forest);
+    expect(forest).toHaveAttribute('aria-pressed', 'true');
+    expect(within(growth).getByText(/your plot is a small green city/)).toBeInTheDocument();
   });
 });

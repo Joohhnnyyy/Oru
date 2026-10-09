@@ -57,3 +57,8 @@ playwright-report/
 # Web build intermediates
 .ssr/
 dist-analyze/
+
+# Art pipeline intermediates
+apps/web/design/crops/
+apps/web/design/cutouts/_*.png
+.venv-art/

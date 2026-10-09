@@ -1,15 +1,15 @@
 import type { KeyboardEvent } from 'react';
-import type { GuardianId } from './Guardians';
+import type { CharacterId } from '../../../content/media';
 
 export type RegionId = 'mountains' | 'dry' | 'rivers' | 'wetlands' | 'coasts' | 'cities';
 
-export const REGIONS: { id: RegionId; code: string; guardian: GuardianId; fill: string }[] = [
-  { id: 'mountains', code: 'M', guardian: 'leopard', fill: '#a9c6d8' },
-  { id: 'dry', code: 'D', guardian: 'bustard', fill: '#eec27a' },
-  { id: 'rivers', code: 'R', guardian: 'dolphin', fill: '#5fd6e0' },
-  { id: 'wetlands', code: 'W', guardian: 'crane', fill: '#8fdc9f' },
-  { id: 'coasts', code: 'C', guardian: 'turtle', fill: '#ff9f86' },
-  { id: 'cities', code: 'X', guardian: 'sparrow', fill: '#12332a' },
+export const REGIONS: { id: RegionId; code: string; guardian: Exclude<CharacterId, 'buddy'>; fill: string }[] = [
+  { id: 'mountains', code: 'M', guardian: 'leopard', fill: '#c3cff5' },
+  { id: 'dry', code: 'D', guardian: 'bustard', fill: '#ffe08a' },
+  { id: 'rivers', code: 'R', guardian: 'dolphin', fill: '#8edcf8' },
+  { id: 'wetlands', code: 'W', guardian: 'crane', fill: '#a8ecd0' },
+  { id: 'coasts', code: 'C', guardian: 'turtle', fill: '#ffbcd8' },
+  { id: 'cities', code: 'X', guardian: 'sparrow', fill: '#1d2330' },
 ];
 
 /*
@@ -129,7 +129,7 @@ export function IndiaMap({ selected, onSelect, label, regionName }: IndiaMapProp
             width={P - 2}
             height={P - 2}
             rx={7}
-            fill="#12332a"
+            fill="#1d2330"
             stroke="#ffffff"
             strokeWidth={2.5}
           />

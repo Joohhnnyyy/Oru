@@ -10,10 +10,11 @@
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
-    "icons": "node scripts/icons.mjs",
     "size": "node scripts/size.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/baloo-2": "5.3.0",
+    "framer-motion": "13.4.4",
     "i18next": "26.4.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
@@ -22,7 +23,6 @@
   },
   "devDependencies": {
     "@eslint/js": "9.39.5",
-    "@resvg/resvg-js": "2.6.2",
     "@tailwindcss/vite": "4.3.3",
     "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.3",

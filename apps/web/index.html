@@ -9,12 +9,12 @@
       content="Oru is a climate-habit game for India. Log small things you really did for waste, heat, energy and water, grow a pixel city, and wake your region's guardian animal."
     />
     <link rel="canonical" href="%VITE_SITE_URL%/" />
-    <meta name="theme-color" content="#f5faf2" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0f1f19" media="(prefers-color-scheme: dark)" />
-    <meta name="color-scheme" content="light dark" />
-    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/icons/favicon-64.png" type="image/png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preload" as="image" href="/media/scenes/plaza.webp" imagesrcset="/media/scenes/plaza-960.webp 960w, /media/scenes/plaza.webp 1770w" imagesizes="100vw" fetchpriority="high" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Oru" />
@@ -47,7 +47,12 @@
   </head>
   <body>
     <div id="root"><!--app-html--></div>
-    <noscript><p style="padding:16px">Oru needs JavaScript for the language switch and the game. The story above still reads without it.</p></noscript>
+    <noscript>
+      <style>
+        [style*='opacity:0'] { opacity: 1 !important; transform: none !important; }
+        .intro-loader { display: none; }
+      </style>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -1,42 +1,39 @@
+import { MotionConfig } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { useActiveChapter } from '../../hooks/useActiveChapter';
-import { CHAPTER_IDS } from './chapters';
-import { ChapterMenu } from './sections/ChapterMenu';
-import { Day1 } from './sections/Day1';
+import { Band } from './sections/Band';
 import { Footer } from './sections/Footer';
-import { Growth } from './sections/Growth';
 import { Guardians } from './sections/Guardians';
-import { Header } from './sections/Header';
 import { Hero } from './sections/Hero';
-import { Impact } from './sections/Impact';
-import { NextChapter } from './sections/NextChapter';
-import { Places } from './sections/Places';
-import { Why } from './sections/Why';
+import { Loader } from './sections/Loader';
+import { Mission } from './sections/Mission';
+import { Pills } from './sections/Pills';
+import { NAV_IDS } from './sections/shared';
+import { SplitCards } from './sections/SplitCards';
+import { StickyHeader } from './sections/StickyHeader';
 
 export function LandingPage() {
   const { t } = useTranslation();
-  const active = useActiveChapter(CHAPTER_IDS);
+  const active = useActiveChapter(NAV_IDS);
   return (
-    <>
+    <MotionConfig reducedMotion="user">
+      <Loader />
       <a
         href="#main"
-        className="sr-only-focusable fixed top-2 left-2 z-50 rounded-full border-2 border-line bg-energy px-4 py-3 font-bold text-on-accent"
+        className="sr-only-focusable fixed top-2 left-2 z-[70] rounded-full bg-ink px-5 py-3 font-bold text-white"
       >
         {t('a11y.skip')}
       </a>
-      <Header active={active} />
+      <StickyHeader active={active} />
+      <Hero />
       <main id="main" tabIndex={-1} className="outline-none">
-        <Hero />
-        <ChapterMenu active={active} />
-        <Why />
-        <Day1 />
+        <Mission />
+        <Band />
+        <SplitCards />
         <Guardians />
-        <Growth />
-        <Places />
-        <Impact />
-        <NextChapter />
+        <Pills />
       </main>
       <Footer />
-    </>
+    </MotionConfig>
   );
 }
