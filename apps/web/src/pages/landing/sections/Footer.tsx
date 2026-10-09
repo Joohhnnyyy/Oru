@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { env } from '../../../config/env';
 import { BRAND, CHARACTER, SCENE } from '../../../content/media';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
-import { Container, InstallButton, LangSwitch, NAV, PlayLink } from './shared';
+import { Container, InstallButton, LangSwitch, PlayLink } from './shared';
 
 /** Full-bleed closing art with the final call to action. */
 function Closing() {
@@ -90,21 +90,10 @@ export function Footer() {
       <Closing />
       <footer className="overflow-hidden bg-surface">
         <Container className="flex flex-wrap items-center justify-between gap-4 pt-8">
-          <div className="flex flex-wrap items-center gap-x-8 gap-y-2">
+          <div className="flex items-center">
             <a href="#top" aria-label={t('a11y.home')} className="rounded-lg">
               <img src={BRAND.wordmark} alt="" width={120} height={71} loading="lazy" className="h-11 w-auto" />
             </a>
-            <nav aria-label={t('footer.nav')}>
-              <ul className="flex flex-wrap gap-x-5 gap-y-1">
-                {NAV.map((n) => (
-                  <li key={n.key}>
-                    <a href={n.href} className="inline-flex min-h-11 items-center text-ink/80 no-underline hover:text-ink hover:underline">
-                      {t(`nav.${n.key}`)}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
           </div>
           <div className="flex items-center gap-2">
             <LangSwitch className="!shadow-none ring-1 ring-line" />
