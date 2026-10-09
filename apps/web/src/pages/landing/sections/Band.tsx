@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { SplitWords } from '../../../components/TextFx';
 import { CHARACTER, SCENE, type CharacterId } from '../../../content/media';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
 import { ArrowIcon, Container } from './shared';
@@ -38,16 +39,14 @@ export function Band() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
   const reduced = useReducedMotion();
   const push = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [120, -220]);
+  // Section transition: the band grows from an inset card to full width as it arrives.
+  const { scrollYProgress: arrive } = useScroll({ target: ref, offset: ['start end', 'start 25%'] });
+  const grow = useTransform(arrive, [0, 1], reduced ? [1, 1] : [0.88, 1]);
+  const lift = useTransform(arrive, [0, 1], reduced ? [0, 0] : [80, 0]);
   return (
     <section id="about" ref={ref} aria-labelledby="about-title" className="pb-20 sm:pb-28">
       <Container>
-        <motion.div
-          className="band-texture relative overflow-hidden rounded-[36px] bg-band text-band-ink"
-          initial={{ opacity: 0, y: 50, scale: 0.98 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: true, margin: '-100px' }}
-          transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
-        >
+        <motion.div style={{ scale: grow, y: lift }} className="band-texture relative overflow-hidden rounded-[36px] bg-band text-band-ink">
           <div className="relative h-[200px]" role="img" aria-label={t('band.bubbles')}>
             <div className="dotted-line absolute inset-x-0 top-1/2 h-1 -translate-y-1/2" />
             <motion.div style={{ x: push }} className="absolute inset-y-0 left-0">
@@ -61,9 +60,9 @@ export function Band() {
           <div className="grid gap-8 px-6 pt-6 pb-12 sm:px-12 sm:pb-16 lg:grid-cols-[1.3fr_1fr] lg:items-end">
             <div>
               <h2 id="about-title" className="text-[clamp(2.25rem,5vw,4rem)] leading-[1.02] font-extrabold">
-                {t('band.title')}
+                <SplitWords text={t('band.title')} />
               </h2>
-              <p className="mt-4 max-w-[34rem] text-lg text-band-muted">{t('band.body')}</p>
+              <p className="mt-5 max-w-[34rem] text-lg leading-relaxed text-band-muted">{t('band.body')}</p>
             </div>
             <div className="lg:justify-self-end">
               <a href="#day-1" className="group btn btn-ghost-dark gap-4 py-3 pr-3 pl-7">

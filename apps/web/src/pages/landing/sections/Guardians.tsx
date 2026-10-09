@@ -2,6 +2,7 @@ import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useState, type PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiseIn } from '../../../components/ScrollFx';
+import { SplitWords } from '../../../components/TextFx';
 import { CHARACTER, type CharacterId } from '../../../content/media';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
 import type { Mission } from '../svg/Icons';
@@ -126,9 +127,9 @@ export function Guardians() {
           {t('chapter.guardians.short')}
         </p>
         <h2 id="guardians-title" className="max-w-[44rem] text-[clamp(2rem,4vw,3.25rem)] leading-[1.05] font-extrabold">
-          {t('guardians.title')}
+          <SplitWords text={t('guardians.title')} />
         </h2>
-        <p className="mt-3 max-w-[40rem] text-lg text-muted">{t('guardians.lead')}</p>
+        <p className="mt-5 max-w-[40rem] text-lg leading-relaxed text-muted">{t('guardians.lead')}</p>
         </RiseIn>
         <ul className="mt-20 grid gap-x-6 gap-y-20 sm:grid-cols-2 lg:grid-cols-3">
           {GUARDIANS.map((g, i) => (

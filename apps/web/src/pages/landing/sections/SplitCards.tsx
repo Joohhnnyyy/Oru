@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Parallax, RiseIn } from '../../../components/ScrollFx';
+import { RiseIn } from '../../../components/ScrollFx';
+import { SplitWords, Unmask } from '../../../components/TextFx';
 import { CHARACTER, SPLIT_MEDIA } from '../../../content/media';
 import { useInViewOnce } from '../../../hooks/useInView';
 import { prefersReducedMotion } from '../../../hooks/useReducedMotion';
@@ -17,32 +18,40 @@ interface SplitProps {
   lead: string;
   body: ReactNode;
   media: ReactNode;
+  /** Put the media on the left (alternating rhythm down the page). */
+  flip?: boolean;
 }
 
-/** Big rounded card: copy on the left with a coloured accent bar, media on the right. */
-function Split({ id, accent, title, lead, body, media }: SplitProps) {
+const EASE = [0.2, 0.8, 0.2, 1] as const;
+
+/** Open (box-less) two-column section: copy with a growing accent rule, media that unmasks on scroll. */
+function Split({ id, accent, title, lead, body, media, flip = false }: SplitProps) {
+  // Trigger from the text column: a scaleY(0) rule has no height for IntersectionObserver to see.
+  const [colRef, colInView] = useInViewOnce<HTMLDivElement>('0px 0px -15% 0px');
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="pb-8 sm:pb-10">
+    <section id={id} aria-labelledby={`${id}-title`} className="py-16 sm:py-24">
       <Container>
-        <motion.article
-          className="grid gap-3 rounded-card bg-surface p-3 lg:grid-cols-2"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: '-80px' }}
-          transition={{ duration: 0.65, ease: [0.2, 0.8, 0.2, 1] }}
-        >
-          <div className="relative flex flex-col justify-center px-5 py-8 sm:px-10 sm:py-12">
-            <span aria-hidden="true" className={`absolute top-10 bottom-10 left-0 w-1.5 rounded-full ${accent}`} />
-            <RiseIn delay={0.1}>
-              <h2 id={`${id}-title`} className="text-[clamp(1.875rem,3.2vw,2.75rem)] leading-[1.08] font-extrabold">
-                {title}
-              </h2>
-              <p className="mt-3 max-w-[32rem] text-lg text-muted">{lead}</p>
+        <article className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+          <div ref={colRef} className={`relative pl-7 sm:pl-10 ${flip ? 'lg:order-2' : ''}`}>
+            <motion.span
+              aria-hidden="true"
+              className={`absolute top-1 bottom-1 left-0 w-1.5 origin-top rounded-full ${accent}`}
+              initial={{ scaleY: 0 }}
+              animate={{ scaleY: colInView ? 1 : 0 }}
+              transition={{ duration: 0.9, ease: EASE }}
+            />
+            <h2 id={`${id}-title`} className="text-[clamp(2rem,3.4vw,3rem)] leading-[1.1] font-extrabold">
+              <SplitWords text={title} />
+            </h2>
+            <RiseIn delay={0.15}>
+              <p className="mt-5 max-w-[34rem] text-lg leading-relaxed text-muted">{lead}</p>
             </RiseIn>
-            <div className="mt-7">{body}</div>
+            <RiseIn delay={0.25} className="mt-10">
+              {body}
+            </RiseIn>
           </div>
-          <div className="relative min-h-[320px] overflow-hidden rounded-[22px] bg-white">{media}</div>
-        </motion.article>
+          <Unmask className={`relative rounded-[28px] bg-surface ${flip ? 'lg:order-1' : ''}`}>{media}</Unmask>
+        </article>
       </Container>
     </section>
   );
@@ -64,7 +73,7 @@ function Day1Card() {
       lead={t('day1.lead')}
       body={
         <>
-          <ol className="space-y-4">
+          <ol className="space-y-7">
             {STEPS.map((s, i) => (
               <li key={s.id} className="flex gap-4">
                 <span className="relative shrink-0">
@@ -75,23 +84,21 @@ function Day1Card() {
                 </span>
                 <span>
                   <span className="block font-display text-xl font-bold">{t(`day1.${s.key}.title`)}</span>
-                  <span className="block text-muted">{t(`day1.${s.key}.body`)}</span>
+                  <span className="mt-1 block leading-relaxed text-muted">{t(`day1.${s.key}.body`)}</span>
                 </span>
               </li>
             ))}
           </ol>
-          <p className="mt-6 inline-flex flex-wrap items-center gap-2 rounded-full bg-white px-4 py-2 text-sm">
+          <p className="mt-10 inline-flex flex-wrap items-center gap-2 rounded-full bg-surface px-4 py-2 text-sm">
             <span className="font-semibold">{t('day1.sample')}:</span> {t('day1.sampleAction')}
             <span className="rounded-full bg-butter px-2 py-0.5 font-bold">{t('day1.sampleSeeds')}</span>
           </p>
-          <p className="mt-2 text-sm text-muted">{t('day1.sampleNote')}</p>
+          <p className="mt-3 text-sm leading-relaxed text-muted">{t('day1.sampleNote')}</p>
         </>
       }
       media={
-        <div className="absolute inset-0">
-          <Parallax amount={36}>
-            <MediaSlot media={SPLIT_MEDIA.day1} alt={t('chapter.day1.title')} width={1770} height={889} />
-          </Parallax>
+        <div className="relative aspect-[4/3] w-full">
+          <MediaSlot media={SPLIT_MEDIA.day1} alt={t('chapter.day1.title')} width={1770} height={889} className="absolute inset-0" />
         </div>
       }
     />
@@ -119,12 +126,13 @@ function GrowthCard() {
   return (
     <Split
       id="growth"
+      flip
       accent="bg-butter"
       title={t('chapter.growth.title')}
       lead={t('growth.lead')}
       body={
         <div ref={ref}>
-          <div className="flex flex-wrap gap-2" role="group" aria-label={t('chapter.growth.sub')}>
+          <div className="flex flex-wrap gap-3" role="group" aria-label={t('chapter.growth.sub')}>
             {STAGES.map((s, i) => (
               <button
                 key={s.id}
@@ -134,21 +142,21 @@ function GrowthCard() {
                   setTouched(true);
                   setIndex(i);
                 }}
-                className={`min-h-11 rounded-full px-4 font-display font-bold transition-colors ${i === index ? 'bg-ink text-white' : 'bg-white text-ink hover:bg-surface-2'}`}
+                className={`min-h-11 rounded-full px-4 font-display font-bold transition-colors ${i === index ? 'bg-ink text-white' : 'bg-surface text-ink hover:bg-surface-2'}`}
               >
                 {t(`growth.${s.id}.name`)}
               </button>
             ))}
           </div>
-          <div aria-live="polite" className="mt-5 min-h-[96px]">
+          <div aria-live="polite" className="mt-8 min-h-[110px]">
             <p className="text-sm font-semibold text-primary">{t('growth.dayLabel', { day: stage.day })}</p>
-            <p className="mt-1 text-lg">{t(`growth.${stage.id}.body`)}</p>
+            <p className="mt-2 text-lg leading-relaxed">{t(`growth.${stage.id}.body`)}</p>
           </div>
-          <p className="mt-4 text-sm text-muted">{t('growth.pace')}</p>
+          <p className="mt-6 text-sm leading-relaxed text-muted">{t('growth.pace')}</p>
         </div>
       }
       media={
-        <div className="flex h-full items-center justify-center gap-4 bg-gradient-to-br from-[#fff6d6] to-[#fde3ef] p-6 sm:gap-8">
+        <div className="flex min-h-[420px] items-center justify-center gap-4 bg-gradient-to-br from-[#fff6d6] to-[#fde3ef] p-8 sm:gap-8">
           <div key={stage.id} className="w-full max-w-[300px]">
             <Plot stage={stage} previous={STAGES[index - 1]} label={t('growth.plotLabel', { stage: name })} />
           </div>
@@ -181,7 +189,7 @@ function PlacesCard() {
       body={
         <>
           <h3 className="text-sm font-bold text-muted">{t('places.listLabel')}</h3>
-          <ul className="mt-2 grid gap-2 sm:grid-cols-2">
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
             {REGIONS.map((r) => (
               <li key={r.id}>
                 <button
@@ -189,7 +197,7 @@ function PlacesCard() {
                   aria-pressed={selected === r.id}
                   onClick={() => setSelected(r.id)}
                   className={`flex min-h-12 w-full items-center gap-3 rounded-chip px-3 py-2 text-left font-semibold ${
-                    selected === r.id ? 'bg-ink text-white' : 'bg-white text-ink hover:bg-surface-2'
+                    selected === r.id ? 'bg-ink text-white' : 'bg-surface text-ink hover:bg-surface-2'
                   }`}
                 >
                   <span aria-hidden="true" className={`size-5 shrink-0 ring-2 ring-white ${r.id === 'cities' ? 'rounded-full' : 'rounded-[5px]'}`} style={{ background: r.fill }} />
@@ -198,7 +206,7 @@ function PlacesCard() {
               </li>
             ))}
           </ul>
-          <div aria-live="polite" className="mt-4 min-h-[132px] rounded-chip bg-white p-4">
+          <div aria-live="polite" className="mt-6 min-h-[140px] rounded-chip bg-surface p-5">
             {region ? (
               <div className="flex items-start gap-4">
                 <img src={CHARACTER[region.guardian]} alt="" width={96} height={96} className="h-20 w-20 shrink-0 object-contain" />
@@ -218,7 +226,7 @@ function PlacesCard() {
         </>
       }
       media={
-        <figure className="flex h-full flex-col items-center justify-center gap-3 p-6">
+        <figure className="flex min-h-[420px] flex-col items-center justify-center gap-4 p-8">
           <IndiaMap selected={selected} onSelect={setSelected} label={t('places.mapLabel')} regionName={regionName} />
           <figcaption className="max-w-[26rem] text-center text-sm text-muted">{t('places.disclaimer')}</figcaption>
         </figure>

@@ -2,6 +2,7 @@ import { motion, useMotionValue, useSpring } from 'framer-motion';
 import type { PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiseIn } from '../../../components/ScrollFx';
+import { SplitWords } from '../../../components/TextFx';
 import { env } from '../../../config/env';
 import { BRAND, CHARACTER, SCENE } from '../../../content/media';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
@@ -17,7 +18,7 @@ function Closing() {
       <Container className="grid items-center gap-8 py-20 md:grid-cols-[1.2fr_1fr] md:py-28">
         <RiseIn>
           <h2 id="closing-title" className="text-[clamp(2.25rem,5vw,4rem)] leading-[1.02] font-extrabold">
-            {t('next.finalTitle')}
+            <SplitWords text={t('next.finalTitle')} />
           </h2>
           <p className="mt-3 max-w-[30rem] text-lg text-muted">{t('next.finalBody')}</p>
           <div className="mt-7 flex flex-wrap gap-3">

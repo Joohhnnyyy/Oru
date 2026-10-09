@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { RollText } from '../../../components/TextFx';
 import { env } from '../../../config/env';
 import type { MediaSlot as MediaSlotData } from '../../../content/media';
 import { useInstallPrompt } from '../../../hooks/useInstallPrompt';
@@ -31,8 +32,8 @@ export function ArrowIcon({ size = 20 }: { size?: number }) {
 export function PlayLink({ className = '' }: { className?: string }) {
   const { t } = useTranslation();
   return (
-    <a href={env.VITE_PLAY_URL} className={`btn btn-play ${className}`}>
-      {t('cta.play')}
+    <a href={env.VITE_PLAY_URL} className={`btn btn-play roll-host shine ${className}`}>
+      <RollText text={t('cta.play')} />
     </a>
   );
 }
@@ -59,13 +60,15 @@ export function LangSwitch({ className = '' }: { className?: string }) {
       type="button"
       onClick={() => void setLanguage(next)}
       aria-label={t('a11y.switchLang')}
-      className={`inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-4 font-semibold text-ink shadow-soft ${className}`}
+      className={`roll-host shine inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-4 font-semibold text-ink shadow-soft ${className}`}
     >
-      <svg viewBox="0 0 24 24" width={18} height={18} aria-hidden="true" focusable="false">
+      <svg viewBox="0 0 24 24" width={18} height={18} aria-hidden="true" focusable="false" className="spin-on-hover">
         <circle cx={12} cy={12} r={9} fill="none" stroke="currentColor" strokeWidth={1.8} />
         <path d="M3 12h18M12 3c2.8 3 2.8 15 0 18M12 3c-2.8 3-2.8 15 0 18" fill="none" stroke="currentColor" strokeWidth={1.8} />
       </svg>
-      <span lang={next}>{t('a11y.langName')}</span>
+      <span lang={next}>
+        <RollText text={t('a11y.langName')} />
+      </span>
     </button>
   );
 }

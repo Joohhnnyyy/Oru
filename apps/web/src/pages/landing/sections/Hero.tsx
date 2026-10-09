@@ -135,8 +135,14 @@ export function Hero() {
       <motion.div style={{ opacity: fade }} className="relative z-10 flex h-full flex-col">
         <Container className="flex items-start justify-between gap-6 pt-5 sm:pt-7">
           <div>
-            <a href="#top" className="inline-block rounded-[22px] bg-white/95 px-4 py-2 shadow-lift" aria-label={t('a11y.home')}>
-              <img src={BRAND.wordmark} alt="Oru" width={120} height={72} className="h-12 w-auto sm:h-16" />
+            <a href="#top" className="inline-block rounded-xl" aria-label={t('a11y.home')}>
+              <img
+                src={BRAND.wordmarkOnDark}
+                alt="Oru"
+                width={419}
+                height={282}
+                className="h-20 w-auto drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)] transition-transform duration-500 hover:-rotate-3 hover:scale-105 sm:h-24"
+              />
             </a>
             <nav aria-label={t('nav.label')} className="mt-5 hidden lg:block">
               <ul className="flex flex-wrap gap-x-7 gap-y-2">
@@ -180,7 +186,7 @@ export function Hero() {
           </Container>
         )}
 
-        <Container className="mt-auto flex items-end justify-between gap-8 pb-24 sm:pb-28">
+        <Container className="mt-auto flex items-end justify-between gap-8 pb-16 sm:pb-20">
           <div className="max-w-[40rem]">
             <motion.h1
               id="hero-title"
@@ -215,17 +221,6 @@ export function Hero() {
         </Container>
       </motion.div>
 
-      <a
-        href="#mission"
-        className="absolute bottom-0 left-1/2 z-10 inline-flex -translate-x-1/2 items-center gap-2 rounded-t-2xl bg-ink px-5 py-2.5 text-sm font-semibold text-white no-underline"
-      >
-        <span className="bob inline-block">
-          <svg viewBox="0 0 24 24" width={16} height={16} aria-hidden="true" focusable="false">
-            <path d="M12 4v15m0 0-5-5m5 5 5-5" fill="none" stroke="currentColor" strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </span>
-        {t('hero.scroll')}
-      </a>
     </section>
   );
 }
