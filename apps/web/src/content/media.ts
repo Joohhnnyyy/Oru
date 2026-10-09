@@ -58,9 +58,9 @@ export const BRAND = {
 
 /** Hero highlight cards (bottom-right carousel). */
 export const HIGHLIGHTS: { id: 'n1' | 'n2' | 'n3'; href: string; media: MediaSlot }[] = [
-  { id: 'n1', href: '#day-1', media: { poster: SCENE.sparrow, video: null } },
-  { id: 'n2', href: '#guardians', media: { poster: SCENE.leopard, video: null } },
-  { id: 'n3', href: '#next', media: { poster: SCENE.dolphin, video: null } },
+  { id: 'n1', href: '/how-it-works', media: { poster: SCENE.sparrow, video: null } },
+  { id: 'n2', href: '/guardians', media: { poster: SCENE.leopard, video: null } },
+  { id: 'n3', href: '/play', media: { poster: SCENE.dolphin, video: null } },
 ];
 
 /** Large split cards. */

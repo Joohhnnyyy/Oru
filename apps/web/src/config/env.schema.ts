@@ -8,7 +8,7 @@ export const EnvSchema = z.object({
 });
 
 export const ENV_DEFAULTS: z.infer<typeof EnvSchema> = {
-  VITE_PLAY_URL: '/home',
+  VITE_PLAY_URL: '/play',
   VITE_SOURCE_URL: 'https://github.com/Joohhnnyyy/Oru',
   VITE_SITE_URL: 'https://oru.example.org',
 };

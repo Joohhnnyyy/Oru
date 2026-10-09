@@ -8,6 +8,12 @@ const HEADER_OFFSET = 88;
 
 let instance: Lenis | null = null;
 
+/** Jump to the top instantly (used on page changes). */
+export function scrollToTopNow() {
+  instance?.scrollTo(0, { immediate: true, force: true });
+  window.scrollTo(0, 0);
+}
+
 /** Pause or resume smooth scrolling (used while the intro loader is up). */
 export function setScrollLocked(locked: boolean) {
   document.documentElement.classList.toggle('scroll-locked', locked);

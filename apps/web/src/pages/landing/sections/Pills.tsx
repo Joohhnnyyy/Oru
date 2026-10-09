@@ -1,13 +1,13 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { CountUp } from '../../../components/CountUp';
-import { CHARACTER, SCENE } from '../../../content/media';
+import { RollText } from '../../../components/TextFx';
+import { SCENE } from '../../../content/media';
 import { STAGES } from '../svg/Plot';
 import { GUARDIANS } from './Guardians';
 import { ArrowIcon, Container } from './shared';
 
-type PillId = 'impact' | 'next';
 
 // Every number here is a true fact about the product, not a usage claim.
 const FACTS = [
@@ -17,11 +17,10 @@ const FACTS = [
   { key: 'languages', value: 2, dot: 'bg-pink' },
 ] as const;
 
-function ImpactPanel() {
+export function ImpactPanel() {
   const { t } = useTranslation();
   return (
     <div className="space-y-6">
-      <p className="max-w-[44rem] text-lg text-muted">{t('impact.lead')}</p>
       <dl className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         {FACTS.map((f) => (
           <div key={f.key} className="flex flex-col-reverse rounded-card bg-white p-5">
@@ -57,11 +56,10 @@ function ImpactPanel() {
   );
 }
 
-function NextPanel() {
+export function NextPanel() {
   const { t } = useTranslation();
   return (
     <div className="space-y-4">
-      <p className="max-w-[44rem] text-lg text-muted">{t('next.lead')}</p>
       <ol className="grid gap-4 md:grid-cols-3">
         {(['r1', 'r2', 'r3'] as const).map((k, i) => (
           <li key={k} className="rounded-card bg-white p-5">
@@ -77,83 +75,40 @@ function NextPanel() {
   );
 }
 
-function Pill({ id, title, image, open, onToggle }: { id: PillId; title: string; image: ReactNode; open: boolean; onToggle: () => void }) {
-  const { t } = useTranslation();
+function Pill({ to, title, image }: { to: string; title: string; image: ReactNode }) {
   return (
-    <button
-      type="button"
-      id={id}
-      aria-expanded={open}
-      aria-controls={`${id}-panel`}
-      onClick={onToggle}
-      className={`group flex w-full scroll-mt-28 items-center gap-5 rounded-full p-3 pr-5 text-left transition-colors ${open ? 'bg-surface-2' : 'bg-surface hover:bg-surface-2'}`}
+    <Link
+      to={to}
+      className="group roll-host flex w-full items-center gap-5 rounded-full bg-surface p-3 pr-5 text-ink no-underline transition-colors hover:bg-surface-2"
     >
-      <span className="size-24 shrink-0 overflow-hidden rounded-full sm:size-32">{image}</span>
-      <span className="flex-1 font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight font-bold">{title}</span>
-      <span className="sr-only">{open ? t('pills.hide') : t('pills.show')}</span>
-      <span className={`arrow-badge transition-transform ${open ? 'rotate-90' : ''}`}>
+      <span className="size-24 shrink-0 overflow-hidden rounded-full transition-transform duration-500 group-hover:scale-105 sm:size-32">{image}</span>
+      <span className="flex-1 font-display text-[clamp(1.5rem,2.4vw,2rem)] leading-tight font-bold">
+        <RollText text={title} />
+      </span>
+      <span className="arrow-badge">
         <ArrowIcon />
       </span>
-    </button>
+    </Link>
   );
 }
 
 export function Pills() {
   const { t } = useTranslation();
-  const [open, setOpen] = useState<PillId | null>(null);
-
-  // Links like #impact or #next (from the nav and hero highlights) open the matching panel.
-  useEffect(() => {
-    const sync = () => {
-      const hash = window.location.hash.slice(1);
-      if (hash === 'impact' || hash === 'next') setOpen(hash);
-    };
-    sync();
-    window.addEventListener('hashchange', sync);
-    return () => window.removeEventListener('hashchange', sync);
-  }, []);
-
-  const toggle = (id: PillId) => setOpen((o) => (o === id ? null : id));
-
   return (
     <section aria-label={`${t('pills.impact')}, ${t('pills.next')}`} className="pb-20 sm:pb-28">
       <Container>
         <div className="grid gap-5 md:grid-cols-2">
           <Pill
-            id="impact"
+            to="/impact"
             title={t('pills.impact')}
-            open={open === 'impact'}
-            onToggle={() => toggle('impact')}
             image={<img src={SCENE.sparrow} alt="" width={128} height={128} loading="lazy" className="h-full w-full object-cover" />}
           />
           <Pill
-            id="next"
+            to="/roadmap"
             title={t('pills.next')}
-            open={open === 'next'}
-            onToggle={() => toggle('next')}
             image={<img src={SCENE.turtle} alt="" width={128} height={128} loading="lazy" className="h-full w-full object-cover" />}
           />
         </div>
-        <AnimatePresence initial={false}>
-          {open && (
-            <motion.div
-              key={open}
-              id={`${open}-panel`}
-              role="region"
-              aria-labelledby={open}
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
-              className="overflow-hidden"
-            >
-              <div className="relative mt-5 rounded-card bg-surface p-5 sm:p-8">
-                <img src={CHARACTER.buddy} alt="" width={120} height={120} className="bob pointer-events-none absolute -top-10 right-6 hidden w-24 sm:block" />
-                {open === 'impact' ? <ImpactPanel /> : <NextPanel />}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </Container>
     </section>
   );

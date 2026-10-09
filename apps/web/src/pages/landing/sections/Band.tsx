@@ -1,10 +1,10 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SplitWords } from '../../../components/TextFx';
+import { Rich, SplitWords } from '../../../components/TextFx';
 import { CHARACTER, SCENE, type CharacterId } from '../../../content/media';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
-import { ArrowIcon, Container } from './shared';
+import { Container, MoreLink } from './shared';
 
 /** Bubbles that drift along the dotted line: size (px), vertical offset (px), artwork. */
 const BUBBLES: { id: CharacterId; size: number; dy: number; ring: string }[] = [
@@ -62,15 +62,10 @@ export function Band() {
               <h2 id="about-title" className="text-[clamp(2.25rem,5vw,4rem)] leading-[1.02] font-extrabold">
                 <SplitWords text={t('band.title')} />
               </h2>
-              <p className="mt-5 max-w-[34rem] text-lg leading-relaxed text-band-muted">{t('band.body')}</p>
+              <p className="mt-5 max-w-[34rem] text-lg leading-relaxed text-band-muted"><Rich k="band.body" /></p>
             </div>
             <div className="lg:justify-self-end">
-              <a href="#day-1" className="group btn btn-ghost-dark gap-4 py-3 pr-3 pl-7">
-                {t('band.cta')}
-                <span className="arrow-badge size-10 bg-white/15 text-band-ink">
-                  <ArrowIcon />
-                </span>
-              </a>
+              <MoreLink to="/how-it-works" label={t('band.cta')} dark />
             </div>
           </div>
         </motion.div>

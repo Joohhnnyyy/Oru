@@ -1,12 +1,14 @@
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { ReactNode } from 'react';
+import { createMemoryRouter, MemoryRouter, RouterProvider } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
+import { PRERENDER_PATHS, routes } from '../app/routes';
 import '../i18n';
 import en from '../i18n/en.json';
 import hi from '../i18n/hi.json';
-import { LandingPage } from '../pages/landing/LandingPage';
 import { FlipCard, GUARDIANS } from '../pages/landing/sections/Guardians';
-import { NAV_IDS } from '../pages/landing/sections/shared';
+import { NAV } from '../pages/landing/sections/shared';
 import { SplitCards } from '../pages/landing/sections/SplitCards';
 
 type Tree = { [key: string]: string | Tree };
@@ -18,6 +20,13 @@ function leaves(tree: Tree, prefix = ''): Record<string, string> {
   }, {});
 }
 
+function renderAt(path: string) {
+  const router = createMemoryRouter(routes, { initialEntries: [path] });
+  return render(<RouterProvider router={router} />);
+}
+
+const inRouter = (ui: ReactNode) => render(<MemoryRouter>{ui}</MemoryRouter>);
+
 describe('i18n bundles', () => {
   const enKeys = leaves(en);
   const hiKeys = leaves(hi);
@@ -26,26 +35,27 @@ describe('i18n bundles', () => {
     expect(Object.keys(hiKeys).sort()).toEqual(Object.keys(enKeys).sort());
   });
 
-  it('has no empty strings and keeps interpolation variables', () => {
+  it('has no empty strings and keeps interpolation variables and emphasis tags', () => {
+    const tokens = (s: string) => (s.match(/\{\{\w+\}\}|<\/?[mug]>/g) ?? []).sort();
     for (const [key, value] of Object.entries(enKeys)) {
       expect(value.trim(), key).not.toBe('');
       expect(hiKeys[key]?.trim(), key).not.toBe('');
-      const vars = (s: string) => (s.match(/\{\{\w+\}\}/g) ?? []).sort();
-      expect(vars(hiKeys[key] ?? ''), key).toEqual(vars(value));
+      expect(tokens(hiKeys[key] ?? ''), key).toEqual(tokens(value));
     }
   });
 });
 
-describe('LandingPage', () => {
-  it('has one h1, a skip link and every nav target', () => {
-    const { container } = render(<LandingPage />);
+describe('Home page', () => {
+  it('has one h1, a skip link and menu links that open pages', () => {
+    const { container } = renderAt('/');
     expect(container.querySelectorAll('h1')).toHaveLength(1);
     expect(screen.getByRole('link', { name: 'Skip to content' })).toHaveAttribute('href', '#main');
-    for (const id of [...NAV_IDS, 'next', 'mission', 'about']) expect(container.querySelector(`#${id}`), id).not.toBeNull();
+    const hrefs = [...container.querySelectorAll('nav a')].map((a) => a.getAttribute('href'));
+    for (const n of NAV) expect(hrefs).toContain(n.to);
   });
 
   it('gives every image an alt attribute and every svg a label or aria-hidden', () => {
-    const { container } = render(<LandingPage />);
+    const { container } = renderAt('/');
     for (const img of container.querySelectorAll('img')) expect(img.hasAttribute('alt'), img.outerHTML.slice(0, 100)).toBe(true);
     for (const svg of container.querySelectorAll('svg')) {
       const labelled = (svg.getAttribute('role') === 'img' || svg.getAttribute('role') === 'group') && svg.hasAttribute('aria-label');
@@ -54,9 +64,17 @@ describe('LandingPage', () => {
     }
   });
 
+  it('renders emphasis tags as effects, never as raw markup', () => {
+    const { container } = renderAt('/');
+    expect(container.textContent).not.toMatch(/<\/?[mug]>/);
+    expect(container.querySelector('.mark-marker')?.textContent).toBe('about a minute');
+    expect(container.querySelector('.mark-scribble')).not.toBeNull();
+    expect(container.querySelector('.mark-shimmer')).not.toBeNull();
+  });
+
   it('steps through hero highlights with the carousel buttons', async () => {
     const user = userEvent.setup();
-    render(<LandingPage />);
+    renderAt('/');
     const highlights = screen.getByRole('complementary', { name: 'Highlights' });
     expect(within(highlights).getByText('Your first day takes about a minute')).toBeInTheDocument();
     await user.click(within(highlights).getByRole('button', { name: 'Pause highlights' }));
@@ -64,16 +82,35 @@ describe('LandingPage', () => {
     expect(await within(highlights).findByText('Six guardians are waiting to wake up')).toBeInTheDocument();
   });
 
-  it('opens the impact and roadmap pills in place', async () => {
-    const user = userEvent.setup();
-    render(<LandingPage />);
-    const impact = screen.getByRole('button', { name: /Oru in numbers/ });
-    expect(impact).toHaveAttribute('aria-expanded', 'false');
-    await user.click(impact);
-    expect(impact).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByText('guardians to wake')).toBeInTheDocument();
-    await user.click(screen.getByRole('button', { name: /What comes next/ }));
-    expect(await screen.findByText('A pilot in one city')).toBeInTheDocument();
+  it('links the pills and section buttons to their pages', () => {
+    renderAt('/');
+    expect(screen.getByRole('link', { name: /Oru in numbers/ })).toHaveAttribute('href', '/impact');
+    expect(screen.getByRole('link', { name: /What comes next/ })).toHaveAttribute('href', '/roadmap');
+    expect(screen.getByRole('link', { name: /See all guardians/ })).toHaveAttribute('href', '/guardians');
+    expect(screen.getByRole('link', { name: /Read about the Sarus crane/ })).toHaveAttribute('href', '/guardians/crane');
+  });
+});
+
+describe('Pages', () => {
+  it.each(PRERENDER_PATHS.filter((p) => p !== '/'))('%s renders a single page heading', (path) => {
+    const { container } = renderAt(path);
+    expect(container.querySelectorAll('h1')).toHaveLength(1);
+  });
+
+  it('shows the guardian page for a known id and the not-found page otherwise', () => {
+    renderAt('/guardians/dolphin');
+    expect(screen.getByRole('heading', { level: 1, name: 'River dolphin' })).toBeInTheDocument();
+    expect(screen.getByText(/finds its way and its food in muddy water/)).toBeInTheDocument();
+  });
+
+  it('shows the not-found page for unknown URLs', () => {
+    renderAt('/no-such-page');
+    expect(screen.getByRole('heading', { level: 1, name: 'This page wandered off' })).toBeInTheDocument();
+  });
+
+  it('shows the not-found page for an unknown guardian', () => {
+    renderAt('/guardians/unicorn');
+    expect(screen.getByRole('heading', { level: 1, name: 'This page wandered off' })).toBeInTheDocument();
   });
 });
 
@@ -101,13 +138,13 @@ describe('FlipCard', () => {
 describe('Split cards', () => {
   it('updates the places panel from the list and from the map with the keyboard', async () => {
     const user = userEvent.setup();
-    render(<SplitCards />);
+    inRouter(<SplitCards />);
     const places = document.getElementById('places') as HTMLElement;
     const list = within(places).getByRole('heading', { name: 'Regions' }).nextElementSibling as HTMLElement;
 
     await user.click(within(list).getByRole('button', { name: 'Coasts and islands' }));
     expect(within(places).getByRole('heading', { level: 3, name: 'Coasts and islands' })).toBeInTheDocument();
-    expect(within(places).getByRole('link', { name: 'Meet the Sea turtle' })).toHaveAttribute('href', '#guardian-turtle');
+    expect(within(places).getByRole('link', { name: 'Meet the Sea turtle' })).toHaveAttribute('href', '/guardians/turtle');
 
     const map = within(places).getByRole('group', { name: /pixel map of India/ });
     const mountains = within(map).getByRole('button', { name: 'High mountains' });
@@ -119,11 +156,17 @@ describe('Split cards', () => {
 
   it('lets people pick a growth stage', async () => {
     const user = userEvent.setup();
-    render(<SplitCards />);
+    inRouter(<SplitCards />);
     const growth = document.getElementById('growth') as HTMLElement;
     const forest = within(growth).getByRole('button', { name: 'Forest' });
     await user.click(forest);
     expect(forest).toHaveAttribute('aria-pressed', 'true');
     expect(within(growth).getByText(/your plot is a small green city/)).toBeInTheDocument();
+  });
+
+  it('has a Learn more link to each section page', () => {
+    inRouter(<SplitCards />);
+    const hrefs = screen.getAllByRole('link', { name: /Learn more/ }).map((a) => a.getAttribute('href'));
+    expect(hrefs).toEqual(['/how-it-works', '/grow', '/places']);
   });
 });

@@ -1,5 +1,7 @@
 import { motion, useMotionTemplate, useScroll, useTransform } from 'framer-motion';
 import { Fragment, useRef, type CSSProperties, type ReactNode } from 'react';
+import { Trans } from 'react-i18next';
+import { useInViewOnce } from '../hooks/useInView';
 import { useReducedMotion } from '../hooks/useReducedMotion';
 
 const DEVANAGARI = /[ऀ-ॿ]/;
@@ -79,4 +81,49 @@ export function Unmask({ children, className = '', radius = 28 }: { children: Re
       </motion.div>
     </motion.div>
   );
+}
+
+type MarkKind = 'marker' | 'scribble' | 'shimmer';
+
+/**
+ * Inline emphasis for a few words inside a paragraph, animated once when it scrolls into view:
+ * - marker: a pastel highlighter sweeps in behind the words
+ * - scribble: a hand-drawn underline draws itself
+ * - shimmer: the words take a slow, colour-shifting gradient (AA-contrast colours)
+ */
+export function Mark({ kind, children }: { kind: MarkKind; children?: ReactNode }) {
+  const [ref, inView] = useInViewOnce<HTMLSpanElement>('0px 0px -12% 0px');
+  if (kind === 'shimmer') {
+    return (
+      <span ref={ref} className="mark-shimmer font-semibold">
+        {children}
+      </span>
+    );
+  }
+  if (kind === 'scribble') {
+    return (
+      <span ref={ref} className={`mark-scribble relative inline-block ${inView ? 'is-in' : ''}`}>
+        {children}
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 200 12" preserveAspectRatio="none" className="pointer-events-none absolute -bottom-1.5 left-0 h-3 w-full">
+          <path d="M2 8 C 40 2, 70 11, 105 6 S 170 2, 198 7" pathLength={1} fill="none" stroke="var(--butter)" strokeWidth={4} strokeLinecap="round" />
+        </svg>
+      </span>
+    );
+  }
+  return (
+    <span ref={ref} className={`mark-marker ${inView ? 'is-in' : ''}`}>
+      {children}
+    </span>
+  );
+}
+
+const MARKS = {
+  m: <Mark kind="marker" />,
+  u: <Mark kind="scribble" />,
+  g: <Mark kind="shimmer" />,
+};
+
+/** Renders an i18n string that may contain <m>, <u> or <g> tags as animated inline emphasis. */
+export function Rich({ k }: { k: string }) {
+  return <Trans i18nKey={k} components={MARKS} />;
 }

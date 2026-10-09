@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion';
 import { useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { Parallax } from '../../../components/ScrollFx';
 import { CHARACTER, SCENE } from '../../../content/media';
 import { MissionIcon, type Mission as MissionId } from '../svg/Icons';
@@ -47,10 +48,12 @@ function Statement() {
   );
 }
 
+const MotionLink = motion.create(Link);
+
 function ImageCard({ href, title, children, delay }: { href: string; title: string; children: ReactNode; delay: number }) {
   return (
-    <motion.a
-      href={href}
+    <MotionLink
+      to={href}
       className="group relative block aspect-[16/10] overflow-hidden rounded-card bg-surface no-underline"
       initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -67,7 +70,7 @@ function ImageCard({ href, title, children, delay }: { href: string; title: stri
           <ArrowIcon />
         </span>
       </div>
-    </motion.a>
+    </MotionLink>
   );
 }
 
@@ -93,12 +96,12 @@ export function Mission() {
         </ul>
 
         <div className="mt-12 grid gap-6 md:grid-cols-2">
-          <ImageCard href="#day-1" title={t('mission.cardHow')} delay={0}>
+          <ImageCard href="/how-it-works" title={t('mission.cardHow')} delay={0}>
             <div className="relative h-full w-full bg-gradient-to-br from-butter via-[#ffe9a8] to-pink">
               <img src={CHARACTER.buddy} alt="" width={401} height={403} loading="lazy" className="bob absolute top-1/2 left-1/2 h-[78%] w-auto -translate-x-1/2 -translate-y-[54%]" />
             </div>
           </ImageCard>
-          <ImageCard href="#guardians" title={t('mission.cardGuardians')} delay={0.12}>
+          <ImageCard href="/guardians" title={t('mission.cardGuardians')} delay={0.12}>
             <img src={SCENE.leopard} alt="" width={512} height={458} loading="lazy" className="h-full w-full object-cover" />
           </ImageCard>
         </div>

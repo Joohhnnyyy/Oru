@@ -2,7 +2,8 @@ import { motion, useMotionValue, useSpring } from 'framer-motion';
 import type { PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiseIn } from '../../../components/ScrollFx';
-import { SplitWords } from '../../../components/TextFx';
+import { Rich, SplitWords } from '../../../components/TextFx';
+import { Link } from 'react-router-dom';
 import { env } from '../../../config/env';
 import { BRAND, CHARACTER, SCENE } from '../../../content/media';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
@@ -20,7 +21,7 @@ function Closing() {
           <h2 id="closing-title" className="text-[clamp(2.25rem,5vw,4rem)] leading-[1.02] font-extrabold">
             <SplitWords text={t('next.finalTitle')} />
           </h2>
-          <p className="mt-3 max-w-[30rem] text-lg text-muted">{t('next.finalBody')}</p>
+          <p className="mt-3 max-w-[30rem] text-lg text-muted"><Rich k="next.finalBody" /></p>
           <div className="mt-7 flex flex-wrap gap-3">
             <PlayLink />
             <InstallButton />
@@ -93,9 +94,9 @@ export function Footer() {
       <footer className="overflow-hidden bg-surface">
         <Container className="flex flex-wrap items-center justify-between gap-4 pt-8">
           <div className="flex items-center">
-            <a href="#top" aria-label={t('a11y.home')} className="rounded-lg">
+            <Link to="/" aria-label={t('a11y.home')} className="rounded-lg">
               <img src={BRAND.wordmark} alt="" width={120} height={71} loading="lazy" className="h-11 w-auto" />
-            </a>
+            </Link>
           </div>
           <div className="flex items-center gap-2">
             <LangSwitch className="!shadow-none ring-1 ring-line" />

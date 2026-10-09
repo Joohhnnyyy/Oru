@@ -26,20 +26,27 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
 
-  // Pages: network first. Offline, the home page falls back to the cached shell
-  // and every other page to the offline page.
+  // Pages: network first, and every successfully loaded page is kept for offline use.
+  // Offline, a page falls back to its cached copy (with or without a trailing slash),
+  // then to the offline page.
   if (request.mode === 'navigate') {
-    const isHome = url.pathname === '/';
     event.respondWith(
       fetch(request)
         .then((response) => {
-          if (isHome && response.ok) {
+          if (response.ok) {
             const copy = response.clone();
-            caches.open(CACHE).then((cache) => cache.put('/', copy));
+            caches.open(CACHE).then((cache) => cache.put(request, copy));
           }
           return response;
         })
-        .catch(async () => (isHome && (await caches.match('/'))) || (await caches.match('/offline.html'))),
+        .catch(async () => {
+          const withSlash = url.pathname.endsWith('/') ? url.pathname : `${url.pathname}/`;
+          return (
+            (await caches.match(request, { ignoreVary: true, ignoreSearch: true })) ||
+            (await caches.match(withSlash, { ignoreVary: true })) ||
+            (await caches.match('/offline.html'))
+          );
+        }),
     );
     return;
   }

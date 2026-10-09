@@ -1,5 +1,5 @@
 // Reports the gzip size of what a first visit downloads (HTML + CSS + entry JS) against the budget.
-// Budget relaxed on 2026-10-10 for the image-led redesign (website first): 160 KB code, 140 KB JS.
+// Budget relaxed on 2026-10-10 for the image-led redesign (website first), then for the router: 200 KB code, 170 KB JS.
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -23,5 +23,5 @@ const js = rows.filter((r) => r[2] === 'js').reduce((s, r) => s + r[1], 0);
 
 for (const [name, size] of rows) console.log(`${name.padEnd(48)} ${kb(size).padStart(9)} gzip`);
 console.log('-'.repeat(68));
-console.log(`First load (HTML + CSS + JS)`.padEnd(48), kb(firstLoad).padStart(9), firstLoad <= 160 * 1024 ? 'OK  (budget 160 KB)' : 'OVER (budget 160 KB)');
-console.log(`First-load JS`.padEnd(48), kb(js).padStart(9), js <= 140 * 1024 ? 'OK  (budget 140 KB)' : 'OVER (budget 140 KB)');
+console.log(`First load (HTML + CSS + JS)`.padEnd(48), kb(firstLoad).padStart(9), firstLoad <= 200 * 1024 ? 'OK  (budget 200 KB)' : 'OVER (budget 200 KB)');
+console.log(`First-load JS`.padEnd(48), kb(js).padStart(9), js <= 170 * 1024 ? 'OK  (budget 170 KB)' : 'OVER (budget 170 KB)');

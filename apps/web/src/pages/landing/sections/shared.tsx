@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { RollText } from '../../../components/TextFx';
 import { env } from '../../../config/env';
 import type { MediaSlot as MediaSlotData } from '../../../content/media';
@@ -7,23 +8,23 @@ import { useInstallPrompt } from '../../../hooks/useInstallPrompt';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
 import { setLanguage } from '../../../i18n';
 
+/** Main menu: each item opens its own page. */
 export const NAV = [
-  { href: '#day-1', key: 'how' },
-  { href: '#guardians', key: 'guardians' },
-  { href: '#growth', key: 'grow' },
-  { href: '#places', key: 'places' },
-  { href: '#impact', key: 'impact' },
+  { to: '/how-it-works', key: 'how' },
+  { to: '/guardians', key: 'guardians' },
+  { to: '/grow', key: 'grow' },
+  { to: '/places', key: 'places' },
+  { to: '/impact', key: 'impact' },
+  { to: '/roadmap', key: 'roadmap' },
 ] as const;
-
-export const NAV_IDS: readonly string[] = NAV.map((n) => n.href.slice(1));
 
 export function Container({ children, className = '' }: { children: ReactNode; className?: string }) {
   return <div className={`mx-auto w-full max-w-[1240px] px-4 sm:px-6 lg:px-10 ${className}`}>{children}</div>;
 }
 
-export function ArrowIcon({ size = 20 }: { size?: number }) {
+export function ArrowIcon({ size = 20, back = false }: { size?: number; back?: boolean }) {
   return (
-    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" focusable="false">
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" focusable="false" className={back ? 'rotate-180' : undefined}>
       <path d="M5 12h13m-5-5 5 5-5 5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
@@ -32,9 +33,26 @@ export function ArrowIcon({ size = 20 }: { size?: number }) {
 export function PlayLink({ className = '' }: { className?: string }) {
   const { t } = useTranslation();
   return (
-    <a href={env.VITE_PLAY_URL} className={`btn btn-play roll-host shine ${className}`}>
+    <Link to={env.VITE_PLAY_URL} className={`btn btn-play roll-host shine ${className}`}>
       <RollText text={t('cta.play')} />
-    </a>
+    </Link>
+  );
+}
+
+/** Pill button that opens a page, with a rolling label and a sliding arrow badge. */
+export function MoreLink({ to, label, className = '', dark = false }: { to: string; label: string; className?: string; dark?: boolean }) {
+  return (
+    <Link
+      to={to}
+      className={`group roll-host shine inline-flex min-h-12 items-center gap-4 rounded-full py-2 pr-2 pl-6 font-display text-[1.0625rem] font-bold no-underline ${
+        dark ? 'text-band-ink ring-1 ring-white/40' : 'bg-surface text-ink hover:bg-surface-2'
+      } ${className}`}
+    >
+      <RollText text={label} />
+      <span className={`arrow-badge size-10 ${dark ? 'bg-white/15 text-band-ink' : ''}`}>
+        <ArrowIcon />
+      </span>
+    </Link>
   );
 }
 

@@ -1,21 +1,34 @@
 import { StrictMode } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import './styles/index.css';
+import { routes } from './app/routes';
 import { setLanguage, storedLanguage } from './i18n';
-import { LandingPage } from './pages/landing/LandingPage';
 
 // Scroll-reveal styles only apply once JS is running, so no-JS visitors see everything.
 document.documentElement.classList.add('js');
+
+declare global {
+  interface Window {
+    __staticRouterHydrationData?: Parameters<typeof createBrowserRouter>[1] extends infer O
+      ? O extends { hydrationData?: infer H }
+        ? H
+        : never
+      : never;
+  }
+}
+
+const router = createBrowserRouter(routes, { hydrationData: window.__staticRouterHydrationData });
 
 const container = document.getElementById('root');
 if (!container) throw new Error('Missing #root element');
 const app = (
   <StrictMode>
-    <LandingPage />
+    <RouterProvider router={router} />
   </StrictMode>
 );
 
-// Production HTML is prerendered (scripts/prerender.mjs); dev starts empty.
+// Production HTML is prerendered per page (scripts/prerender.mjs); dev starts empty.
 if (container.firstElementChild) hydrateRoot(container, app);
 else createRoot(container).render(app);
 

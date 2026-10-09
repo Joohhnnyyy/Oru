@@ -1,11 +1,14 @@
 import { AnimatePresence, motion, useMotionValue, useScroll, useSpring, useTransform } from 'framer-motion';
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { Rich, RollText } from '../../../components/TextFx';
 import { BRAND, HIGHLIGHTS, SCENE } from '../../../content/media';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
 import { ArrowIcon, Container, InstallButton, LangSwitch, MediaSlot, NAV, PlayLink } from './shared';
 
 const SLIDE_MS = 6000;
+const MotionLink = motion.create(Link);
 
 function Highlights() {
   const { t } = useTranslation();
@@ -46,9 +49,9 @@ function Highlights() {
         </svg>
       </button>
       <AnimatePresence mode="wait" initial={false}>
-        <motion.a
+        <MotionLink
           key={item.id}
-          href={item.href}
+          to={item.href}
           className="block rounded-[18px] text-ink no-underline"
           initial={{ opacity: 0, x: 24 }}
           animate={{ opacity: 1, x: 0 }}
@@ -60,7 +63,7 @@ function Highlights() {
           </div>
           <p className="mt-3 px-1 text-sm font-semibold text-primary">{t(`news.${item.id}.tag`)}</p>
           <p className="px-1 font-display text-xl leading-tight font-bold">{t(`news.${item.id}.title`)}</p>
-        </motion.a>
+        </MotionLink>
       </AnimatePresence>
       <div className="mt-3 flex items-center justify-between gap-2 px-1">
         <div className="flex items-center gap-1.5" aria-hidden="true">
@@ -126,7 +129,7 @@ export function Hero() {
         alt={t('hero.scene')}
         width={1770}
         height={889}
-        fetchPriority="high"
+        {...{ fetchpriority: 'high' }}
         style={{ scale, x: sx, y }}
         className="absolute inset-0 h-full w-full object-cover"
       />
@@ -134,23 +137,27 @@ export function Hero() {
 
       <motion.div style={{ opacity: fade }} className="relative z-10 flex h-full flex-col">
         <Container className="flex items-start justify-between gap-6 pt-5 sm:pt-7">
-          <div>
-            <a href="#top" className="inline-block rounded-xl" aria-label={t('a11y.home')}>
+          {/* Logo with the menu tucked behind it: links fan out beside it on hover or keyboard focus. */}
+          <div className="logo-menu group/logo relative flex items-center">
+            <Link to="/" className="relative z-10 inline-block rounded-xl" aria-label={t('a11y.home')}>
               <img
                 src={BRAND.wordmarkOnDark}
                 alt="Oru"
                 width={419}
                 height={282}
-                className="h-20 w-auto drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)] transition-transform duration-500 hover:-rotate-3 hover:scale-105 sm:h-24"
+                className="h-20 w-auto drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)] transition-transform duration-500 group-hover/logo:-rotate-3 group-hover/logo:scale-105 sm:h-24"
               />
-            </a>
-            <nav aria-label={t('nav.label')} className="mt-5 hidden lg:block">
-              <ul className="flex flex-wrap gap-x-7 gap-y-2">
-                {NAV.map((n) => (
-                  <li key={n.key}>
-                    <a href={n.href} className="text-shadow-soft font-display text-xl font-bold text-white no-underline hover:underline hover:underline-offset-8">
-                      {t(`nav.${n.key}`)}
-                    </a>
+            </Link>
+            <nav aria-label={t('nav.label')} className="logo-menu-nav absolute top-1/2 left-full hidden -translate-y-1/2 pl-5 lg:block">
+              <ul className="flex items-center gap-2">
+                {NAV.map((n, i) => (
+                  <li key={n.key} className="logo-menu-item" style={{ '--i': i } as CSSProperties}>
+                    <Link
+                      to={n.to}
+                      className="roll-host shine flex min-h-11 items-center rounded-full bg-white/15 px-4 font-display text-lg font-bold whitespace-nowrap text-white no-underline ring-1 ring-white/30 backdrop-blur-md hover:bg-white hover:text-ink"
+                    >
+                      <RollText text={t(`nav.${n.key}`)} />
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -177,9 +184,9 @@ export function Hero() {
             <ul id="hero-menu" className="mt-3 rounded-[22px] bg-white p-2 shadow-lift">
               {NAV.map((n) => (
                 <li key={n.key}>
-                  <a href={n.href} onClick={() => setMenuOpen(false)} className="flex min-h-12 items-center rounded-xl px-4 font-display text-lg font-bold text-ink no-underline hover:bg-surface">
+                  <Link to={n.to} onClick={() => setMenuOpen(false)} className="flex min-h-12 items-center rounded-xl px-4 font-display text-lg font-bold text-ink no-underline hover:bg-surface">
                     {t(`nav.${n.key}`)}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -203,7 +210,7 @@ export function Hero() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.65, duration: 0.6 }}
             >
-              {t('hero.lead')}
+              <Rich k="hero.lead" />
             </motion.p>
             <motion.div
               className="mt-6 flex flex-wrap gap-3"

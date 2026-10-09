@@ -2,11 +2,12 @@ import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useState, type PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiseIn } from '../../../components/ScrollFx';
-import { SplitWords } from '../../../components/TextFx';
+import { Rich, RollText, SplitWords } from '../../../components/TextFx';
+import { Link } from 'react-router-dom';
 import { CHARACTER, type CharacterId } from '../../../content/media';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
 import type { Mission } from '../svg/Icons';
-import { Container } from './shared';
+import { ArrowIcon, Container, MoreLink } from './shared';
 
 export type GuardianId = Exclude<CharacterId, 'buddy'>;
 
@@ -116,28 +117,50 @@ export function FlipCard({ id, mission, bg, index = 0 }: { id: GuardianId; missi
   );
 }
 
+/** The six flip cards, each with a link to that guardian's own page. */
+export function GuardianGrid() {
+  const { t } = useTranslation();
+  return (
+    <ul className="grid gap-x-6 gap-y-20 sm:grid-cols-2 lg:grid-cols-3">
+      {GUARDIANS.map((g, i) => (
+        <li key={g.id} className="flex flex-col">
+          <FlipCard {...g} index={i} />
+          <Link
+            to={`/guardians/${g.id}`}
+            className="roll-host mt-4 inline-flex min-h-11 items-center gap-2 self-start rounded-full px-2 font-semibold text-primary no-underline hover:text-ink"
+          >
+            <RollText text={t('pages.readMore', { name: t(`guardians.${g.id}.name`) })} />
+            <ArrowIcon size={18} />
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function Guardians() {
   const { t } = useTranslation();
   return (
     <section id="guardians" aria-labelledby="guardians-title" className="py-20 sm:py-28">
       <Container>
         <RiseIn>
-        <p className="mb-3 flex items-center gap-2 text-muted">
-          <span aria-hidden="true" className="size-2.5 rounded-full bg-lilac" />
-          {t('chapter.guardians.short')}
-        </p>
-        <h2 id="guardians-title" className="max-w-[44rem] text-[clamp(2rem,4vw,3.25rem)] leading-[1.05] font-extrabold">
-          <SplitWords text={t('guardians.title')} />
-        </h2>
-        <p className="mt-5 max-w-[40rem] text-lg leading-relaxed text-muted">{t('guardians.lead')}</p>
+          <p className="mb-3 flex items-center gap-2 text-muted">
+            <span aria-hidden="true" className="size-2.5 rounded-full bg-lilac" />
+            {t('chapter.guardians.short')}
+          </p>
+          <h2 id="guardians-title" className="max-w-[44rem] text-[clamp(2rem,4vw,3.25rem)] leading-[1.05] font-extrabold">
+            <SplitWords text={t('guardians.title')} />
+          </h2>
+          <p className="mt-5 max-w-[40rem] text-lg leading-relaxed text-muted">
+            <Rich k="guardians.lead" />
+          </p>
         </RiseIn>
-        <ul className="mt-20 grid gap-x-6 gap-y-20 sm:grid-cols-2 lg:grid-cols-3">
-          {GUARDIANS.map((g, i) => (
-            <li key={g.id}>
-              <FlipCard {...g} index={i} />
-            </li>
-          ))}
-        </ul>
+        <div className="mt-20">
+          <GuardianGrid />
+        </div>
+        <RiseIn className="mt-16 flex justify-center">
+          <MoreLink to="/guardians" label={t('pages.seeAll')} />
+        </RiseIn>
       </Container>
     </section>
   );

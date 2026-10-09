@@ -43,6 +43,27 @@ To deploy, upload `dist/` to S3 + CloudFront, or use Amplify Hosting via the rep
 | 7 | Pill cards: Oru in numbers, What comes next | `sections/Pills.tsx` | panels expand in place; `#impact` / `#next` links open them |
 | 8 | Closing art + footer | `sections/Footer.tsx` | buddy springs in |
 
+## Pages
+
+Every button opens its own page (React Router v6 data router, `src/app/routes.tsx`). Each page is prerendered to static HTML at build time (`dist/<route>/index.html`, plus `dist/404.html`) with its own title and canonical URL.
+
+| URL | Page |
+|---|---|
+| `/` | Home (hero, mission, band, split sections, guardians, pills) |
+| `/how-it-works` | Day 1 steps, the four missions, why small acts |
+| `/guardians` | All six guardians (flip cards) |
+| `/guardians/:id` | One guardian: fact, mission, where it lives (map), habitat scene, the others |
+| `/grow` | Stage picker and all five pixel-plot stages |
+| `/places` | Map and region list, every region linked to its guardian |
+| `/impact` | Honest numbers (product facts, community totals at zero) |
+| `/roadmap` | What comes next |
+| `/play` | What the game will let you do (opening soon), install |
+| anything else | Not-found page |
+
+Hosting note: Amplify serves `/grow` from `grow/index.html` automatically. On S3 + CloudFront, add a CloudFront Function (viewer request) that appends `/index.html` to extension-less paths, and set `404.html` as the custom error page. `vite preview` does the same through a small plugin in `vite.config.ts`.
+
+Motion added in this pass: the hero menu hides behind the logo and fans out on hover or focus; letters roll on buttons and menu links; marker, scribble and shimmer effects on chosen words (`<m>`, `<u>`, `<g>` tags in the i18n strings, rendered by `<Rich>`); and a curtain with the little truck between pages.
+
 ## Replacing images and videos
 
 Every slot is defined in **`src/content/media.ts`**:

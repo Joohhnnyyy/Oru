@@ -251,6 +251,97 @@ section[id] {
   transform: rotate(180deg);
 }
 
+/* ---------------------------------------------------------------
+   Inline text emphasis (see <Mark>): marker sweep, drawn underline,
+   colour shimmer.
+   --------------------------------------------------------------- */
+.mark-marker {
+  background-image: linear-gradient(100deg, rgba(255, 214, 74, 0.75), rgba(255, 143, 191, 0.6));
+  background-repeat: no-repeat;
+  background-position: 0 88%;
+  background-size: 0% 42%;
+  border-radius: 4px;
+  padding: 0 0.12em;
+  margin: 0 -0.06em;
+  transition: background-size 900ms cubic-bezier(0.2, 0.8, 0.2, 1) 150ms;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.mark-marker.is-in {
+  background-size: 100% 42%;
+}
+
+.mark-scribble path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 900ms cubic-bezier(0.6, 0, 0.2, 1) 200ms;
+}
+
+.mark-scribble.is-in path {
+  stroke-dashoffset: 0;
+}
+
+.mark-shimmer {
+  background-image: linear-gradient(90deg, #0a6e9e, #7a4fd6, #c2397a, #7a4fd6, #0a6e9e);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 7s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 300% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark-marker {
+    background-size: 100% 42%;
+  }
+
+  .mark-scribble path {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Hero logo menu: links are tucked behind the logo and spring out
+   beside it on hover or when any link gets keyboard focus.
+   --------------------------------------------------------------- */
+.logo-menu-nav {
+  pointer-events: none;
+}
+
+.logo-menu-item {
+  opacity: 0;
+  transform: translateX(calc(-40px - var(--i, 0) * 110px)) scale(0.5);
+  transition:
+    transform 520ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    opacity 220ms ease;
+  transition-delay: calc((5 - var(--i, 0)) * 25ms);
+}
+
+.logo-menu:hover .logo-menu-nav,
+.logo-menu:focus-within .logo-menu-nav {
+  pointer-events: auto;
+}
+
+.logo-menu:hover .logo-menu-item,
+.logo-menu:focus-within .logo-menu-item {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--i, 0) * 45ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-menu-item {
+    transform: none;
+  }
+}
+
 /* Round arrow badge used on cards. */
 .arrow-badge {
   display: grid;

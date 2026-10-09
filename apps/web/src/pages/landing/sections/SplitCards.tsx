@@ -1,45 +1,35 @@
-import { motion } from 'framer-motion';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RiseIn } from '../../../components/ScrollFx';
-import { SplitWords, Unmask } from '../../../components/TextFx';
+import { Link } from 'react-router-dom';
+import { Rich, SplitWords, Unmask } from '../../../components/TextFx';
 import { CHARACTER, SPLIT_MEDIA } from '../../../content/media';
 import { useInViewOnce } from '../../../hooks/useInView';
 import { prefersReducedMotion } from '../../../hooks/useReducedMotion';
 import { IndiaMap, REGIONS, type RegionId } from '../svg/IndiaMap';
 import { StepIcon, type Step } from '../svg/Icons';
 import { Plot, STAGES } from '../svg/Plot';
-import { Container, MediaSlot } from './shared';
+import { Container, MediaSlot, MoreLink } from './shared';
 
 interface SplitProps {
   id: string;
-  accent: string;
   title: string;
-  lead: string;
+  lead: ReactNode;
   body: ReactNode;
   media: ReactNode;
+  /** Optional button that opens the section's own page. */
+  more?: { to: string; label: string };
   /** Put the media on the left (alternating rhythm down the page). */
   flip?: boolean;
 }
 
-const EASE = [0.2, 0.8, 0.2, 1] as const;
-
-/** Open (box-less) two-column section: copy with a growing accent rule, media that unmasks on scroll. */
-function Split({ id, accent, title, lead, body, media, flip = false }: SplitProps) {
-  // Trigger from the text column: a scaleY(0) rule has no height for IntersectionObserver to see.
-  const [colRef, colInView] = useInViewOnce<HTMLDivElement>('0px 0px -15% 0px');
+/** Open (box-less) two-column section: copy on one side, media that unmasks on scroll on the other. */
+function Split({ id, title, lead, body, media, more, flip = false }: SplitProps) {
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="py-16 sm:py-24">
       <Container>
         <article className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-          <div ref={colRef} className={`relative pl-7 sm:pl-10 ${flip ? 'lg:order-2' : ''}`}>
-            <motion.span
-              aria-hidden="true"
-              className={`absolute top-1 bottom-1 left-0 w-1.5 origin-top rounded-full ${accent}`}
-              initial={{ scaleY: 0 }}
-              animate={{ scaleY: colInView ? 1 : 0 }}
-              transition={{ duration: 0.9, ease: EASE }}
-            />
+          <div className={flip ? 'lg:order-2' : undefined}>
             <h2 id={`${id}-title`} className="text-[clamp(2rem,3.4vw,3rem)] leading-[1.1] font-extrabold">
               <SplitWords text={title} />
             </h2>
@@ -49,6 +39,11 @@ function Split({ id, accent, title, lead, body, media, flip = false }: SplitProp
             <RiseIn delay={0.25} className="mt-10">
               {body}
             </RiseIn>
+            {more && (
+              <RiseIn delay={0.3} className="mt-10">
+                <MoreLink to={more.to} label={more.label} />
+              </RiseIn>
+            )}
           </div>
           <Unmask className={`relative rounded-[28px] bg-surface ${flip ? 'lg:order-1' : ''}`}>{media}</Unmask>
         </article>
@@ -63,14 +58,14 @@ const STEPS: { id: Step; key: 'step1' | 'step2' | 'step3' }[] = [
   { id: 'grow', key: 'step3' },
 ];
 
-function Day1Card() {
+export function Day1Card({ more = false }: { more?: boolean }) {
   const { t } = useTranslation();
   return (
     <Split
       id="day-1"
-      accent="bg-mint"
+      more={more ? { to: '/how-it-works', label: t('pages.learnMore') } : undefined}
       title={t('chapter.day1.title')}
-      lead={t('day1.lead')}
+      lead={<Rich k="day1.lead" />}
       body={
         <>
           <ol className="space-y-7">
@@ -84,7 +79,9 @@ function Day1Card() {
                 </span>
                 <span>
                   <span className="block font-display text-xl font-bold">{t(`day1.${s.key}.title`)}</span>
-                  <span className="mt-1 block leading-relaxed text-muted">{t(`day1.${s.key}.body`)}</span>
+                  <span className="mt-1 block leading-relaxed text-muted">
+                    <Rich k={`day1.${s.key}.body`} />
+                  </span>
                 </span>
               </li>
             ))}
@@ -105,7 +102,7 @@ function Day1Card() {
   );
 }
 
-function GrowthCard() {
+export function GrowthCard({ more = false }: { more?: boolean }) {
   const { t } = useTranslation();
   const [ref, inView] = useInViewOnce<HTMLDivElement>('0px 0px -30% 0px');
   const [index, setIndex] = useState(0);
@@ -126,10 +123,10 @@ function GrowthCard() {
   return (
     <Split
       id="growth"
+      more={more ? { to: '/grow', label: t('pages.learnMore') } : undefined}
       flip
-      accent="bg-butter"
       title={t('chapter.growth.title')}
-      lead={t('growth.lead')}
+      lead={<Rich k="growth.lead" />}
       body={
         <div ref={ref}>
           <div className="flex flex-wrap gap-3" role="group" aria-label={t('chapter.growth.sub')}>
@@ -174,7 +171,7 @@ function GrowthCard() {
   );
 }
 
-function PlacesCard() {
+export function PlacesCard({ more = false }: { more?: boolean }) {
   const { t } = useTranslation();
   const [selected, setSelected] = useState<RegionId | null>(null);
   const region = REGIONS.find((r) => r.id === selected);
@@ -183,9 +180,9 @@ function PlacesCard() {
   return (
     <Split
       id="places"
-      accent="bg-sky"
+      more={more ? { to: '/places', label: t('pages.learnMore') } : undefined}
       title={t('chapter.places.title')}
-      lead={t('places.lead')}
+      lead={<Rich k="places.lead" />}
       body={
         <>
           <h3 className="text-sm font-bold text-muted">{t('places.listLabel')}</h3>
@@ -214,9 +211,9 @@ function PlacesCard() {
                   <h3 className="font-display text-xl font-bold">{regionName(region.id)}</h3>
                   <p className="text-muted">{t(`places.${region.id}.body`)}</p>
                   <p className="mt-1 font-semibold">{t('places.guardianIs', { name: t(`guardians.${region.guardian}.name`) })}</p>
-                  <a href={`#guardian-${region.guardian}`} className="inline-flex min-h-11 items-center font-bold text-primary underline underline-offset-4">
+                  <Link to={`/guardians/${region.guardian}`} className="inline-flex min-h-11 items-center font-bold text-primary underline underline-offset-4">
                     {t('places.meet', { name: t(`guardians.${region.guardian}.name`) })}
-                  </a>
+                  </Link>
                 </div>
               </div>
             ) : (
@@ -238,9 +235,9 @@ function PlacesCard() {
 export function SplitCards() {
   return (
     <>
-      <Day1Card />
-      <GrowthCard />
-      <PlacesCard />
+      <Day1Card more />
+      <GrowthCard more />
+      <PlacesCard more />
     </>
   );
 }

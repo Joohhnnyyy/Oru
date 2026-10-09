@@ -17,7 +17,7 @@
   "hero": {
     "line1": "grow small.",
     "line2": "spread wide.",
-    "lead": "Oru is a pocket game for India. Log the small things you really did for waste, heat, energy and water, grow a pixel city, and wake the guardian animal of your region.",
+    "lead": "Oru is a pocket game for India. Log the small things you really did for waste, heat, energy and water, grow a pixel city, and <u>wake the guardian animal</u> of your region.",
     "note": "Free. Works on entry-level Android phones, even on a patchy connection.",
     "scroll": "Scroll down",
     "scene": "An isometric plaza with Oru buddy in the middle, surrounded by six guardian habitats: a snowy mountain, dry grassland, a river, a wetland, a beach and a city block."
@@ -85,14 +85,14 @@
     }
   },
   "day1": {
-    "lead": "Your first day takes about a minute.",
+    "lead": "Your first day takes <m>about a minute</m>.",
     "step1": {
       "title": "Log it",
       "body": "Pick something you did today, like handing over sorted waste. Add a photo if you have one."
     },
     "step2": {
       "title": "Earn it",
-      "body": "Each action earns seeds. Actions checked with a photo or a QR scan earn more than a quick tap."
+      "body": "Each action earns seeds. Actions checked with a photo or a QR scan <g>earn more</g> than a quick tap."
     },
     "step3": {
       "title": "Grow it",
@@ -105,7 +105,7 @@
     "sampleNote": "Example only. Real rewards depend on how the action is checked."
   },
   "guardians": {
-    "lead": "Your guardian matches the land where you live. Turn a card over to read about it.",
+    "lead": "Your guardian matches <g>the land where you live</g>. Turn a card over to read about it.",
     "turn": "Turn over",
     "turnBack": "Turn back",
     "missionLink": "Linked mission: {{mission}}",
@@ -148,7 +148,7 @@
     "title": "Six guardians, six kinds of land"
   },
   "growth": {
-    "lead": "Your pixel plot changes as your habits stick, and your guardian wakes up a little more at each stage.",
+    "lead": "Your pixel plot changes as your habits stick, and your guardian <u>wakes up a little more</u> at each stage.",
     "pace": "The days are an example pace. Stages follow the actions you log, not the calendar.",
     "dayLabel": "Day {{day}}",
     "plotLabel": "Pixel plot at the {{stage}} stage",
@@ -174,7 +174,7 @@
     }
   },
   "places": {
-    "lead": "Oru picks your guardian from the land around you. Choose a region to see who looks after it.",
+    "lead": "Oru picks your guardian from <m>the land around you</m>. Choose a region to see who looks after it.",
     "mapLabel": "Simplified pixel map of India split into terrain regions",
     "disclaimer": "A simplified sketch for the game. Not to scale and not an official map of India.",
     "listLabel": "Regions",
@@ -207,7 +207,7 @@
     }
   },
   "impact": {
-    "lead": "We only show numbers we can stand behind. Community totals start at zero and go live after launch.",
+    "lead": "We only show numbers <m>we can stand behind</m>. Community totals start at zero and go live after launch.",
     "missions": "missions to choose from",
     "guardians": "guardians to wake",
     "stages": "growth stages for your plot",
@@ -234,7 +234,7 @@
       "body": "Tamil, Bengali and Marathi, after Hindi and English."
     },
     "finalTitle": "Your guardian is waiting.",
-    "finalBody": "Install Oru on your phone and log your first action today."
+    "finalBody": "Install Oru on your phone and log your first action <m>today</m>."
   },
   "footer": {
     "privacyTitle": "Privacy",
@@ -256,7 +256,8 @@
     "places": "Places",
     "impact": "Impact",
     "menu": "Open menu",
-    "close": "Close menu"
+    "close": "Close menu",
+    "roadmap": "Roadmap"
   },
   "loader": {
     "label": "Loading Oru"
@@ -296,7 +297,7 @@
   },
   "band": {
     "title": "What is Oru?",
-    "body": "A pocket game for India. Log real actions for waste, heat, energy and water, then watch your guardian and your pixel city grow with you.",
+    "body": "A pocket game for India. Log <u>real actions</u> for waste, heat, energy and water, then watch your guardian and your pixel city grow with you.",
     "cta": "See how it works",
     "bubbles": "Oru buddy and the six guardians"
   },
@@ -309,5 +310,56 @@
     "next": "What comes next",
     "show": "Show",
     "hide": "Hide"
+  },
+  "pages": {
+    "back": "Back to home",
+    "learnMore": "Learn more",
+    "seeAll": "See all guardians",
+    "readMore": "Read about the {{name}}",
+    "how": {
+      "title": "How Oru works",
+      "intro": "Small, real actions, checked fairly, turned into a little world that grows with you."
+    },
+    "guardians": {
+      "title": "The guardians",
+      "intro": "Six animals, one for each kind of land in India. Find yours, then wake it up with small daily habits."
+    },
+    "guardian": {
+      "lives": "Where it lives",
+      "mission": "Its mission",
+      "fact": "Did you know?",
+      "others": "Other guardians",
+      "prev": "Previous guardian",
+      "next": "Next guardian"
+    },
+    "grow": {
+      "title": "Grow your plot",
+      "intro": "Every action you log plants something. This is how a plot changes from a single seed to a small green city.",
+      "stages": "All five stages"
+    },
+    "places": {
+      "title": "Find your region",
+      "intro": "Oru looks at the land around you to choose your guardian. Explore the regions below.",
+      "regions": "Every region and its guardian"
+    },
+    "impact": {
+      "title": "Oru in numbers"
+    },
+    "roadmap": {
+      "title": "What comes next"
+    },
+    "play": {
+      "title": "Play Oru",
+      "intro": "The Oru game is being built right now. This is what you will be able to do when it opens.",
+      "status": "Opening soon",
+      "steps": "What you will do",
+      "note": "There is no sign-up on this page. Check back soon, or add Oru to your home screen.",
+      "explore": "While you wait"
+    },
+    "notFound": {
+      "title": "This page wandered off",
+      "body": "We could not find that page. It may have moved.",
+      "home": "Go to the home page"
+    }
   }
 }
