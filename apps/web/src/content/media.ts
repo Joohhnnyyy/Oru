@@ -42,6 +42,8 @@ export const SCENE: Record<Exclude<CharacterId, 'buddy'> | 'plaza' | 'plazaSmall
 
 export const BRAND = {
   wordmark: '/media/brand/wordmark.webp',
+  /** 2x upscale for the giant footer logo. TODO: replace with a high-res/SVG export of the logo. */
+  wordmarkLarge: '/media/brand/wordmark-large.webp',
   icon: '/icons/icon-192.png',
 };
 
