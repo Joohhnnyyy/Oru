@@ -1,6 +1,8 @@
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CHARACTER, SCENE, type CharacterId } from '../../../content/media';
+import { useReducedMotion } from '../../../hooks/useReducedMotion';
 import { ArrowIcon, Container } from './shared';
 
 /** Bubbles that drift along the dotted line: size (px), vertical offset (px), artwork. */
@@ -31,8 +33,13 @@ function Bubble({ id, size, dy, ring, delay }: (typeof BUBBLES)[number] & { dela
 export function Band() {
   const { t } = useTranslation();
   const track = [...BUBBLES, ...BUBBLES];
+  // The whole bubble row also slides with the page, so scrolling visibly pushes it along.
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] });
+  const reduced = useReducedMotion();
+  const push = useTransform(scrollYProgress, [0, 1], reduced ? [0, 0] : [120, -220]);
   return (
-    <section id="about" aria-labelledby="about-title" className="pb-20 sm:pb-28">
+    <section id="about" ref={ref} aria-labelledby="about-title" className="pb-20 sm:pb-28">
       <Container>
         <motion.div
           className="band-texture relative overflow-hidden rounded-[36px] bg-band text-band-ink"
@@ -43,11 +50,13 @@ export function Band() {
         >
           <div className="relative h-[200px]" role="img" aria-label={t('band.bubbles')}>
             <div className="dotted-line absolute inset-x-0 top-1/2 h-1 -translate-y-1/2" />
-            <div className="drift absolute top-1/2 left-0 flex w-max -translate-y-1/2 items-center gap-16 pl-10">
-              {track.map((b, i) => (
-                <Bubble key={`${b.id}-${i}`} {...b} delay={(i % 7) * 0.45} />
-              ))}
-            </div>
+            <motion.div style={{ x: push }} className="absolute inset-y-0 left-0">
+              <div className="drift absolute top-1/2 left-0 flex w-max -translate-y-1/2 items-center gap-16 pl-10">
+                {track.map((b, i) => (
+                  <Bubble key={`${b.id}-${i}`} {...b} delay={(i % 7) * 0.45} />
+                ))}
+              </div>
+            </motion.div>
           </div>
           <div className="grid gap-8 px-6 pt-6 pb-12 sm:px-12 sm:pb-16 lg:grid-cols-[1.3fr_1fr] lg:items-end">
             <div>

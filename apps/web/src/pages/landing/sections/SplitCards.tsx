@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Parallax, RiseIn } from '../../../components/ScrollFx';
 import { CHARACTER, SPLIT_MEDIA } from '../../../content/media';
 import { useInViewOnce } from '../../../hooks/useInView';
 import { prefersReducedMotion } from '../../../hooks/useReducedMotion';
@@ -32,10 +33,12 @@ function Split({ id, accent, title, lead, body, media }: SplitProps) {
         >
           <div className="relative flex flex-col justify-center px-5 py-8 sm:px-10 sm:py-12">
             <span aria-hidden="true" className={`absolute top-10 bottom-10 left-0 w-1.5 rounded-full ${accent}`} />
-            <h2 id={`${id}-title`} className="text-[clamp(1.875rem,3.2vw,2.75rem)] leading-[1.08] font-extrabold">
-              {title}
-            </h2>
-            <p className="mt-3 max-w-[32rem] text-lg text-muted">{lead}</p>
+            <RiseIn delay={0.1}>
+              <h2 id={`${id}-title`} className="text-[clamp(1.875rem,3.2vw,2.75rem)] leading-[1.08] font-extrabold">
+                {title}
+              </h2>
+              <p className="mt-3 max-w-[32rem] text-lg text-muted">{lead}</p>
+            </RiseIn>
             <div className="mt-7">{body}</div>
           </div>
           <div className="relative min-h-[320px] overflow-hidden rounded-[22px] bg-white">{media}</div>
@@ -84,7 +87,13 @@ function Day1Card() {
           <p className="mt-2 text-sm text-muted">{t('day1.sampleNote')}</p>
         </>
       }
-      media={<MediaSlot media={SPLIT_MEDIA.day1} alt={t('chapter.day1.title')} width={1770} height={889} className="absolute inset-0" />}
+      media={
+        <div className="absolute inset-0">
+          <Parallax amount={36}>
+            <MediaSlot media={SPLIT_MEDIA.day1} alt={t('chapter.day1.title')} width={1770} height={889} />
+          </Parallax>
+        </div>
+      }
     />
   );
 }

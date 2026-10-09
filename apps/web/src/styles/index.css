@@ -383,13 +383,17 @@ section[id] {
   stroke-width: 2.5;
 }
 
-/* Intro loader: hides itself even without JS; JS hides it sooner. */
+/* ---------------------------------------------------------------
+   Intro loader (~2.6 s): the truck drives in, the road fills, the
+   truck drives off, the overlay fades. Pure CSS, so it also clears
+   itself without JS. Scroll is locked meanwhile (html.scroll-locked).
+   --------------------------------------------------------------- */
 .intro-loader {
-  animation: loader-out 450ms ease 2.4s forwards;
+  animation: loader-out 450ms ease 2.5s forwards;
 }
 
 .intro-loader.is-done {
-  animation: loader-out 450ms ease forwards;
+  animation: loader-out 300ms ease forwards;
 }
 
 @keyframes loader-out {
@@ -397,6 +401,72 @@ section[id] {
     opacity: 0;
     visibility: hidden;
   }
+}
+
+.loader-truck {
+  animation: truck-drive 2.6s cubic-bezier(0.55, 0, 0.35, 1) both;
+}
+
+@keyframes truck-drive {
+  0% {
+    transform: translateX(-75vw);
+  }
+  42%,
+  78% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(80vw);
+  }
+}
+
+.loader-bump {
+  animation: bump 0.28s ease-in-out infinite alternate;
+}
+
+@keyframes bump {
+  to {
+    transform: translateY(-3px) rotate(-0.6deg);
+  }
+}
+
+.loader-road-fill {
+  transform-origin: left;
+  animation: road-fill 2.2s cubic-bezier(0.45, 0, 0.2, 1) 0.2s both;
+}
+
+@keyframes road-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.loader-puff {
+  animation: puff 0.9s ease-out infinite;
+}
+
+@keyframes puff {
+  from {
+    transform: translate(0, 0) scale(0.4);
+    opacity: 0.7;
+  }
+  to {
+    transform: translate(-28px, -14px) scale(1.4);
+    opacity: 0;
+  }
+}
+
+html.scroll-locked,
+html.scroll-locked body {
+  overflow: hidden;
+}
+
+/* Brand rainbow, used by the road and the scroll-progress bar. */
+.rainbow {
+  background: linear-gradient(90deg, var(--sky), var(--mint), var(--butter), var(--pink), var(--lilac));
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,6 +1,7 @@
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { useState, type PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { RiseIn } from '../../../components/ScrollFx';
 import { CHARACTER, type CharacterId } from '../../../content/media';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
 import type { Mission } from '../svg/Icons';
@@ -119,6 +120,7 @@ export function Guardians() {
   return (
     <section id="guardians" aria-labelledby="guardians-title" className="py-20 sm:py-28">
       <Container>
+        <RiseIn>
         <p className="mb-3 flex items-center gap-2 text-muted">
           <span aria-hidden="true" className="size-2.5 rounded-full bg-lilac" />
           {t('chapter.guardians.short')}
@@ -127,6 +129,7 @@ export function Guardians() {
           {t('guardians.title')}
         </h2>
         <p className="mt-3 max-w-[40rem] text-lg text-muted">{t('guardians.lead')}</p>
+        </RiseIn>
         <ul className="mt-20 grid gap-x-6 gap-y-20 sm:grid-cols-2 lg:grid-cols-3">
           {GUARDIANS.map((g, i) => (
             <li key={g.id}>

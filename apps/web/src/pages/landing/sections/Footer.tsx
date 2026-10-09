@@ -1,6 +1,7 @@
 import { motion, useMotionValue, useSpring } from 'framer-motion';
 import type { PointerEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { RiseIn } from '../../../components/ScrollFx';
 import { env } from '../../../config/env';
 import { BRAND, CHARACTER, SCENE } from '../../../content/media';
 import { useReducedMotion } from '../../../hooks/useReducedMotion';
@@ -14,7 +15,7 @@ function Closing() {
       <img src={SCENE.plaza} alt="" width={1770} height={889} loading="lazy" className="absolute inset-0 -z-10 h-full w-full object-cover object-[50%_70%]" />
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-white via-white/85 to-white/10" />
       <Container className="grid items-center gap-8 py-20 md:grid-cols-[1.2fr_1fr] md:py-28">
-        <div>
+        <RiseIn>
           <h2 id="closing-title" className="text-[clamp(2.25rem,5vw,4rem)] leading-[1.02] font-extrabold">
             {t('next.finalTitle')}
           </h2>
@@ -23,7 +24,7 @@ function Closing() {
             <PlayLink />
             <InstallButton />
           </div>
-        </div>
+        </RiseIn>
         <motion.img
           src={CHARACTER.buddy}
           alt={t('buddy.name')}

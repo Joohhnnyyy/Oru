@@ -1,6 +1,8 @@
 import { MotionConfig } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { ScrollProgress } from '../../components/ScrollFx';
 import { useActiveChapter } from '../../hooks/useActiveChapter';
+import { useSmoothScroll } from '../../hooks/useSmoothScroll';
 import { Band } from './sections/Band';
 import { Footer } from './sections/Footer';
 import { Guardians } from './sections/Guardians';
@@ -15,6 +17,7 @@ import { StickyHeader } from './sections/StickyHeader';
 export function LandingPage() {
   const { t } = useTranslation();
   const active = useActiveChapter(NAV_IDS);
+  useSmoothScroll();
   return (
     <MotionConfig reducedMotion="user">
       <Loader />
@@ -34,6 +37,7 @@ export function LandingPage() {
         <Pills />
       </main>
       <Footer />
+      <ScrollProgress />
     </MotionConfig>
   );
 }

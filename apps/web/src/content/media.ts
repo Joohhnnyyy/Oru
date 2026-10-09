@@ -28,6 +28,13 @@ export const CHARACTER: Record<CharacterId, string> = {
   sparrow: '/media/characters/sparrow.webp',
 };
 
+/** The recycling truck (loader, scroll-progress road). */
+export const TRUCK = {
+  side: '/media/characters/truck-side.webp',
+  front: '/media/characters/truck-front34.webp',
+  hero: '/media/characters/truck-hero.webp',
+};
+
 /** Painted habitat scenes (with backgrounds) for cards and bubbles. */
 export const SCENE: Record<Exclude<CharacterId, 'buddy'> | 'plaza' | 'plazaSmall', string> = {
   plaza: '/media/scenes/plaza.webp',

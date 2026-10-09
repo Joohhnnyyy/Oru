@@ -28,3 +28,10 @@ window.matchMedia ??= ((query: string) => ({
   removeListener: () => undefined,
   dispatchEvent: () => false,
 })) as typeof window.matchMedia;
+
+// jsdom has no ResizeObserver (Lenis and Framer Motion use it).
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+} as unknown as typeof ResizeObserver;

@@ -1,37 +1,36 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BRAND, CHARACTER } from '../../../content/media';
+import { BRAND, TRUCK } from '../../../content/media';
+import { prefersReducedMotion } from '../../../hooks/useReducedMotion';
+import { setScrollLocked } from '../../../hooks/useSmoothScroll';
 
-const SEEN_KEY = 'oru.intro-seen';
+/** Matches the CSS timeline in index.css (truck in, road fills, truck out). */
+const LOADER_MS = 2600;
 
 /**
- * Full-screen intro with the buddy bouncing. Pure CSS hides it after ~2.4 s even without JS;
- * on the client it fades as soon as the page has loaded (or instantly on repeat visits).
- * Reduced-motion visitors never see it.
+ * Intro: the recycling truck drives across a filling rainbow road, then the page fades in.
+ * The animation is pure CSS (it also clears itself without JS); JS only locks scrolling
+ * meanwhile. Reduced-motion visitors skip it entirely.
  */
 export function Loader() {
   const { t } = useTranslation();
   const [done, setDone] = useState(false);
 
   useEffect(() => {
-    let seen = false;
-    try {
-      seen = sessionStorage.getItem(SEEN_KEY) === '1';
-      sessionStorage.setItem(SEEN_KEY, '1');
-    } catch {
-      // storage blocked: just play the intro
-    }
-    const finish = () => window.setTimeout(() => setDone(true), seen ? 0 : 500);
-    if (seen) {
-      const id = finish();
+    if (prefersReducedMotion()) {
+      const id = window.setTimeout(() => setDone(true), 0);
       return () => window.clearTimeout(id);
     }
-    if (document.readyState === 'complete') {
-      const id = finish();
-      return () => window.clearTimeout(id);
-    }
-    window.addEventListener('load', finish, { once: true });
-    return () => window.removeEventListener('load', finish);
+    setScrollLocked(true);
+    window.scrollTo(0, 0);
+    const id = window.setTimeout(() => {
+      setDone(true);
+      setScrollLocked(false);
+    }, LOADER_MS);
+    return () => {
+      window.clearTimeout(id);
+      setScrollLocked(false);
+    };
   }, []);
 
   return (
@@ -39,12 +38,21 @@ export function Loader() {
       role="status"
       aria-live="polite"
       aria-hidden={done}
-      className={`intro-loader fixed inset-0 z-[60] grid place-items-center bg-white ${done ? 'is-done pointer-events-none' : ''}`}
+      className={`intro-loader fixed inset-0 z-[60] grid place-items-center overflow-hidden bg-white ${done ? 'is-done pointer-events-none' : ''}`}
     >
       <span className="sr-only">{t('loader.label')}</span>
-      <div className="flex flex-col items-center gap-4" aria-hidden="true">
-        <img src={CHARACTER.buddy} alt="" width={140} height={141} className="bob h-auto w-32" />
-        <img src={BRAND.wordmark} alt="" width={160} height={95} className="h-auto w-36" />
+      <div className="flex w-full flex-col items-center gap-8" aria-hidden="true">
+        <img src={BRAND.wordmark} alt="" width={150} height={89} className="h-auto w-32 sm:w-40" />
+        <div className="relative w-[min(560px,86vw)]">
+          <div className="loader-truck relative mx-auto w-[min(240px,52vw)]">
+            <span className="loader-puff absolute bottom-6 -left-2 size-4 rounded-full bg-line" />
+            <span className="loader-puff absolute bottom-8 -left-1 size-3 rounded-full bg-line [animation-delay:0.35s]" />
+            <img src={TRUCK.side} alt="" width={523} height={247} className="loader-bump relative h-auto w-full" />
+          </div>
+          <div className="mt-1 h-2 overflow-hidden rounded-full bg-surface-2">
+            <div className="loader-road-fill rainbow h-full w-full rounded-full" />
+          </div>
+        </div>
       </div>
     </div>
   );

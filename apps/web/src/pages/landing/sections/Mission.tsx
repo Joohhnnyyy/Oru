@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion';
 import { useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Parallax } from '../../../components/ScrollFx';
 import { CHARACTER, SCENE } from '../../../content/media';
 import { MissionIcon, type Mission as MissionId } from '../svg/Icons';
 import { ArrowIcon, Container } from './shared';
@@ -56,7 +57,9 @@ function ImageCard({ href, title, children, delay }: { href: string; title: stri
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.6, delay, ease: [0.2, 0.8, 0.2, 1] }}
     >
-      <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-[1.04]">{children}</div>
+      <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-[1.04]">
+        <Parallax amount={28}>{children}</Parallax>
+      </div>
       <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/0 to-black/0" />
       <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-4 p-6 sm:p-8">
         <span className="font-display text-[clamp(1.5rem,2.4vw,2rem)] font-bold text-white drop-shadow">{title}</span>
