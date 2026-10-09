@@ -45,3 +45,11 @@ Thumbs.db
 
 # Scraped reference site (dev-only)
 Butter-Video-Online-Video-Editor-Engineered-for-Creativity/
+
+# Playwright (MCP screenshots/traces + test output)
+.playwright-mcp/
+test-results/
+playwright-report/
+
+# Claude Code local settings
+.claude/settings.local.json
