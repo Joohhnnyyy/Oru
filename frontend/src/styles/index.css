@@ -1,0 +1,634 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/baloo-2/index.css';
+
+/* ---------------------------------------------------------------
+   Oru tokens: light, airy chrome; pastel accents lifted from the
+   rainbow logo. Accents are fills only; text stays ink/muted.
+   --------------------------------------------------------------- */
+:root {
+  --bg: #ffffff;
+  --surface: #f1f4f9;
+  --surface-2: #e7ecf5;
+  --ink: #1d2330;
+  --muted: #5a6375;
+  --primary: #0a6e9e;
+  --band: #20242e;
+  --band-ink: #f4f6fb;
+  --band-muted: #a9b1c2;
+  --line: #d9dfe9;
+
+  --sky: #3ec5f5;
+  --pink: #ff8fbf;
+  --butter: #ffd64a;
+  --mint: #6eddb0;
+  --lilac: #a98cf0;
+  --coral: #ff8a65;
+
+  /* mission mapping */
+  --waste: var(--mint);
+  --heat: var(--coral);
+  --energy: var(--butter);
+  --water: var(--sky);
+
+  --on-accent: #1d2330;
+  --radius: 28px;
+  --radius-sm: 16px;
+  --shadow: 0 10px 30px rgba(29, 35, 48, 0.08);
+  --shadow-lift: 0 24px 48px rgba(29, 35, 48, 0.16);
+  --header-h: 72px;
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-band: var(--band);
+  --color-band-ink: var(--band-ink);
+  --color-band-muted: var(--band-muted);
+  --color-line: var(--line);
+  --color-sky: var(--sky);
+  --color-pink: var(--pink);
+  --color-butter: var(--butter);
+  --color-mint: var(--mint);
+  --color-lilac: var(--lilac);
+  --color-coral: var(--coral);
+  --color-waste: var(--waste);
+  --color-heat: var(--heat);
+  --color-energy: var(--energy);
+  --color-water: var(--water);
+  --color-on-accent: var(--on-accent);
+
+  --radius-card: var(--radius);
+  --radius-chip: var(--radius-sm);
+  --shadow-soft: var(--shadow);
+  --shadow-lift: var(--shadow-lift);
+
+  --font-sans: 'Noto Sans', 'Noto Sans Devanagari', system-ui, -apple-system, 'Segoe UI', Roboto, 'Nirmala UI',
+    sans-serif;
+  --font-display: 'Baloo 2 Variable', 'Baloo 2', 'Noto Sans Devanagari', system-ui, sans-serif;
+
+  /* Type scale: 16px base, nothing below 14px. */
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1rem;
+  --text-base--line-height: 1.65;
+  --text-lg: 1.1875rem;
+  --text-lg--line-height: 1.6;
+  --text-xl: 1.5rem;
+  --text-xl--line-height: 1.25;
+  --text-2xl: 2rem;
+  --text-2xl--line-height: 1.15;
+  --text-3xl: 2.75rem;
+  --text-3xl--line-height: 1.08;
+  --text-4xl: 3.75rem;
+  --text-4xl--line-height: 1.02;
+}
+
+/* ---------------------------------------------------------------
+   Base
+   --------------------------------------------------------------- */
+html {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.65;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+:lang(hi) {
+  line-height: 1.75;
+}
+
+section[id] {
+  scroll-margin-top: calc(var(--header-h) + 16px);
+}
+
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+::selection {
+  background: var(--butter);
+  color: var(--ink);
+}
+
+.sr-only-focusable:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------------------------------------------------------------
+   Buttons
+   --------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  min-height: 48px;
+  padding: 0.6rem 1.4rem;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  line-height: 1.1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.btn-play {
+  background: var(--ink);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(29, 35, 48, 0.25);
+}
+
+.btn-quiet {
+  background: #fff;
+  color: var(--ink);
+  box-shadow: inset 0 0 0 1.5px var(--line);
+}
+
+.btn-ghost-dark {
+  color: var(--band-ink);
+  box-shadow: inset 0 0 0 1.5px rgba(244, 246, 251, 0.45);
+}
+
+/* ---------------------------------------------------------------
+   Text roll: each letter slides up and a twin rolls in from below,
+   staggered, on hover/focus of the parent .roll-host.
+   --------------------------------------------------------------- */
+.roll-char {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+
+.roll-char > span {
+  display: block;
+  transition: transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(var(--i, 0) * 16ms);
+}
+
+.roll-char > span + span {
+  position: absolute;
+  inset: 100% 0 auto;
+}
+
+.roll-host:hover .roll-char > span,
+.roll-host:focus-visible .roll-char > span {
+  transform: translateY(-100%);
+}
+
+/* Soft shine that sweeps across a button on hover. */
+.shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(110deg, transparent 25%, rgba(255, 255, 255, 0.35) 50%, transparent 75%);
+  transform: translateX(-120%);
+  transition: transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.shine:hover::after,
+.shine:focus-visible::after {
+  transform: translateX(120%);
+}
+
+.btn-play.shine::after {
+  z-index: 0;
+}
+
+/* On white buttons the sweep is a soft grey instead of white. */
+.btn-quiet.shine::after,
+.shine[class*='bg-white']::after {
+  background: linear-gradient(110deg, transparent 25%, rgba(29, 35, 48, 0.08) 50%, transparent 75%);
+}
+
+.spin-on-hover {
+  transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.roll-host:hover .spin-on-hover {
+  transform: rotate(180deg);
+}
+
+/* ---------------------------------------------------------------
+   Inline text emphasis (see <Mark>): marker sweep, drawn underline,
+   colour shimmer.
+   --------------------------------------------------------------- */
+.mark-marker {
+  background-image: linear-gradient(100deg, rgba(255, 214, 74, 0.75), rgba(255, 143, 191, 0.6));
+  background-repeat: no-repeat;
+  background-position: 0 88%;
+  background-size: 0% 42%;
+  border-radius: 4px;
+  padding: 0 0.12em;
+  margin: 0 -0.06em;
+  transition: background-size 900ms cubic-bezier(0.2, 0.8, 0.2, 1) 150ms;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.mark-marker.is-in {
+  background-size: 100% 42%;
+}
+
+.mark-scribble path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 900ms cubic-bezier(0.6, 0, 0.2, 1) 200ms;
+}
+
+.mark-scribble.is-in path {
+  stroke-dashoffset: 0;
+}
+
+.mark-shimmer {
+  background-image: linear-gradient(90deg, #0a6e9e, #7a4fd6, #c2397a, #7a4fd6, #0a6e9e);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 7s linear infinite;
+}
+
+@keyframes shimmer {
+  to {
+    background-position: 300% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark-marker {
+    background-size: 100% 42%;
+  }
+
+  .mark-scribble path {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Hero logo menu: links are tucked behind the logo and spring out
+   beside it on hover or when any link gets keyboard focus.
+   --------------------------------------------------------------- */
+.logo-menu-nav {
+  pointer-events: none;
+}
+
+.logo-menu-item {
+  opacity: 0;
+  transform: translateX(calc(-40px - var(--i, 0) * 110px)) scale(0.5);
+  transition:
+    transform 520ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    opacity 220ms ease;
+  transition-delay: calc((5 - var(--i, 0)) * 25ms);
+}
+
+.logo-menu:hover .logo-menu-nav,
+.logo-menu:focus-within .logo-menu-nav {
+  pointer-events: auto;
+}
+
+.logo-menu:hover .logo-menu-item,
+.logo-menu:focus-within .logo-menu-item {
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--i, 0) * 45ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-menu-item {
+    transform: none;
+  }
+}
+
+/* Round arrow badge used on cards. */
+.arrow-badge {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--ink);
+  transition: transform 200ms ease;
+}
+
+.group:hover .arrow-badge {
+  transform: translateX(4px);
+}
+
+/* ---------------------------------------------------------------
+   Hero
+   --------------------------------------------------------------- */
+.hero-scrim {
+  background:
+    linear-gradient(180deg, rgba(20, 24, 33, 0.55) 0%, rgba(20, 24, 33, 0) 34%),
+    linear-gradient(0deg, rgba(20, 24, 33, 0.6) 0%, rgba(20, 24, 33, 0) 42%);
+}
+
+.text-shadow-soft {
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------------------------------------------------------------
+   Dark band: grid texture + pastel glow
+   --------------------------------------------------------------- */
+.band-texture {
+  background-image:
+    radial-gradient(60% 80% at 100% 100%, rgba(255, 143, 191, 0.35), transparent 60%),
+    radial-gradient(50% 70% at 0% 0%, rgba(169, 140, 240, 0.3), transparent 60%),
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: auto, auto, 32px 32px, 32px 32px;
+}
+
+.dotted-line {
+  background-image: radial-gradient(circle, rgba(244, 246, 251, 0.5) 1.2px, transparent 1.6px);
+  background-size: 10px 4px;
+  background-repeat: repeat-x;
+  background-position: center;
+}
+
+@keyframes drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.drift {
+  animation: drift 48s linear infinite;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.bob {
+  animation: bob 4.2s ease-in-out infinite;
+}
+
+/* ---------------------------------------------------------------
+   Flip cards (guardians)
+   --------------------------------------------------------------- */
+.flip-inner {
+  position: relative;
+  display: grid;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 420ms cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+
+.flip[aria-pressed='true'] .flip-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-face {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip-back {
+  transform: rotateY(180deg);
+}
+
+/* ---------------------------------------------------------------
+   Pixel plot tiles + map regions
+   --------------------------------------------------------------- */
+.tile-new {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop 320ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(var(--i, 0) * 28ms);
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.region {
+  cursor: pointer;
+  outline: none;
+}
+
+.region rect {
+  rx: 2.5px;
+  transition: opacity 160ms ease;
+}
+
+.region-map[data-selected] .region:not([aria-pressed='true']) rect {
+  opacity: 0.4;
+}
+
+.region[aria-pressed='true'] rect {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.region:focus-visible rect,
+.region:hover rect {
+  stroke: var(--primary);
+  stroke-width: 2.5;
+}
+
+/* ---------------------------------------------------------------
+   Reduced motion: no animation anywhere, everything visible.
+   (Framer Motion is set to reducedMotion="user" in the page root.)
+   --------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+
+  .flip-inner,
+  .flip[aria-pressed='true'] .flip-inner {
+    transform: none;
+  }
+
+  .flip-face {
+    backface-visibility: visible;
+  }
+
+  .flip-back {
+    transform: none;
+  }
+
+  .flip[aria-pressed='false'] .flip-back,
+  .flip[aria-pressed='true'] .flip-front {
+    visibility: hidden;
+  }
+}
+
+/* ---------------------------------------------------------------
+   Small sticker icons (missions / steps): shapes are drawn twice;
+   the back copy becomes a white die-cut border.
+   --------------------------------------------------------------- */
+.art {
+  stroke: var(--ink);
+  stroke-width: 3.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.sticker-back,
+.sticker-back * {
+  fill: #fff;
+  stroke: #fff;
+  stroke-width: 12px;
+}
+
+.art .thin {
+  stroke-width: 2.5;
+}
+
+/* ---------------------------------------------------------------
+   Intro loader (~2.6 s): the truck drives in, the road fills, the
+   truck drives off, the overlay fades. Pure CSS, so it also clears
+   itself without JS. Scroll is locked meanwhile (html.scroll-locked).
+   --------------------------------------------------------------- */
+.intro-loader {
+  animation: loader-out 450ms ease 2.5s forwards;
+}
+
+.intro-loader.is-done {
+  animation: loader-out 300ms ease forwards;
+}
+
+@keyframes loader-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+.loader-truck {
+  animation: truck-drive 2.6s cubic-bezier(0.55, 0, 0.35, 1) both;
+}
+
+@keyframes truck-drive {
+  0% {
+    transform: translateX(-75vw);
+  }
+  42%,
+  78% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(80vw);
+  }
+}
+
+.loader-bump {
+  animation: bump 0.28s ease-in-out infinite alternate;
+}
+
+@keyframes bump {
+  to {
+    transform: translateY(-3px) rotate(-0.6deg);
+  }
+}
+
+.loader-road-fill {
+  transform-origin: left;
+  animation: road-fill 2.2s cubic-bezier(0.45, 0, 0.2, 1) 0.2s both;
+}
+
+@keyframes road-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.loader-puff {
+  animation: puff 0.9s ease-out infinite;
+}
+
+@keyframes puff {
+  from {
+    transform: translate(0, 0) scale(0.4);
+    opacity: 0.7;
+  }
+  to {
+    transform: translate(-28px, -14px) scale(1.4);
+    opacity: 0;
+  }
+}
+
+html.scroll-locked,
+html.scroll-locked body {
+  overflow: hidden;
+}
+
+/* Brand rainbow, used by the road and the scroll-progress bar. */
+.rainbow {
+  background: linear-gradient(90deg, var(--sky), var(--mint), var(--butter), var(--pink), var(--lilac));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-loader {
+    display: none;
+  }
+}

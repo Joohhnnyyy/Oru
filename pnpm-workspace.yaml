@@ -1,0 +1,5 @@
+# Workspace packages. The old Butter clone in legacy/oru keeps its own lockfile and is not part of it.
+packages:
+  - frontend
+  - apps/*
+  - packages/*

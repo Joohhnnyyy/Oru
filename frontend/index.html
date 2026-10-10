@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Oru: grow small. spread wide.</title>
+    <meta
+      name="description"
+      content="Oru is a climate-habit game for India. Log small things you really did for waste, heat, energy and water, grow a pixel city, and wake your region's guardian animal."
+    />
+    <link rel="canonical" href="%VITE_SITE_URL%/" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="color-scheme" content="light" />
+    <link rel="icon" href="/icons/favicon-64.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preload" as="image" href="/media/scenes/plaza.webp" imagesrcset="/media/scenes/plaza-960.webp 960w, /media/scenes/plaza.webp 1770w" imagesizes="100vw" fetchpriority="high" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Oru" />
+    <meta property="og:title" content="Oru: grow small. spread wide." />
+    <meta
+      property="og:description"
+      content="A climate-habit game for India. Log small real actions, grow a pixel city and wake your region's guardian animal."
+    />
+    <meta property="og:url" content="%VITE_SITE_URL%/" />
+    <meta property="og:image" content="%VITE_SITE_URL%/icons/icon-512.png" />
+    <meta property="og:locale" content="en_IN" />
+    <meta property="og:locale:alternate" content="hi_IN" />
+    <meta name="twitter:card" content="summary" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Oru",
+        "url": "%VITE_SITE_URL%/",
+        "description": "A climate-habit game for India. Log small real actions for waste, heat, energy and water, grow a pixel city and wake your region's guardian animal.",
+        "applicationCategory": "GameApplication",
+        "operatingSystem": "Android, iOS, Windows, macOS, Linux (any modern browser)",
+        "browserRequirements": "Requires JavaScript. Installable as a PWA.",
+        "inLanguage": ["en-IN", "hi-IN"],
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "INR" }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"><!--app-html--></div>
+    <noscript>
+      <style>
+        [style*='opacity:0'] { opacity: 1 !important; transform: none !important; }
+        .intro-loader { display: none; }
+      </style>
+    </noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
