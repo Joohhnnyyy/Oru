@@ -27,7 +27,7 @@ export function ScrollProgress() {
         width={64}
         height={30}
         style={{ left }}
-        className="loader-bump absolute bottom-1.5 h-auto w-16 drop-shadow-[0_4px_6px_rgba(29,35,48,0.25)]"
+        className="loader-bump absolute bottom-1.5 hidden h-auto w-16 drop-shadow-[0_4px_6px_rgba(29,35,48,0.25)] sm:block"
       />
       <div className="h-1.5 bg-line/50">
         <motion.div style={{ scaleX: progress }} className="rainbow h-full origin-left" />

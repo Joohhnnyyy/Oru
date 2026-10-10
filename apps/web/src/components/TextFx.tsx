@@ -17,15 +17,29 @@ function units(text: string): string[] {
  * The visible letters are hidden from screen readers; the full text is read once.
  */
 export function RollText({ text }: { text: string }) {
+  // Each word is an unbreakable group of rolling letters; the spaces between words stay
+  // normal so long labels can wrap on narrow screens (no forced single line).
+  const words = text.split(/\s+/).filter(Boolean);
+  let i = 0;
   return (
-    <span className="inline-flex whitespace-pre">
+    <span>
       <span className="sr-only">{text}</span>
-      <span aria-hidden="true" className="inline-flex whitespace-pre">
-        {units(text).map((u, i) => (
-          <span key={`${u}-${i}`} className="roll-char" style={{ '--i': i } as CSSProperties}>
-            <span>{u}</span>
-            <span>{u}</span>
-          </span>
+      <span aria-hidden="true">
+        {words.map((word, w) => (
+          <Fragment key={`${word}-${w}`}>
+            <span className="inline-flex whitespace-nowrap">
+              {units(word).map((u) => {
+                const idx = i++;
+                return (
+                  <span key={idx} className="roll-char" style={{ '--i': idx } as CSSProperties}>
+                    <span>{u}</span>
+                    <span>{u}</span>
+                  </span>
+                );
+              })}
+            </span>
+            {w < words.length - 1 ? ' ' : null}
+          </Fragment>
         ))}
       </span>
     </span>
