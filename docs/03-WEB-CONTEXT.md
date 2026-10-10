@@ -28,7 +28,7 @@ Hosted on **AWS Amplify Hosting** (GitHub-connected, `main` → prod, PR preview
 
 ## 2. Folder structure
 ```
-apps/web/
+frontend/
 ├── index.html
 ├── public/
 │   └── mascots/                     # fallback; prod sprites from CloudFront
@@ -132,7 +132,7 @@ Role guard reads `cognito:groups` from the ID token; the API enforces it again (
 - Map `ApiError.code` → localized toasts: `COOLDOWN_ACTIVE` ("You already scanned here — try again in 3 h"), `OUT_OF_RANGE`, `TOKEN_EXPIRED`, `DAILY_CAP_REACHED`, `INSUFFICIENT_BALANCE`.
 - Poll `GET /submissions/:id` every 3 s for up to 60 s after upload, then show "Under review" state.
 
-## 7. Env vars (`apps/web/.env.example`)
+## 7. Env vars (`frontend/.env.example`)
 ```
 VITE_API_URL=
 VITE_COGNITO_USER_POOL_ID=
@@ -149,7 +149,7 @@ VITE_ASSET_CDN_URL=
 ```yaml
 version: 1
 applications:
-  - appRoot: apps/web
+  - appRoot: frontend
     frontend:
       phases:
         preBuild:

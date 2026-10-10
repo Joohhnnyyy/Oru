@@ -166,7 +166,7 @@ importers:
 
   .: {}
 
-  apps/web:
+  frontend:
     dependencies:
       '@fontsource-variable/baloo-2':
         specifier: 5.3.0

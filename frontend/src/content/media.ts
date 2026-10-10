@@ -2,7 +2,7 @@
  * Every image and video slot on the landing page, in one place.
  *
  * To swap in your own media:
- *   1. Put the file in `apps/web/public/media/` (videos: `public/media/videos/`).
+ *   1. Put the file in `frontend/public/media/` (videos: `public/media/videos/`).
  *   2. Change the path below. For a video slot, set `video` to the .mp4/.webm path;
  *      the `poster` shows until it plays (and for reduced-motion visitors).
  * Slots with `video: null` show the poster with a "Video coming soon" tag.

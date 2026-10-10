@@ -1,4 +1,4 @@
-# Oru — Frontend CLAUDE.md (apps/web)
+# Oru — Frontend CLAUDE.md (frontend/)
 
 You are helping build the **web frontend only**: the citizen web app and the municipal console (`/console`). Backend, AWS infra and the mobile app are owned by other people. Do not create or edit Lambdas, CDK, DynamoDB code, or `apps/mobile`. If something needs a backend change, write it down as an "API request" for me instead of building it.
 
@@ -15,7 +15,7 @@ Everything else is background. If the docs and code disagree, tell me; do not si
 ## Stack (do not swap without asking)
 Vite + React 18 + TypeScript (strict) · React Router v6 (data routers) · TanStack Query · Zustand · Tailwind CSS + Radix UI + lucide-react · `aws-amplify` v6 (Auth module only) · MapLibre GL JS · `h3-js` · Recharts (console only) · `@zxing/browser` (webcam QR) · `qrcode` · i18next (`en`, `hi`) · react-hook-form + zod · Framer Motion · Vitest + Testing Library · Playwright.
 
-## Folder structure (apps/web/src)
+## Folder structure (frontend/src)
 ```
 app/        router.tsx, providers.tsx, layouts/{Citizen,Console,Auth}Layout.tsx
 config/     env.ts            zod-validated import.meta.env

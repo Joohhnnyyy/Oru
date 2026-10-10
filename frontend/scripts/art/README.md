@@ -1,6 +1,6 @@
 # Art pipeline (character cut-outs, scenes, logo, icons)
 
-Turns the source art in `apps/web/design/source/` into the web assets in `apps/web/public/media/` and `public/icons/`.
+Turns the source art in `frontend/design/source/` into the web assets in `frontend/public/media/` and `public/icons/`.
 Runs locally and needs no paid service. Requires Python 3.10+ with `rembg[cpu]`, `Pillow`, `numpy` and `scipy`
 (install them in a virtualenv, not in your system Python).
 
