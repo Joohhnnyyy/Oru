@@ -1,4 +1,8 @@
-[![Oru brand logo](docs/design/oru-brand-logo.png)](https://main.d2yv74n1dn7go4.amplifyapp.com)
+<p align="center">
+  <a href="https://main.d2yv74n1dn7go4.amplifyapp.com">
+    <img src="docs/design/oru-brand-badge.png" alt="Oru brand badge" width="160" height="160" />
+  </a>
+</p>
 
 <h1 align="center">Oru</h1>
 
