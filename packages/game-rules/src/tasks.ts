@@ -1,4 +1,4 @@
-import type { CivicActionType } from './credits';
+import type { CivicActionType } from './credits.js';
 
 export interface TaskItem {
   id: string;

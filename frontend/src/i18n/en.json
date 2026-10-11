@@ -1,0 +1,365 @@
+{
+  "meta": {
+    "title": "Oru: grow small. spread wide.",
+    "description": "Oru is a climate-habit game for India. Log small things you really did for waste, heat, energy and water, grow a pixel city, and wake your region's guardian animal."
+  },
+  "a11y": {
+    "skip": "Skip to content",
+    "chapters": "Chapters",
+    "home": "Oru home",
+    "switchLang": "Switch language to Hindi",
+    "langName": "हिन्दी"
+  },
+  "cta": {
+    "play": "Play now",
+    "install": "Install app"
+  },
+  "hero": {
+    "line1": "grow small.",
+    "line2": "spread wide.",
+    "lead": "Oru is a pocket game for India. Log the small things you really did for waste, heat, energy and water, grow a pixel city, and <u>wake the guardian animal</u> of your region.",
+    "note": "Free. Works on entry-level Android phones, even on a patchy connection.",
+    "scroll": "Scroll down",
+    "scene": "An isometric plaza with Oru buddy in the middle, surrounded by six guardian habitats: a snowy mountain, dry grassland, a river, a wetland, a beach and a city block."
+  },
+  "chapter": {
+    "why": {
+      "short": "Why",
+      "title": "Why small acts",
+      "sub": "Three linked problems"
+    },
+    "day1": {
+      "short": "Day 1",
+      "title": "Day 1: your first action",
+      "sub": "Log it, earn it, grow it"
+    },
+    "guardians": {
+      "short": "Guardians",
+      "title": "Six guardians, six kinds of land",
+      "sub": "Turn the cards over"
+    },
+    "growth": {
+      "short": "Day 7 to 30",
+      "title": "Day 7 and Day 30: from seed to forest",
+      "sub": "Watch a plot grow"
+    },
+    "places": {
+      "short": "Places",
+      "title": "Real places",
+      "sub": "Find your region"
+    },
+    "impact": {
+      "short": "Impact",
+      "title": "What we count",
+      "sub": "Only honest numbers"
+    },
+    "next": {
+      "short": "Next",
+      "title": "Not the end",
+      "sub": "Where Oru goes next"
+    }
+  },
+  "why": {
+    "p1": "Climate change, nature loss and pollution are linked problems. Scientists call them the triple planetary crisis.",
+    "p2": "Big fixes need governments and industry, but everyday habits in homes and streets add up too. That is where Oru starts.",
+    "missionsLabel": "The four missions",
+    "waste": {
+      "name": "Waste",
+      "title": "Sort it, reuse it, hand it over right",
+      "body": "Separate wet and dry waste, carry your own bag, and give recyclables to a kabadiwala."
+    },
+    "heat": {
+      "name": "Heat",
+      "title": "Keep yourself and your street cooler",
+      "body": "Shade a window, water a street tree, and save the AC for when you need it."
+    },
+    "energy": {
+      "name": "Energy",
+      "title": "Use less, switch cleaner",
+      "body": "Switch off at the plug, take the bus or metro, and ask about rooftop solar."
+    },
+    "water": {
+      "name": "Water",
+      "title": "Save it and keep it clean",
+      "body": "Fix a dripping tap, reuse RO wastewater, and keep plastic out of drains."
+    }
+  },
+  "day1": {
+    "lead": "Your first day takes <m>about a minute</m>.",
+    "step1": {
+      "title": "Log it",
+      "body": "Pick something you did today, like handing over sorted waste. Add a photo if you have one."
+    },
+    "step2": {
+      "title": "Earn it",
+      "body": "Each action earns seeds. Actions checked with a photo or a QR scan <g>earn more</g> than a quick tap."
+    },
+    "step3": {
+      "title": "Grow it",
+      "body": "Plant your seeds in your pixel city. Every tile you grow helps your guardian wake up."
+    },
+    "sample": "Example log",
+    "sampleAction": "Handed over sorted waste",
+    "sampleMission": "Waste mission",
+    "sampleSeeds": "+3 seeds",
+    "sampleNote": "Example only. Real rewards depend on how the action is checked."
+  },
+  "guardians": {
+    "lead": "Your guardian matches <g>the land where you live</g>. Turn a card over to read about it.",
+    "turn": "Turn over",
+    "turnBack": "Turn back",
+    "missionLink": "Linked mission: {{mission}}",
+    "dolphin": {
+      "name": "River dolphin",
+      "terrain": "Rivers",
+      "fact": "The Ganges river dolphin is almost blind. It finds its way and its food in muddy water using sound. India named it the national aquatic animal in 2009.",
+      "link": "Less plastic and sewage in drains means cleaner rivers."
+    },
+    "turtle": {
+      "name": "Sea turtle",
+      "terrain": "Coasts",
+      "fact": "Olive ridley turtles can come ashore in large groups to nest on the same beach. Some of the biggest nesting beaches are on Odisha's coast.",
+      "link": "Plastic and lost fishing nets are among the dangers they face at sea."
+    },
+    "leopard": {
+      "name": "Snow leopard",
+      "terrain": "High mountains",
+      "fact": "It lives high in the Himalaya, often above the tree line, and is so hard to spot that people call it the ghost of the mountains.",
+      "link": "A warming climate is changing the snow and high pastures it depends on."
+    },
+    "bustard": {
+      "name": "Great Indian bustard",
+      "terrain": "Deserts and dry grasslands",
+      "fact": "One of the heaviest flying birds, it lives in open dry grasslands, mostly in Rajasthan. Very few remain in the wild.",
+      "link": "Collisions with overhead power lines are a major threat, so where new energy lines go matters."
+    },
+    "sparrow": {
+      "name": "House sparrow",
+      "terrain": "Cities and towns",
+      "fact": "Once found around almost every home, it has become less common in many Indian cities. 20 March is World Sparrow Day.",
+      "link": "Trees, shade and green corners make hot streets kinder for birds and people."
+    },
+    "crane": {
+      "name": "Sarus crane",
+      "terrain": "Wetlands and fields",
+      "fact": "It is the tallest flying bird in the world. Pairs are often seen together in the wetlands and farm fields of north India.",
+      "link": "It needs wetlands, so saving water and keeping ponds clean helps."
+    },
+    "title": "Six guardians, six kinds of land"
+  },
+  "growth": {
+    "lead": "Your pixel plot changes as your habits stick, and your guardian <u>wakes up a little more</u> at each stage.",
+    "pace": "The days are an example pace. Stages follow the actions you log, not the calendar.",
+    "dayLabel": "Day {{day}}",
+    "plotLabel": "Pixel plot at the {{stage}} stage",
+    "seed": {
+      "name": "Seed",
+      "body": "Your first logged action plants a seed. Your guardian is fast asleep."
+    },
+    "sprout": {
+      "name": "Sprout",
+      "body": "A few days in, the first green shoots come up around it."
+    },
+    "patch": {
+      "name": "Patch",
+      "body": "A week of small habits turns into a patch of green. Your guardian opens one eye."
+    },
+    "grove": {
+      "name": "Grove",
+      "body": "Trees grow between new houses and a pond appears. Your guardian is awake and watching."
+    },
+    "forest": {
+      "name": "Forest",
+      "body": "A month in, your plot is a small green city and your guardian is out exploring."
+    }
+  },
+  "places": {
+    "lead": "Oru picks your guardian from <m>the land around you</m>. Choose a region to see who looks after it.",
+    "mapLabel": "Simplified pixel map of India split into terrain regions",
+    "disclaimer": "A simplified sketch for the game. Not to scale and not an official map of India.",
+    "listLabel": "Regions",
+    "pick": "Choose a region on the map or in the list.",
+    "guardianIs": "Guardian: {{name}}",
+    "meet": "Meet the {{name}}",
+    "mountains": {
+      "name": "High mountains",
+      "body": "The Himalaya and high valleys across the north."
+    },
+    "dry": {
+      "name": "Deserts and dry grasslands",
+      "body": "The Thar desert in the west and the dry grasslands of the Deccan."
+    },
+    "rivers": {
+      "name": "River plains",
+      "body": "The wide plains of the Ganga and Brahmaputra and their many rivers."
+    },
+    "wetlands": {
+      "name": "Wetlands and fields",
+      "body": "Lakes, marshes and farmland across the plains and central India."
+    },
+    "coasts": {
+      "name": "Coasts and islands",
+      "body": "Beaches, mangroves and islands along the east and west coasts."
+    },
+    "cities": {
+      "name": "Cities",
+      "body": "Big and small cities everywhere, shown as dots on the map."
+    }
+  },
+  "impact": {
+    "lead": "We only show numbers <m>we can stand behind</m>. Community totals start at zero and go live after launch.",
+    "missions": "missions to choose from",
+    "guardians": "guardians to wake",
+    "stages": "growth stages for your plot",
+    "languages": "languages at launch",
+    "community": "Community totals",
+    "badge": "Starts at launch",
+    "actions": "actions logged",
+    "players": "players",
+    "export": "Your record is yours. Export every logged action as a JSON-LD file aligned with Mission LiFE, and take it wherever you like.",
+    "estimate": "Oru builds habits and estimates impact. It does not claim to save species or the planet."
+  },
+  "next": {
+    "lead": "This is where the story pauses, not where it ends. Here is what comes next.",
+    "r1": {
+      "title": "A pilot in one city",
+      "body": "Test Oru with a few neighbourhoods and fix what does not work."
+    },
+    "r2": {
+      "title": "Offline first",
+      "body": "Log actions with no signal and sync when you are back online."
+    },
+    "r3": {
+      "title": "More languages",
+      "body": "Tamil, Bengali and Marathi, after Hindi and English."
+    },
+    "finalTitle": "Your guardian is waiting.",
+    "finalBody": "Install Oru on your phone and log your first action <m>today</m>."
+  },
+  "footer": {
+    "privacyTitle": "Privacy",
+    "privacy": "This page uses no cookies, no trackers and no third-party scripts. Your language choice is saved only on this device.",
+    "a11yTitle": "Accessibility",
+    "a11y": "We aim for WCAG 2.2 AA in both languages. If something does not work for you, tell us on GitHub.",
+    "sourceTitle": "Source",
+    "source": "Source code on GitHub",
+    "safety": "Log only what you really did, and stay safe outdoors.",
+    "languages": "Languages:",
+    "made": "Made in India for the Environmental Hacks build.",
+    "rights": "© 2026 Oru team. All characters and artwork are original to Oru."
+  },
+  "nav": {
+    "label": "Main",
+    "how": "How it works",
+    "guardians": "Guardians",
+    "grow": "Grow",
+    "places": "Places",
+    "impact": "Impact",
+    "menu": "Open menu",
+    "close": "Close menu",
+    "roadmap": "Roadmap"
+  },
+  "loader": {
+    "label": "Loading Oru"
+  },
+  "buddy": {
+    "name": "Oru buddy"
+  },
+  "news": {
+    "label": "Highlights",
+    "prev": "Previous highlight",
+    "next": "Next highlight",
+    "pause": "Pause highlights",
+    "play": "Play highlights",
+    "close": "Hide highlights",
+    "reopen": "Show highlights",
+    "n1": {
+      "tag": "How it works",
+      "title": "Your first day takes about a minute"
+    },
+    "n2": {
+      "tag": "Guardians",
+      "title": "Six guardians are waiting to wake up"
+    },
+    "n3": {
+      "tag": "App",
+      "title": "Install Oru on your phone, free"
+    }
+  },
+  "mission": {
+    "eyebrow": "Our mission",
+    "quiet": "Oru turns the small things you really do",
+    "loud": "into a living world.",
+    "tail": "Every action you log wakes a guardian and grows your corner of the city.",
+    "cardHow": "How Oru works",
+    "cardGuardians": "Meet the guardians",
+    "missions": "The four missions"
+  },
+  "band": {
+    "title": "What is Oru?",
+    "body": "A pocket game for India. Log <u>real actions</u> for waste, heat, energy and water, then watch your guardian and your pixel city grow with you.",
+    "cta": "See how it works",
+    "bubbles": "Oru buddy and the six guardians"
+  },
+  "video": {
+    "soon": "Video coming soon",
+    "label": "Video: {{title}}"
+  },
+  "pills": {
+    "impact": "Oru in numbers",
+    "next": "What comes next",
+    "show": "Show",
+    "hide": "Hide"
+  },
+  "pages": {
+    "back": "Back to home",
+    "learnMore": "Learn more",
+    "seeAll": "See all guardians",
+    "readMore": "Read about the {{name}}",
+    "how": {
+      "title": "How Oru works",
+      "intro": "Small, real actions, checked fairly, turned into a little world that grows with you."
+    },
+    "guardians": {
+      "title": "The guardians",
+      "intro": "Six animals, one for each kind of land in India. Find yours, then wake it up with small daily habits."
+    },
+    "guardian": {
+      "lives": "Where it lives",
+      "mission": "Its mission",
+      "fact": "Did you know?",
+      "others": "Other guardians",
+      "prev": "Previous guardian",
+      "next": "Next guardian"
+    },
+    "grow": {
+      "title": "Grow your plot",
+      "intro": "Every action you log plants something. This is how a plot changes from a single seed to a small green city.",
+      "stages": "All five stages"
+    },
+    "places": {
+      "title": "Find your region",
+      "intro": "Oru looks at the land around you to choose your guardian. Explore the regions below.",
+      "regions": "Every region and its guardian"
+    },
+    "impact": {
+      "title": "Oru in numbers"
+    },
+    "roadmap": {
+      "title": "What comes next"
+    },
+    "play": {
+      "title": "Play Oru",
+      "intro": "The Oru game is being built right now. This is what you will be able to do when it opens.",
+      "status": "Opening soon",
+      "steps": "What you will do",
+      "note": "There is no sign-up on this page. Check back soon, or add Oru to your home screen.",
+      "explore": "While you wait"
+    },
+    "notFound": {
+      "title": "This page wandered off",
+      "body": "We could not find that page. It may have moved.",
+      "home": "Go to the home page"
+    }
+  }
+}
