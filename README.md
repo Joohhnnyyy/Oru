@@ -1,3 +1,9 @@
+
+
+Uploading oru-startup-pitch.mp4…
+
+
+
 # Oru
 
 **A verification layer for India's informal waste chain.** When a household hands sorted waste to a garbage truck, kabadiwala or e-waste point, the collector shows a QR code that changes every 30 seconds and the household scans it. That handover becomes a geo-verified record. Both sides earn credits, and the neighbourhood's guardian animal recovers as the area improves.
