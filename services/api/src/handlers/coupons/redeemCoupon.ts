@@ -8,6 +8,7 @@ import {
   createErrorResponse,
 } from '@saafsafari/shared';
 import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
+import { ledgerSortKey } from '../../utils/territory.js';
 
 function getIsoWeekString(date: Date): string {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -215,7 +216,7 @@ export const handler = async (
           TableName: TABLE_NAME,
           Item: {
             PK: `USER#${userId}`,
-            SK: `LEDGER#${nowIso}`,
+            SK: ledgerSortKey(nowIso),
             GSI1PK: 'ACTION#COUPON_REDEMPTION',
             GSI1SK: nowIso,
             userId,
@@ -272,6 +273,7 @@ export const handler = async (
       body: JSON.stringify(responsePayload),
     };
   } catch (error: any) {
+    console.error('[redeemCoupon] failed', { error: error?.message, name: error?.name });
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

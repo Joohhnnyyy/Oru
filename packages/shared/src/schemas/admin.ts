@@ -64,8 +64,8 @@ export const ResolveReviewQueueRequestSchema = z.object({
   submissionId: z.string(),
   decision: z.enum(['APPROVE', 'REJECT']),
   reason: z.string().min(3).max(500),
-  awardedGC: z.number().min(0).max(500).optional().default(100),
-  awardedXP: z.number().min(0).max(1000).optional().default(250),
+  awardedGC: z.number().int().min(0).max(100).optional(), // defaults to the rule-engine reward
+  awardedXP: z.number().int().min(0).max(250).optional(),
 });
 export type ResolveReviewQueueRequest = z.infer<typeof ResolveReviewQueueRequestSchema>;
 

@@ -5,13 +5,56 @@ import {
   AdminAddUserToGroupCommand,
   InitiateAuthCommand,
 } from '@aws-sdk/client-cognito-identity-provider';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { DynamoDBDocumentClient, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 
 const USER_POOL_ID = 'ap-south-1_KZcMN2CaO';
 const CLIENT_ID = '2g4b36dekkv7f0lu9ad4h4s7oa';
 const REGION = 'ap-south-1';
 const API_URL = 'https://dp029jx9uf.execute-api.ap-south-1.amazonaws.com';
 
+const TABLE_NAME = process.env.TABLE_NAME || 'SaafSafariMain';
+const DEMO_TRUCK_SOURCE_ID = 'qr_truck_vehicle_01';
+
 const client = new CognitoIdentityProviderClient({ region: REGION });
+const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({ region: REGION }));
+
+/** Reads the Cognito `sub` from an ID token (no verification needed: we just minted it). */
+function subFromIdToken(idToken: string): string {
+  return JSON.parse(Buffer.from(idToken.split('.')[1], 'base64url').toString('utf8')).sub;
+}
+
+/**
+ * Makes the demo collector the owner of truck qr_truck_vehicle_01 so its phone can
+ * display the server-issued rotating QR and receive the +2 GC handover reward.
+ */
+async function linkCollectorToTruck(collectorSub: string) {
+  await ddb.send(
+    new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: `USER#${collectorSub}`, SK: 'PROFILE' },
+      UpdateExpression: 'SET #role = :role, assignedSourceId = :src, assignedVehicleId = :veh, displayName = :name',
+      ConditionExpression: 'attribute_exists(PK)',
+      ExpressionAttributeNames: { '#role': 'role' },
+      ExpressionAttributeValues: {
+        ':role': 'collector',
+        ':src': DEMO_TRUCK_SOURCE_ID,
+        ':veh': 'DL-01-ET-1001',
+        ':name': 'Ramesh (Demo Collector)',
+      },
+    }),
+  );
+  await ddb.send(
+    new UpdateCommand({
+      TableName: TABLE_NAME,
+      Key: { PK: `QR#${DEMO_TRUCK_SOURCE_ID}`, SK: 'METADATA' },
+      UpdateExpression: 'SET collectorId = :sub',
+      ConditionExpression: 'attribute_exists(PK)',
+      ExpressionAttributeValues: { ':sub': collectorSub },
+    }),
+  );
+  console.log(`✓ Linked collector ${collectorSub} to ${DEMO_TRUCK_SOURCE_ID}`);
+}
 
 async function setupUser(email: string, pass: string, groups: string[], role: string) {
   console.log(`Setting up user: ${email} (Role: ${role})...`);
@@ -118,9 +161,18 @@ async function main() {
     'ward_admin'
   );
 
+  const collector = await setupUser(
+    'demo-collector@saafsafari.local',
+    'REMOVED_CREDENTIAL',
+    ['collector'],
+    'collector'
+  );
+  await linkCollectorToTruck(subFromIdToken(collector.idToken));
+
   console.log('\n--- Live Persona Setup Complete ---');
   console.log('Citizen: demo-citizen@saafsafari.local / REMOVED_CREDENTIAL');
   console.log('Admin:   demo-admin@saafsafari.local / REMOVED_CREDENTIAL');
+  console.log('Collector: demo-collector@saafsafari.local / REMOVED_CREDENTIAL');
 }
 
 main().catch(console.error);

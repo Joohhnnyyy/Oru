@@ -122,6 +122,7 @@ export const handler = async (
       body: JSON.stringify(responsePayload),
     };
   } catch (error: any) {
+    console.error('[getWallet] failed', { error: error?.message, name: error?.name });
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

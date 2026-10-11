@@ -44,6 +44,7 @@ export const handler = async (
       body: JSON.stringify(profile as UserProfile),
     };
   } catch (error: any) {
+    console.error('[getMe] failed', { error: error?.message, name: error?.name });
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

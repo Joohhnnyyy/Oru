@@ -42,7 +42,7 @@ export const HotspotItemSchema = z.object({
   GSI2PK: z.string().optional(),
   GSI2SK: z.string().optional(),
   hotspotId: z.string(),
-  reporterUserId: z.string(),
+  reporterUserId: z.string().optional(), // omitted from the public API for privacy
   territoryId: z.string(),
   latitude: z.number(),
   longitude: z.number(),

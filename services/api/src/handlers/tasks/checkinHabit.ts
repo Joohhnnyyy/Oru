@@ -2,6 +2,7 @@ import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda
 import { GetCommand, TransactWriteCommand } from '@aws-sdk/lib-dynamodb';
 import { HabitCheckInResponse, createErrorResponse } from '@saafsafari/shared';
 import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
+import { clampTerritoryHealth, istDayString, ledgerSortKey } from '../../utils/territory.js';
 
 export const handler = async (
   event: APIGatewayProxyEventV2,
@@ -39,7 +40,7 @@ export const handler = async (
 
     const user = userRes.Item;
     const now = new Date();
-    const todayStr = now.toISOString().slice(0, 10);
+    const todayStr = istDayString(now); // IST day, 3 AM cutoff
     const nowIso = now.toISOString();
 
     // Check if already completed today
@@ -52,8 +53,7 @@ export const handler = async (
     }
 
     // Compute streak days
-    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const yesterdayStr = yesterday.toISOString().slice(0, 10);
+    const yesterdayStr = istDayString(now, -1);
 
     let newStreak = 1;
     if (user.lastHabitDate === yesterdayStr) {
@@ -87,7 +87,7 @@ export const handler = async (
           TableName: TABLE_NAME,
           Item: {
             PK: `USER#${userId}`,
-            SK: `LEDGER#${nowIso}`,
+            SK: ledgerSortKey(nowIso),
             GSI1PK: 'ACTION#HABIT_SEGREGATION',
             GSI1SK: nowIso,
             userId,
@@ -157,6 +157,8 @@ export const handler = async (
       throw txErr;
     }
 
+    await clampTerritoryHealth(user.homeTerritoryId);
+
     const responsePayload: HabitCheckInResponse = {
       success: true,
       creditsEarned,
@@ -173,6 +175,7 @@ export const handler = async (
       body: JSON.stringify(responsePayload),
     };
   } catch (error: any) {
+    console.error('[checkinHabit] failed', { error: error?.message, name: error?.name });
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

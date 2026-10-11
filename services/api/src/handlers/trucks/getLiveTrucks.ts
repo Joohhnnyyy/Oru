@@ -29,16 +29,24 @@ export const handler = async (
     const items = res.Items || [];
     const nowIso = new Date().toISOString();
 
-    const trucks: LiveTruck[] = items.map((item: any) => ({
-      truckId: item.sourceId.replace('qr_truck_', 'trk_'),
-      sourceId: item.sourceId,
-      name: item.name,
-      latitude: item.latitude,
-      longitude: item.longitude,
-      h3TerritoryId: item.h3TerritoryId,
-      lastUpdated: item.updatedAt || nowIso,
-      status: item.isActive !== false ? 'active' : 'idle',
-    }));
+    // A truck is "live" if its collector app reported a position in the last 10 minutes
+    const LIVE_WINDOW_MS = 10 * 60 * 1000;
+    const trucks: LiveTruck[] = items.map((item: any) => {
+      const live =
+        !!item.livePositionAt &&
+        Date.now() - Date.parse(item.livePositionAt) <= LIVE_WINDOW_MS &&
+        typeof item.liveLatitude === 'number';
+      return {
+        truckId: item.sourceId.replace('qr_truck_', 'trk_'),
+        sourceId: item.sourceId,
+        name: item.name,
+        latitude: live ? item.liveLatitude : item.latitude,
+        longitude: live ? item.liveLongitude : item.longitude,
+        h3TerritoryId: item.h3TerritoryId,
+        lastUpdated: live ? item.livePositionAt : item.updatedAt || nowIso,
+        status: live ? 'active' : 'idle',
+      };
+    });
 
     const responsePayload: LiveTrucksResponse = {
       trucks,
@@ -52,6 +60,7 @@ export const handler = async (
       body: JSON.stringify(responsePayload),
     };
   } catch (error: any) {
+    console.error('[getLiveTrucks] failed', { error: error?.message, name: error?.name });
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

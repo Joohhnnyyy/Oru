@@ -1,23 +1,29 @@
+import * as crypto from 'crypto';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { RekognitionClient, DetectModerationLabelsCommand, DetectLabelsCommand } from '@aws-sdk/client-rekognition';
-import { BedrockRuntimeClient, InvokeModelCommand } from '@aws-sdk/client-bedrock-runtime';
-import { GetCommand, TransactWriteCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import { BedrockRuntimeClient, ConverseCommand } from '@aws-sdk/client-bedrock-runtime';
+import { GetCommand, PutCommand, TransactWriteCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { calculateRewards, CivicActionType } from '@saafsafari/game-rules';
 import { AiEvaluationResult } from '@saafsafari/shared';
 import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
+import { s3Client } from '../../utils/s3.js';
+import { clampTerritoryHealth, istDayString, ledgerSortKey } from '../../utils/territory.js';
 
-export const rekognitionClient = new RekognitionClient({
-  region: process.env.AWS_REGION || 'ap-south-1',
-});
+const REGION = process.env.AWS_REGION || 'ap-south-1';
+export const rekognitionClient = new RekognitionClient({ region: REGION });
+export const bedrockClient = new BedrockRuntimeClient({ region: REGION });
 
-export const bedrockClient = new BedrockRuntimeClient({
-  region: process.env.AWS_REGION || 'ap-south-1',
-});
+/** Nova Lite through the APAC cross-region inference profile (works from ap-south-1). */
+const NOVA_MODEL_ID = process.env.NOVA_MODEL_ID || 'apac.amazon.nova-lite-v1:0';
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+const MAX_AUTO_APPROVALS_PER_DAY = 3;
+const AUTO_APPROVE_THRESHOLD = 0.75;
+const REVIEW_THRESHOLD = 0.35;
 
 export interface EvaluateSubmissionInput {
-  submissionId: string;
+  submissionId?: string; // derived from the S3 key when started by the S3 → EventBridge rule
   s3Bucket: string;
   s3Key: string;
-  taskToken?: string;
 }
 
 export interface EvaluateSubmissionOutput {
@@ -29,328 +35,278 @@ export interface EvaluateSubmissionOutput {
   xpAwarded?: number;
 }
 
-export const handler = async (
-  input: EvaluateSubmissionInput,
-): Promise<EvaluateSubmissionOutput> => {
-  const { submissionId, s3Bucket, s3Key, taskToken } = input;
-  const now = new Date();
-  const nowIso = now.toISOString();
+type Decision = EvaluateSubmissionOutput['status'];
 
-  // 1. Fetch submission metadata
-  const subRes = await docClient.send(
-    new GetCommand({
+/** proofs/<userId>/<submissionId>.jpg → <submissionId> */
+export function submissionIdFromKey(key: string): string | undefined {
+  const match = /^proofs\/[^/]+\/(sub_[A-Za-z0-9]+)\.jpg$/.exec(decodeURIComponent(key));
+  return match?.[1];
+}
+
+async function setStatus(
+  submissionId: string,
+  status: Decision,
+  aiEvaluation: AiEvaluationResult,
+  nowIso: string,
+): Promise<void> {
+  await docClient.send(
+    new UpdateCommand({
       TableName: TABLE_NAME,
-      Key: {
-        PK: `SUBMISSION#${submissionId}`,
-        SK: 'METADATA',
+      Key: { PK: `SUBMISSION#${submissionId}`, SK: 'METADATA' },
+      UpdateExpression: 'SET #status = :status, aiEvaluation = :ai, updatedAt = :now, GSI2PK = :gsi2pk, GSI2SK = :now',
+      // Only the first evaluation counts (Step Functions retries / duplicate S3 events)
+      ConditionExpression: '#status = :pending',
+      ExpressionAttributeNames: { '#status': 'status' },
+      ExpressionAttributeValues: {
+        ':status': status,
+        ':ai': aiEvaluation,
+        ':now': nowIso,
+        ':gsi2pk': `STATUS#${status}`,
+        ':pending': 'PENDING_UPLOAD',
       },
     }),
   );
+}
 
-  if (!subRes.Item) {
-    throw new Error(`Submission '${submissionId}' not found.`);
-  }
+export const handler = async (input: EvaluateSubmissionInput): Promise<EvaluateSubmissionOutput> => {
+  const { s3Bucket, s3Key } = input;
+  const submissionId = input.submissionId || submissionIdFromKey(s3Key);
+  if (!submissionId) throw new Error(`Cannot derive submissionId from key '${s3Key}'`);
 
-  const submission = subRes.Item;
-  const userId = submission.userId;
-  const territoryId = submission.territoryId;
-  const actionType: CivicActionType = submission.actionType || 'COMMUNITY_CLEANUP_PROOF';
+  const nowIso = new Date().toISOString();
 
-  // 2. Step 1: Rekognition Content Moderation
-  let moderationFlags: string[] = [];
-  try {
-    const modRes = await rekognitionClient.send(
-      new DetectModerationLabelsCommand({
-        Image: {
-          S3Object: {
-            Bucket: s3Bucket,
-            Name: s3Key,
-          },
-        },
-        MinConfidence: 60,
-      }),
-    );
-
-    moderationFlags = (modRes.ModerationLabels || [])
-      .map((l) => l.Name || '')
-      .filter((n) => n.length > 0);
-  } catch (modErr) {
-    // If running in mocked test environment, continue gracefully
-  }
-
-  if (moderationFlags.length > 0) {
-    // Immediate rejection due to inappropriate content
-    await docClient.send(
-      new UpdateCommand({
-        TableName: TABLE_NAME,
-        Key: { PK: `SUBMISSION#${submissionId}`, SK: 'METADATA' },
-        UpdateExpression: 'SET #status = :rejected, aiEvaluation = :aiEval, updatedAt = :nowIso, GSI2PK = :gsi2pk',
-        ExpressionAttributeNames: { '#status': 'status' },
-        ExpressionAttributeValues: {
-          ':rejected': 'REJECTED',
-          ':aiEval': {
-            isGenuine: false,
-            confidenceScore: 0.0,
-            detectedLabels: [],
-            moderationFlags,
-            reasoning: 'Image contains prohibited or inappropriate content flagged by moderation.',
-            evaluatedAt: nowIso,
-          } as AiEvaluationResult,
-          ':nowIso': nowIso,
-          ':gsi2pk': 'STATUS#REJECTED',
-        },
-      }),
-    );
-
+  // 1. Load submission; skip if it was already evaluated (idempotent)
+  const submission = (
+    await docClient.send(new GetCommand({ TableName: TABLE_NAME, Key: { PK: `SUBMISSION#${submissionId}`, SK: 'METADATA' } }))
+  ).Item;
+  if (!submission) throw new Error(`Submission '${submissionId}' not found.`);
+  if (submission.status !== 'PENDING_UPLOAD') {
     return {
       submissionId,
-      status: 'REJECTED',
-      confidenceScore: 0.0,
-      reasoning: 'Prohibited content flagged by moderation.',
+      status: submission.status === 'REJECTED' ? 'REJECTED' : submission.status === 'AUTO_APPROVED' ? 'AUTO_APPROVED' : 'FLAGGED_FOR_REVIEW',
+      confidenceScore: submission.aiEvaluation?.confidenceScore ?? 0,
+      reasoning: 'Already evaluated.',
     };
   }
+  const userId: string = submission.userId;
+  const territoryId: string = submission.territoryId;
+  const actionType: CivicActionType = submission.actionType || 'COMMUNITY_CLEANUP_PROOF';
 
-  // 3. Step 2: Rekognition Label Detection
+  const finish = async (
+    status: Decision,
+    confidenceScore: number,
+    reasoning: string,
+    extra: Partial<AiEvaluationResult> = {},
+  ): Promise<EvaluateSubmissionOutput> => {
+    const ai: AiEvaluationResult = {
+      isGenuine: status === 'AUTO_APPROVED',
+      confidenceScore,
+      detectedLabels: [],
+      moderationFlags: [],
+      reasoning,
+      evaluatedAt: nowIso,
+      ...extra,
+    };
+    await setStatus(submissionId, status, ai, nowIso);
+    console.log('[evaluateSubmission] decision', { submissionId, status, confidenceScore });
+    return { submissionId, status, confidenceScore, reasoning };
+  };
+
+  // 2. Read the photo (size-limited)
+  const object = await s3Client.send(new GetObjectCommand({ Bucket: s3Bucket, Key: s3Key }));
+  if ((object.ContentLength ?? 0) > MAX_IMAGE_BYTES) {
+    return finish('REJECTED', 0, 'Photo is larger than 5 MB.');
+  }
+  const bytes = await object.Body!.transformToByteArray();
+
+  // 3. Duplicate-photo check: the same image can only ever earn once
+  const imageHash = crypto.createHash('sha256').update(bytes).digest('hex');
+  try {
+    await docClient.send(
+      new PutCommand({
+        TableName: TABLE_NAME,
+        Item: { PK: `IMGHASH#${imageHash}`, SK: 'METADATA', submissionId, userId, createdAt: nowIso },
+        ConditionExpression: 'attribute_not_exists(PK)',
+      }),
+    );
+  } catch (err: any) {
+    if (err?.name === 'ConditionalCheckFailedException') {
+      return finish('REJECTED', 0, 'This exact photo was already submitted.');
+    }
+    throw err;
+  }
+
+  // 4. Rekognition: moderation + labels. Any failure → human review (fail closed).
   let detectedLabels: string[] = [];
   try {
-    const labelRes = await rekognitionClient.send(
-      new DetectLabelsCommand({
-        Image: {
-          S3Object: {
-            Bucket: s3Bucket,
-            Name: s3Key,
-          },
-        },
-        MaxLabels: 15,
-        MinConfidence: 65,
-      }),
+    const mod = await rekognitionClient.send(new DetectModerationLabelsCommand({ Image: { Bytes: bytes }, MinConfidence: 60 }));
+    const moderationFlags = (mod.ModerationLabels || []).map((l) => l.Name || '').filter(Boolean);
+    if (moderationFlags.length > 0) {
+      return finish('REJECTED', 0, 'Image contains prohibited content.', { moderationFlags });
+    }
+    const labels = await rekognitionClient.send(
+      new DetectLabelsCommand({ Image: { Bytes: bytes }, MaxLabels: 15, MinConfidence: 65 }),
     );
-
-    detectedLabels = (labelRes.Labels || [])
-      .map((l) => l.Name || '')
-      .filter((n) => n.length > 0);
-  } catch (labelErr) {
-    // Fallback if mocked
-    detectedLabels = ['Outdoors', 'Ground', 'Waste', 'Plastic'];
+    detectedLabels = (labels.Labels || []).map((l) => l.Name || '').filter(Boolean);
+  } catch (err: any) {
+    console.error('[evaluateSubmission] Rekognition failed', { submissionId, error: err?.message });
+    return finish('FLAGGED_FOR_REVIEW', 0.5, 'Automatic image screening was unavailable; sent to a ward officer.');
   }
 
-  // 4. Step 3: Bedrock Nova Lite Evaluation
-  let confidenceScore = 0.5;
-  let reasoning = 'Automated AI evaluation completed.';
-  let isGenuine = true;
-
+  // 5. Bedrock Nova Lite looks at the actual photo (multimodal)
+  let confidenceScore: number;
+  let isGenuine: boolean;
+  let reasoning: string;
   try {
-    const prompt = `You are a municipal waste verification AI for SaafSafari in Delhi NCR.
-Evaluate whether this image proof demonstrates authentic civic waste segregation or community litter cleanup.
-Detected visual labels: ${detectedLabels.join(', ')}.
-Output strictly valid JSON in the format:
-{"isGenuine": boolean, "confidenceScore": number (0.0 to 1.0), "reasoning": "short explanation"}`;
+    const prompt = `You verify civic waste-action photos for Oru, a Delhi civic app.
+Claimed action: ${actionType === 'HABIT_SEGREGATION' ? 'household waste segregated into separate wet and dry bins' : 'a community litter cleanup (collected / bagged waste, cleaned public spot)'}.
+User note: ${String(submission.description || '').slice(0, 300) || 'none'}
+Rekognition labels: ${detectedLabels.join(', ') || 'none'}.
+Judge ONLY what is visible in the image. Screenshots, photos of screens, stock images, or unrelated scenes are not genuine.
+Reply with JSON only: {"isGenuine": boolean, "confidenceScore": number between 0 and 1, "reasoning": "one short sentence"}`;
 
-    const modelPayload = {
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              text: prompt,
-            },
-          ],
-        },
-      ],
-      inferenceConfig: {
-        maxTokens: 200,
-        temperature: 0.1,
-      },
-    };
-
-    const bedrockRes = await bedrockClient.send(
-      new InvokeModelCommand({
-        modelId: 'amazon.nova-lite-v1:0',
-        contentType: 'application/json',
-        accept: 'application/json',
-        body: JSON.stringify(modelPayload),
+    const res = await bedrockClient.send(
+      new ConverseCommand({
+        modelId: NOVA_MODEL_ID,
+        messages: [{ role: 'user', content: [{ image: { format: 'jpeg', source: { bytes } } }, { text: prompt }] }],
+        inferenceConfig: { maxTokens: 300, temperature: 0.1 },
       }),
     );
-
-    const responseBody = JSON.parse(new TextDecoder().decode(bedrockRes.body));
-    const aiText = responseBody.output?.message?.content?.[0]?.text || '';
-    const parsedAi = JSON.parse(aiText.match(/\{[\s\S]*\}/)?.[0] || '{}');
-
-    if (typeof parsedAi.confidenceScore === 'number') {
-      confidenceScore = parsedAi.confidenceScore;
+    const text = res.output?.message?.content?.find((c) => 'text' in c && c.text)?.text || '';
+    const parsed = JSON.parse(text.match(/\{[\s\S]*\}/)?.[0] || '{}');
+    if (typeof parsed.confidenceScore !== 'number' || typeof parsed.isGenuine !== 'boolean') {
+      throw new Error(`Unparseable model output: ${text.slice(0, 120)}`);
     }
-    if (typeof parsedAi.isGenuine === 'boolean') {
-      isGenuine = parsedAi.isGenuine;
-    }
-    if (parsedAi.reasoning) {
-      reasoning = parsedAi.reasoning;
-    }
-  } catch (aiErr) {
-    // Fallback scoring based on detected labels if Bedrock is simulated in test
-    const wasteLabels = ['waste', 'garbage', 'trash', 'plastic', 'litter', 'rubbish', 'recycling', 'cleaning'];
-    const matchedCount = detectedLabels.filter((l) =>
-      wasteLabels.some((w) => l.toLowerCase().includes(w)),
-    ).length;
-
-    if (matchedCount >= 2) {
-      confidenceScore = 0.85;
-      reasoning = `High visual confidence: detected civic waste elements (${detectedLabels.slice(0, 3).join(', ')}).`;
-    } else if (matchedCount === 1) {
-      confidenceScore = 0.55;
-      reasoning = 'Borderline visual confidence: partial waste indicators detected.';
-    } else {
-      confidenceScore = 0.25;
-      reasoning = 'No waste segregation or cleanup indicators detected.';
-      isGenuine = false;
-    }
+    confidenceScore = Math.min(1, Math.max(0, parsed.confidenceScore));
+    isGenuine = parsed.isGenuine;
+    reasoning = String(parsed.reasoning || 'Evaluated by Amazon Nova.').slice(0, 300);
+  } catch (err: any) {
+    console.error('[evaluateSubmission] Bedrock failed', { submissionId, error: err?.message });
+    return finish('FLAGGED_FOR_REVIEW', 0.5, 'AI verification was unavailable; sent to a ward officer.', { detectedLabels });
   }
 
-  const aiResult: AiEvaluationResult = {
-    isGenuine,
+  const extra = { detectedLabels, isGenuine };
+  if (!isGenuine || confidenceScore < REVIEW_THRESHOLD) {
+    return finish('REJECTED', confidenceScore, reasoning, { ...extra, isGenuine: false });
+  }
+  if (confidenceScore < AUTO_APPROVE_THRESHOLD) {
+    return finish('FLAGGED_FOR_REVIEW', confidenceScore, reasoning, extra);
+  }
+
+  // 6. Auto-approve: reward with the user's real streak and territory health
+  const [userRes, terrRes] = await Promise.all([
+    docClient.send(new GetCommand({ TableName: TABLE_NAME, Key: { PK: `USER#${userId}`, SK: 'PROFILE' } })),
+    docClient.send(new GetCommand({ TableName: TABLE_NAME, Key: { PK: `TERRITORY#${territoryId}`, SK: 'METADATA' } })),
+  ]);
+  const reward = calculateRewards({
+    actionType,
+    streakDays: userRes.Item?.streakDays || 0,
+    territoryHealth: terrRes.Item?.health ?? 75,
+  });
+  const ai: AiEvaluationResult = {
+    isGenuine: true,
     confidenceScore,
     detectedLabels,
     moderationFlags: [],
     reasoning,
     evaluatedAt: nowIso,
   };
+  const today = istDayString(new Date());
 
-  // 5. Decision Branching: Auto-Approve, Flag for Review, or Auto-Reject
-  if (confidenceScore >= 0.75 && isGenuine) {
-    // AUTO_APPROVED: Award Green Credits and XP atomically
-    const reward = calculateRewards({
-      actionType,
-      streakDays: 0,
-      territoryHealth: 70,
+  const items: any[] = [
+    {
+      Update: {
+        TableName: TABLE_NAME,
+        Key: { PK: `SUBMISSION#${submissionId}`, SK: 'METADATA' },
+        UpdateExpression:
+          'SET #status = :approved, aiEvaluation = :ai, creditsAwarded = :gc, xpAwarded = :xp, updatedAt = :now, GSI2PK = :gsi2pk, GSI2SK = :now',
+        ConditionExpression: '#status = :pending',
+        ExpressionAttributeNames: { '#status': 'status' },
+        ExpressionAttributeValues: {
+          ':approved': 'AUTO_APPROVED',
+          ':ai': ai,
+          ':gc': reward.creditsEarned,
+          ':xp': reward.xpEarned,
+          ':now': nowIso,
+          ':gsi2pk': 'STATUS#AUTO_APPROVED',
+          ':pending': 'PENDING_UPLOAD',
+        },
+      },
+    },
+    // Daily cap on auto-approved photos (above it, a human reviews)
+    {
+      Update: {
+        TableName: TABLE_NAME,
+        Key: { PK: `USER#${userId}`, SK: `PHOTO_LIMIT#${today}` },
+        UpdateExpression: 'ADD approvedCount :one SET #ttl = :ttl',
+        ConditionExpression: 'attribute_not_exists(approvedCount) OR approvedCount < :max',
+        ExpressionAttributeNames: { '#ttl': 'ttl' },
+        ExpressionAttributeValues: {
+          ':one': 1,
+          ':max': MAX_AUTO_APPROVALS_PER_DAY,
+          ':ttl': Math.floor(Date.now() / 1000) + 2 * 86400,
+        },
+      },
+    },
+    {
+      Update: {
+        TableName: TABLE_NAME,
+        Key: { PK: `USER#${userId}`, SK: 'PROFILE' },
+        UpdateExpression: 'SET balanceGC = balanceGC + :gc, lifetimeXP = lifetimeXP + :xp, updatedAt = :now',
+        ConditionExpression: 'attribute_exists(PK)',
+        ExpressionAttributeValues: { ':gc': reward.creditsEarned, ':xp': reward.xpEarned, ':now': nowIso },
+      },
+    },
+    {
+      Put: {
+        TableName: TABLE_NAME,
+        Item: {
+          PK: `USER#${userId}`,
+          SK: ledgerSortKey(nowIso),
+          GSI1PK: `ACTION#${actionType}`,
+          GSI1SK: nowIso,
+          userId,
+          actionType,
+          creditsEarned: reward.creditsEarned,
+          xpEarned: reward.xpEarned,
+          submissionId,
+          territoryId,
+          timestamp: nowIso,
+        },
+      },
+    },
+  ];
+  if (terrRes.Item) {
+    items.push({
+      Update: {
+        TableName: TABLE_NAME,
+        Key: { PK: `TERRITORY#${territoryId}`, SK: 'METADATA' },
+        UpdateExpression: 'SET health = health + :gain, totalActions = if_not_exists(totalActions, :zero) + :one',
+        ConditionExpression: 'attribute_exists(PK)',
+        ExpressionAttributeValues: { ':gain': 1.0, ':zero': 0, ':one': 1 },
+      },
     });
-
-    const creditsAwarded = reward.creditsEarned;
-    const xpAwarded = reward.xpEarned;
-
-    await docClient.send(
-      new TransactWriteCommand({
-        TransactItems: [
-          // Update submission status to AUTO_APPROVED
-          {
-            Update: {
-              TableName: TABLE_NAME,
-              Key: { PK: `SUBMISSION#${submissionId}`, SK: 'METADATA' },
-              UpdateExpression: 'SET #status = :approved, aiEvaluation = :aiEval, creditsAwarded = :gc, xpAwarded = :xp, updatedAt = :nowIso, GSI2PK = :gsi2pk',
-              ExpressionAttributeNames: { '#status': 'status' },
-              ExpressionAttributeValues: {
-                ':approved': 'AUTO_APPROVED',
-                ':aiEval': aiResult,
-                ':gc': creditsAwarded,
-                ':xp': xpAwarded,
-                ':nowIso': nowIso,
-                ':gsi2pk': 'STATUS#AUTO_APPROVED',
-              },
-            },
-          },
-          // Award citizen Green Credits and XP
-          {
-            Update: {
-              TableName: TABLE_NAME,
-              Key: { PK: `USER#${userId}`, SK: 'PROFILE' },
-              UpdateExpression: 'SET balanceGC = balanceGC + :gc, lifetimeXP = lifetimeXP + :xp, updatedAt = :nowIso',
-              ConditionExpression: 'attribute_exists(PK)',
-              ExpressionAttributeValues: {
-                ':gc': creditsAwarded,
-                ':xp': xpAwarded,
-                ':nowIso': nowIso,
-              },
-            },
-          },
-          // Record ledger entry
-          {
-            Put: {
-              TableName: TABLE_NAME,
-              Item: {
-                PK: `USER#${userId}`,
-                SK: `LEDGER#${nowIso}`,
-                GSI1PK: `ACTION#${actionType}`,
-                GSI1SK: nowIso,
-                userId,
-                actionType,
-                creditsEarned: creditsAwarded,
-                xpEarned: xpAwarded,
-                submissionId,
-                territoryId,
-                timestamp: nowIso,
-              },
-            },
-          },
-          // Territory health bump
-          {
-            Update: {
-              TableName: TABLE_NAME,
-              Key: { PK: `TERRITORY#${territoryId}`, SK: 'METADATA' },
-              UpdateExpression: 'SET health = health + :gain, totalActions = if_not_exists(totalActions, :zero) + :one',
-              ConditionExpression: 'attribute_exists(PK)',
-              ExpressionAttributeValues: {
-                ':gain': 1.0,
-                ':zero': 0,
-                ':one': 1,
-              },
-            },
-          },
-        ],
-      }),
-    );
-
-    return {
-      submissionId,
-      status: 'AUTO_APPROVED',
-      confidenceScore,
-      reasoning,
-      creditsAwarded,
-      xpAwarded,
-    };
-  } else if (confidenceScore >= 0.35) {
-    // FLAGGED_FOR_REVIEW: Suspend in review queue for human municipal admin inspection
-    await docClient.send(
-      new UpdateCommand({
-        TableName: TABLE_NAME,
-        Key: { PK: `SUBMISSION#${submissionId}`, SK: 'METADATA' },
-        UpdateExpression: 'SET #status = :flagged, aiEvaluation = :aiEval, taskToken = :token, updatedAt = :nowIso, GSI2PK = :gsi2pk',
-        ExpressionAttributeNames: { '#status': 'status' },
-        ExpressionAttributeValues: {
-          ':flagged': 'FLAGGED_FOR_REVIEW',
-          ':aiEval': aiResult,
-          ':token': taskToken || null,
-          ':nowIso': nowIso,
-          ':gsi2pk': 'STATUS#FLAGGED_FOR_REVIEW',
-        },
-      }),
-    );
-
-    return {
-      submissionId,
-      status: 'FLAGGED_FOR_REVIEW',
-      confidenceScore,
-      reasoning,
-    };
-  } else {
-    // REJECTED: Low confidence / non-genuine proof
-    await docClient.send(
-      new UpdateCommand({
-        TableName: TABLE_NAME,
-        Key: { PK: `SUBMISSION#${submissionId}`, SK: 'METADATA' },
-        UpdateExpression: 'SET #status = :rejected, aiEvaluation = :aiEval, updatedAt = :nowIso, GSI2PK = :gsi2pk',
-        ExpressionAttributeNames: { '#status': 'status' },
-        ExpressionAttributeValues: {
-          ':rejected': 'REJECTED',
-          ':aiEval': aiResult,
-          ':nowIso': nowIso,
-          ':gsi2pk': 'STATUS#REJECTED',
-        },
-      }),
-    );
-
-    return {
-      submissionId,
-      status: 'REJECTED',
-      confidenceScore,
-      reasoning,
-    };
   }
+
+  try {
+    await docClient.send(new TransactWriteCommand({ TransactItems: items }));
+  } catch (err: any) {
+    const reasons: Array<{ Code?: string }> = err?.CancellationReasons || [];
+    if (err?.name === 'TransactionCanceledException' && reasons[1]?.Code === 'ConditionalCheckFailed') {
+      // Daily auto-approval cap reached: a ward officer decides instead
+      return finish('FLAGGED_FOR_REVIEW', confidenceScore, `${reasoning} (Daily auto-approval limit reached.)`, extra);
+    }
+    throw err;
+  }
+  await clampTerritoryHealth(territoryId);
+
+  console.log('[evaluateSubmission] decision', { submissionId, status: 'AUTO_APPROVED', confidenceScore });
+  return {
+    submissionId,
+    status: 'AUTO_APPROVED',
+    confidenceScore,
+    reasoning,
+    creditsAwarded: reward.creditsEarned,
+    xpAwarded: reward.xpEarned,
+  };
 };

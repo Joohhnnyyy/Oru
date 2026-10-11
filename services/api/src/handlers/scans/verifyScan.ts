@@ -8,7 +8,8 @@ import {
 } from '@saafsafari/shared';
 import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
 import { isWithinRadius } from '../../utils/geo.js';
-import { verifyRotatingQrToken } from '../../utils/hmac.js';
+import { verifyRotatingQrToken, verifyStaticQrSignature } from '../../utils/hmac.js';
+import { clampHealthValue, clampTerritoryHealth, ledgerSortKey } from '../../utils/territory.js';
 
 export const handler = async (
   event: APIGatewayProxyEventV2,
@@ -45,7 +46,16 @@ export const handler = async (
     };
   }
 
-  const { sourceId, qrPayload, latitude, longitude } = parseResult.data;
+  const { sourceId, qrPayload, latitude, longitude, isMockLocation } = parseResult.data;
+
+  // Reject scans from devices reporting a mocked / spoofed GPS location (Android)
+  if (isMockLocation) {
+    return {
+      statusCode: 400,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(createErrorResponse('MOCK_LOCATION', 'Mock GPS locations are not allowed for verified scans.')),
+    };
+  }
 
   try {
     // 2. Fetch QR Source metadata
@@ -98,7 +108,19 @@ export const handler = async (
 
     // 4. Verification by QR type
     let actionType: CivicActionType = 'STATIC_BIN_SCAN';
-    const collectorId = qrSource.collectorId || 'collector_ramesh_kumar';
+    const collectorId: string | undefined = qrSource.collectorId;
+
+    // Static sources (bins, e-waste hubs) carry a printed signed payload: "<sourceId>.<hmac>"
+    if (qrSource.type === 'dustbin_static' || qrSource.type === 'ewaste_static') {
+      const sig = verifyStaticQrSignature(qrSource.secretKey, sourceId, qrPayload);
+      if (!sig.valid) {
+        return {
+          statusCode: 400,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(createErrorResponse('INVALID_QR_SIGNATURE', sig.reason || 'This QR code is not a genuine Oru code.')),
+        };
+      }
+    }
 
     if (qrSource.type === 'dustbin_static') {
       actionType = 'STATIC_BIN_SCAN';
@@ -143,9 +165,14 @@ export const handler = async (
         };
       }
 
-      // Verify vehicle proximity (<= 150m)
+      // Verify proximity (<= 150m) to the collector's LIVE position (sent by the collector
+      // app when it fetches the QR, fresh within 2 minutes); fall back to the registered spot.
       const maxRadius = 150;
-      const isClose = isWithinRadius(latitude, longitude, qrSource.latitude, qrSource.longitude, maxRadius);
+      const liveAgeMs = qrSource.livePositionAt ? Date.now() - Date.parse(qrSource.livePositionAt) : Infinity;
+      const useLive = liveAgeMs <= 2 * 60 * 1000 && typeof qrSource.liveLatitude === 'number';
+      const refLat = useLive ? qrSource.liveLatitude : qrSource.latitude;
+      const refLng = useLive ? qrSource.liveLongitude : qrSource.longitude;
+      const isClose = isWithinRadius(latitude, longitude, refLat, refLng, maxRadius);
       if (!isClose) {
         return {
           statusCode: 400,
@@ -199,7 +226,7 @@ export const handler = async (
     const nowIso = new Date().toISOString();
     const cooldownTtl = nowEpoch + 4 * 3600; // 4 hour cooldown
     const healthGain = Math.min(1.0, Math.max(0.1, Number((reward.creditsEarned * 0.02).toFixed(2))));
-    const newTerritoryHealth = Math.min(100, Number((territoryHealth + healthGain).toFixed(2)));
+    const newTerritoryHealth = clampHealthValue(territoryHealth + healthGain);
 
     const newBalanceGC = (user.balanceGC || 0) + reward.creditsEarned;
     const newLifetimeXP = (user.lifetimeXP || 0) + reward.xpEarned;
@@ -213,7 +240,7 @@ export const handler = async (
           TableName: TABLE_NAME,
           Item: {
             PK: `USER#${userId}`,
-            SK: `LEDGER#${nowIso}`,
+            SK: ledgerSortKey(nowIso),
             GSI1PK: `ACTION#${actionType}`,
             GSI1SK: nowIso,
             userId,
@@ -240,7 +267,7 @@ export const handler = async (
           },
         },
       },
-      // Anti-abuse cooldown item (4 hours)
+      // Anti-abuse cooldown item (4 hours). Conditional so two parallel scans can't both pay.
       {
         Put: {
           TableName: TABLE_NAME,
@@ -250,6 +277,9 @@ export const handler = async (
             ttl: cooldownTtl,
             createdAt: nowIso,
           },
+          ConditionExpression: 'attribute_not_exists(PK) OR #ttl < :nowEpoch',
+          ExpressionAttributeNames: { '#ttl': 'ttl' },
+          ExpressionAttributeValues: { ':nowEpoch': nowEpoch },
         },
       },
       // Territory health and action bump
@@ -292,6 +322,7 @@ export const handler = async (
       );
     } catch (txErr: any) {
       if (txErr.name === 'TransactionCanceledException') {
+        console.warn('[verifyScan] transaction cancelled', { userId, sourceId, reasons: txErr.CancellationReasons });
         return {
           statusCode: 409,
           headers: { 'Content-Type': 'application/json' },
@@ -300,6 +331,8 @@ export const handler = async (
       }
       throw txErr;
     }
+
+    await clampTerritoryHealth(qrSource.h3TerritoryId);
 
     const scanResult: ScanResult = {
       success: true,
@@ -338,6 +371,7 @@ export const handler = async (
       body: JSON.stringify(scanResult),
     };
   } catch (error: any) {
+    console.error('[verifyScan] failed', { userId, sourceId, error: error?.message, name: error?.name });
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

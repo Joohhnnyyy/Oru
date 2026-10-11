@@ -82,3 +82,27 @@ export function verifyRotatingQrToken(
     return { valid: false, reason: 'Signature validation failed' };
   }
 }
+
+/**
+ * Signature printed on static QR codes (bins, e-waste hubs). The QR encodes
+ * {"sourceId": "...", "token": "<signature>"} so a code can't be guessed from its id.
+ */
+export function generateStaticQrSignature(secretKey: string, sourceId: string): string {
+  return crypto.createHmac('sha256', secretKey).update(`static:${sourceId}`).digest('hex');
+}
+
+export function verifyStaticQrSignature(
+  secretKey: string | undefined,
+  sourceId: string,
+  signature: string | undefined,
+): { valid: boolean; reason?: string } {
+  if (!secretKey) return { valid: false, reason: 'QR source has no signing key configured' };
+  if (!signature || !/^[0-9a-f]{64}$/i.test(signature)) {
+    return { valid: false, reason: 'Missing or malformed QR signature' };
+  }
+  const expected = Buffer.from(generateStaticQrSignature(secretKey, sourceId), 'hex');
+  const given = Buffer.from(signature, 'hex');
+  return given.length === expected.length && crypto.timingSafeEqual(given, expected)
+    ? { valid: true }
+    : { valid: false, reason: 'QR signature mismatch' };
+}

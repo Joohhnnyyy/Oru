@@ -2,7 +2,7 @@ import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda
 import * as crypto from 'crypto';
 import { GetCommand, TransactWriteCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { SFNClient, SendTaskSuccessCommand } from '@aws-sdk/client-sfn';
-import { getUserTier } from '@saafsafari/game-rules';
+import { calculateRewards, getUserTier } from '@saafsafari/game-rules';
 import {
   ResolveReviewQueueRequestSchema,
   ResolveReviewQueueResponse,
@@ -10,6 +10,7 @@ import {
 } from '@saafsafari/shared';
 import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
 import { evaluateCedarPolicy } from '../../utils/cedar.js';
+import { clampTerritoryHealth, ledgerSortKey } from '../../utils/territory.js';
 
 const sfnClient = new SFNClient({
   region: process.env.AWS_REGION || 'ap-south-1',
@@ -82,9 +83,20 @@ export const handler = async (
 
     const { userId, territoryId, taskToken } = submission;
 
+    // Only submissions waiting for review can be resolved (prevents double payouts)
+    if (submission.status !== 'FLAGGED_FOR_REVIEW') {
+      return {
+        statusCode: 409,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createErrorResponse('ALREADY_RESOLVED', `Submission is ${submission.status}, not awaiting review.`)),
+      };
+    }
+
     if (decision === 'APPROVE') {
-      const finalGC = awardedGC ?? 100;
-      const finalXP = awardedXP ?? 250;
+      // Default to the same rule-engine reward an auto-approval would give
+      const defaultReward = calculateRewards({ actionType: submission.actionType || 'COMMUNITY_CLEANUP_PROOF' });
+      const finalGC = awardedGC ?? defaultReward.creditsEarned;
+      const finalXP = awardedXP ?? defaultReward.xpEarned;
 
       // 3. Fetch citizen profile to compute tier progression
       const userResult = await docClient.send(
@@ -114,10 +126,12 @@ export const handler = async (
                   SK: 'METADATA',
                 },
                 UpdateExpression: 'SET #st = :status, GSI2PK = :gsi2pk, adminDecision = :decision, adminReason = :reason, resolvedBy = :adminId, resolvedAt = :now, awardedGC = :gc, awardedXP = :xp',
+                ConditionExpression: '#st = :flagged',
                 ExpressionAttributeNames: {
                   '#st': 'status',
                 },
                 ExpressionAttributeValues: {
+                  ':flagged': 'FLAGGED_FOR_REVIEW',
                   ':status': 'ADMIN_APPROVED',
                   ':gsi2pk': 'STATUS#ADMIN_APPROVED',
                   ':decision': 'APPROVE',
@@ -136,11 +150,12 @@ export const handler = async (
                   PK: `USER#${userId}`,
                   SK: 'PROFILE',
                 },
-                UpdateExpression: 'SET balanceGC = if_not_exists(balanceGC, :zero) + :gc, lifetimeCredits = if_not_exists(lifetimeCredits, :zero) + :gc, lifetimeXP = :lifetimeXP, currentTier = :tier, xpProgressInTier = :xpProgress, xpToNextTier = :xpNext, updatedAt = :now',
+                UpdateExpression: 'SET balanceGC = if_not_exists(balanceGC, :zero) + :gc, lifetimeCredits = if_not_exists(lifetimeCredits, :zero) + :gc, lifetimeXP = if_not_exists(lifetimeXP, :zero) + :xp, currentTier = :tier, xpProgressInTier = :xpProgress, xpToNextTier = :xpNext, updatedAt = :now',
+                ConditionExpression: 'attribute_exists(PK)',
                 ExpressionAttributeValues: {
                   ':zero': 0,
                   ':gc': finalGC,
-                  ':lifetimeXP': currentXP,
+                  ':xp': finalXP,
                   ':tier': tierProgression.currentTier.key,
                   ':xpProgress': tierProgression.progressPercent,
                   ':xpNext': tierProgression.xpNeededForNextTier ?? 0,
@@ -152,18 +167,20 @@ export const handler = async (
               Put: {
                 TableName: TABLE_NAME,
                 Item: {
-                  PK: `LEDGER#${userId}`,
-                  SK: `TX#${nowIso}#${txId}`,
-                  GSI1PK: `USER#${userId}`,
+                  // Same ledger schema as every other credit (wallet + task progress read this)
+                  PK: `USER#${userId}`,
+                  SK: ledgerSortKey(nowIso),
+                  GSI1PK: `ACTION#${submission.actionType || 'COMMUNITY_CLEANUP_PROOF'}`,
                   GSI1SK: nowIso,
                   txId,
                   userId,
-                  type: 'ADMIN_APPROVED_PROOF',
-                  amountGC: finalGC,
-                  amountXP: finalXP,
+                  actionType: submission.actionType || 'COMMUNITY_CLEANUP_PROOF',
+                  creditsEarned: finalGC,
+                  xpEarned: finalXP,
                   submissionId,
-                  adminId,
-                  createdAt: nowIso,
+                  territoryId,
+                  approvedBy: adminId,
+                  timestamp: nowIso,
                 },
               },
             },
@@ -176,7 +193,7 @@ export const handler = async (
                 },
                 UpdateExpression: 'SET health = if_not_exists(health, :initialHealth) + :healthGain, lastUpdated = :now',
                 ExpressionAttributeValues: {
-                  ':initialHealth': 100,
+                  ':initialHealth': 75,
                   ':healthGain': 2,
                   ':now': nowIso,
                 },
@@ -185,6 +202,8 @@ export const handler = async (
           ],
         }),
       );
+
+      await clampTerritoryHealth(territoryId);
 
       // 5. Send task success to Step Functions if suspended on task token callback
       if (taskToken) {
@@ -230,10 +249,12 @@ export const handler = async (
             SK: 'METADATA',
           },
           UpdateExpression: 'SET #st = :status, GSI2PK = :gsi2pk, adminDecision = :decision, adminReason = :reason, resolvedBy = :adminId, resolvedAt = :now',
+          ConditionExpression: '#st = :flagged',
           ExpressionAttributeNames: {
             '#st': 'status',
           },
           ExpressionAttributeValues: {
+            ':flagged': 'FLAGGED_FOR_REVIEW',
             ':status': 'REJECTED',
             ':gsi2pk': 'STATUS#REJECTED',
             ':decision': 'REJECT',
@@ -281,6 +302,13 @@ export const handler = async (
       };
     }
   } catch (error: any) {
+    if (error?.name === 'TransactionCanceledException' || error?.name === 'ConditionalCheckFailedException') {
+      return {
+        statusCode: 409,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createErrorResponse('ALREADY_RESOLVED', 'This submission was already resolved by another reviewer.')),
+      };
+    }
     console.error('Error resolving review queue submission:', error);
     return {
       statusCode: 500,

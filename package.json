@@ -16,7 +16,9 @@
     "deploy:backend": "AWS_REGION=ap-south-1 AWS_DEFAULT_REGION=ap-south-1 CDK_DEFAULT_ACCOUNT=517025126295 CDK_DEFAULT_REGION=ap-south-1 pnpm --filter @saafsafari/infra cdk deploy --all --outputs-file ../cdk-outputs.json --require-approval never",
     "export-env": "tsx scripts/export-env.ts",
     "test:integration": "vitest run services/api/test/integration/live-e2e.test.ts",
-    "seed": "tsx scripts/seed.ts"
+    "seed": "tsx scripts/seed.ts",
+    "demo:users": "tsx scripts/setup-demo-users.ts",
+    "demo:qr": "tsx scripts/print-static-qrs.ts"
   },
   "devDependencies": {
     "@aws-sdk/client-dynamodb": "^3.750.0",
@@ -27,6 +29,8 @@
     "@types/node": "^22.13.0",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
+    "@types/qrcode": "^1.5.5",
+    "qrcode": "^1.5.4",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3",

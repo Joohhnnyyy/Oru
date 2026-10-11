@@ -39,6 +39,7 @@ export const handler = async (
       body: JSON.stringify({ coupons: availableCoupons, count: availableCoupons.length }),
     };
   } catch (error: any) {
+    console.error('[getCoupons] failed', { error: error?.message, name: error?.name });
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

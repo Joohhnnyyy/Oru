@@ -23,10 +23,11 @@ describe('Game Rules: Credits & XP Calculations', () => {
     expect(truck.creditsEarned).toBe(37);
     expect(truck.xpEarned).toBe(50);
 
-    // T3: Community Cleanup Proof (base GC 100, weight 2.0 => 200 GC, 250 XP)
+    // T1: Community Cleanup Proof (base GC 30, weight 1.0 => 30 GC, 75 XP)
     const cleanup = calculateRewards({ actionType: 'COMMUNITY_CLEANUP_PROOF' });
-    expect(cleanup.creditsEarned).toBe(200);
-    expect(cleanup.xpEarned).toBe(250);
+    expect(cleanup.creditsEarned).toBe(30);
+    expect(cleanup.creditsEarned).toBeLessThan(37); // never above a verified truck handover
+    expect(cleanup.xpEarned).toBe(75);
   });
 
   it('correctly calculates streak multiplier progression and caps at 1.5x', () => {

@@ -1,57 +1,65 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import * as Location from 'expo-location';
+import QRCode from 'react-native-qrcode-svg';
 import { useAuth } from '../../context/AuthContext';
 import { AppHeader } from '../../components/AppHeader';
 import { ChunkyButton, ChunkyCard, ChunkyProgress } from '../../components/Chunky';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { useTheme } from '../../context/ThemeContext';
-import { generateClientRotatingToken } from '../../utils/totp';
-import { telemetryService, TelemetryPoint } from '../../services/telemetry';
+import { api, CollectorQrToken } from '../../services/api';
 import { typography } from '../../theme/tokens';
 
 import { Icon3D } from '../../components/Icon3D';
 
 export const CollectorHomeScreen: React.FC = () => {
-  const { user, switchPersona } = useAuth();
+  const { user, token, switchPersona, refreshProfile } = useAuth();
   const { theme } = useTheme();
   const [isOnRoute, setIsOnRoute] = useState(true);
-  const [scansCount, setScansCount] = useState(14);
-  const [creditsEarned, setCreditsEarned] = useState(140);
-  const [tokenData, setTokenData] = useState(() =>
-    generateClientRotatingToken(user?.assignedSourceId || 'truck-dl1m-4821'),
-  );
-  const [, setLastCoord] = useState<TelemetryPoint | null>(null);
+  const [qr, setQr] = useState<CollectorQrToken | null>(null);
+  const [qrError, setQrError] = useState<string | null>(null);
+  const [secondsRemaining, setSecondsRemaining] = useState(30);
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setTokenData(generateClientRotatingToken(user?.assignedSourceId || 'truck-dl1m-4821'));
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [user?.assignedSourceId]);
-
-  useEffect(() => {
-    if (isOnRoute) {
-      telemetryService.startBroadcasting(user?.assignedVehicleId || 'DL-1M-4821', (pt) => {
-        setLastCoord(pt);
-      });
-    } else {
-      telemetryService.stopBroadcasting();
+  /** Fetch the server-signed rotating QR and report our live GPS position with it. */
+  const fetchQr = useCallback(async () => {
+    try {
+      let position: { latitude: number; longitude: number } | undefined;
+      const perm = await Location.getForegroundPermissionsAsync();
+      const granted = perm.granted || (await Location.requestForegroundPermissionsAsync()).granted;
+      if (granted) {
+        const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+        position = { latitude: pos.coords.latitude, longitude: pos.coords.longitude };
+      }
+      const next = await api.getCollectorQrToken(position);
+      setQr(next);
+      setQrError(null);
+      setSecondsRemaining(Math.ceil(next.refreshInMs / 1000));
+    } catch (err: any) {
+      setQrError(err?.message || 'Could not load QR');
     }
+  }, []);
 
-    return () => telemetryService.stopBroadcasting();
-  }, [isOnRoute, user?.assignedVehicleId]);
+  // Refresh just before each 30-second window rolls over
+  useEffect(() => {
+    if (!isOnRoute || !token) return;
+    fetchQr();
+    const tick = setInterval(() => {
+      setSecondsRemaining((s) => {
+        if (s <= 1) {
+          fetchQr();
+          refreshProfile(); // pick up +2 GC handover rewards
+          return 30;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(tick);
+  }, [isOnRoute, token, fetchQr, refreshProfile]);
 
   const handleToggleRoute = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     setIsOnRoute(!isOnRoute);
-  };
-
-  const handleSimulateScanReceived = () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-    setScansCount((c) => c + 1);
-    setCreditsEarned((g) => g + 10);
   };
 
   return (
@@ -67,7 +75,7 @@ export const CollectorHomeScreen: React.FC = () => {
             <View style={{ flex: 1 }}>
               <Text style={[styles.vehicleId, { color: theme.textPrimary }]}>{user?.assignedVehicleId || 'DL-1M-4821'}</Text>
               <Text style={[styles.vehicleMeta, { color: isOnRoute ? theme.accentLime : theme.textSecondary }]}>
-                {isOnRoute ? 'On route · streaming GPS' : 'Shift paused'}
+                {isOnRoute ? 'On route · live GPS shared with each QR' : 'Shift paused'}
               </Text>
             </View>
             <ChunkyButton small variant={isOnRoute ? 'secondary' : 'success'} label={isOnRoute ? 'Pause' : 'Start'} onPress={handleToggleRoute} />
@@ -78,32 +86,39 @@ export const CollectorHomeScreen: React.FC = () => {
             <Text style={[styles.qrSub, { color: theme.textSecondary }]}>Citizens scan this to award credits</Text>
 
             <View style={styles.qrBox}>
-              {['■ □ ■ ■ □ ■', '□ ■ □ ■ ■ □', '■ □ ■ □ ■ ■', '□ ■ ■ ■ □ ■'].map((row) => (
-                <Text key={row} style={styles.qrRow}>{row}</Text>
-              ))}
-              <Text style={styles.qrToken}>{tokenData.token.slice(-16)}</Text>
+              {isOnRoute && qr ? (
+                <>
+                  <QRCode value={qr.qrPayload} size={200} />
+                  <Text style={styles.qrToken}>{qr.sourceName}</Text>
+                </>
+              ) : qrError ? (
+                <Text style={styles.qrToken}>{qrError}</Text>
+              ) : isOnRoute ? (
+                <ActivityIndicator />
+              ) : (
+                <Text style={styles.qrToken}>Shift paused</Text>
+              )}
             </View>
 
             <View style={styles.refresh}>
               <Text style={[styles.refreshText, { color: theme.textSecondary }]}>
-                Refreshes in <Text style={{ color: theme.inkAccent.accentCyan }}>{tokenData.secondsRemaining}s</Text>
+                Refreshes in <Text style={{ color: theme.inkAccent.accentCyan }}>{secondsRemaining}s</Text>
               </Text>
-              <ChunkyProgress value={tokenData.secondsRemaining / 30} color={theme.accentCyan} track={theme.surface3} height={12} />
+              <ChunkyProgress value={secondsRemaining / 30} color={theme.accentCyan} track={theme.surface3} height={12} />
             </View>
           </ChunkyCard>
 
           <View style={styles.metrics}>
             <ChunkyCard style={styles.metric} tint={theme.accentYellow}>
-              <Text style={[styles.metricVal, { color: theme.textPrimary }]}>{scansCount}</Text>
-              <Text style={[styles.metricLabel, { color: theme.textSecondary }]}>Scans today</Text>
+              <Text style={[styles.metricVal, { color: theme.textPrimary }]}>{user?.lifetimeXp ?? 0}</Text>
+              <Text style={[styles.metricLabel, { color: theme.textSecondary }]}>Lifetime XP</Text>
             </ChunkyCard>
             <ChunkyCard style={styles.metric} tint={theme.accentLime}>
-              <Text style={[styles.metricVal, { color: theme.inkAccent.accentLime }]}>+{creditsEarned}</Text>
-              <Text style={[styles.metricLabel, { color: theme.textSecondary }]}>Incentive (GC)</Text>
+              <Text style={[styles.metricVal, { color: theme.inkAccent.accentLime }]}>{user?.greenCredits ?? 0}</Text>
+              <Text style={[styles.metricLabel, { color: theme.textSecondary }]}>Green Credits</Text>
             </ChunkyCard>
           </View>
 
-          <ChunkyButton label="Simulate handover (+10 GC)" variant="warning" onPress={handleSimulateScanReceived} />
           <ChunkyButton label="Switch to citizen mode" variant="secondary" onPress={() => switchPersona('citizen')} />
         </View>
       </ScrollView>

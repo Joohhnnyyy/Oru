@@ -1,59 +1,102 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import Constants from 'expo-constants';
+import { getUserTier } from '@saafsafari/game-rules';
 import { UserProfile, UserRole } from '../types';
-import { api } from '../services/api';
+import { api, ApiError, BackendProfile } from '../services/api';
 
-export const DEMO_PERSONAS: Record<'citizen' | 'collector' | 'admin', UserProfile> = {
+type PersonaKey = 'citizen' | 'collector' | 'admin';
+
+const extra = (Constants.expoConfig?.extra ?? {}) as Record<string, any>;
+
+/** Demo accounts created by `pnpm demo:users` (scripts/setup-demo-users.ts). */
+const DEMO_ACCOUNTS: Record<PersonaKey, string> = {
+  citizen: 'demo-citizen@saafsafari.local',
+  collector: 'demo-collector@saafsafari.local',
+  admin: 'demo-admin@saafsafari.local',
+};
+const DEMO_PASSWORD: string = process.env.EXPO_PUBLIC_DEMO_PASSWORD || extra.demoPassword || '';
+
+/** Default onboarding location (Lajpat Nagar) if the phone has no GPS fix yet. */
+const DEFAULT_LOCATION = { latitude: 28.5677, longitude: 77.2433 };
+
+/** Placeholder shown only while the real profile loads. Never sent to the API. */
+export const DEMO_PERSONAS: Record<PersonaKey, UserProfile> = {
   citizen: {
-    userId: 'citizen-aarav-01',
-    email: 'aarav.sharma@saafsafari.in',
-    displayName: 'Aarav Sharma',
+    userId: 'loading',
+    email: DEMO_ACCOUNTS.citizen,
+    displayName: 'Citizen',
     role: 'citizen',
-    territoryId: 'mcd-south-34',
-    territoryName: 'MCD South 34 (Lajpat Nagar)',
-    greenCredits: 420,
-    lifetimeXp: 1850,
-    level: 4,
-    rankTitle: 'Van Rakshak',
-    streakDays: 7,
+    territoryId: '',
+    territoryName: 'Delhi',
+    greenCredits: 0,
+    lifetimeXp: 0,
+    level: 1,
+    rankTitle: '',
+    streakDays: 0,
   },
   collector: {
-    userId: 'collector-rajesh-01',
-    email: 'rajesh.driver@mcd.delhi.gov.in',
-    displayName: 'Rajesh Kumar (MCD Driver)',
+    userId: 'loading',
+    email: DEMO_ACCOUNTS.collector,
+    displayName: 'Collector',
     role: 'collector',
-    territoryId: 'mcd-south-34',
-    territoryName: 'MCD South 34 (Lajpat Nagar)',
-    greenCredits: 950,
-    lifetimeXp: 4100,
-    level: 7,
-    rankTitle: 'Safai Senani',
-    streakDays: 24,
-    assignedVehicleId: 'DL-1M-4821',
-    assignedSourceId: 'truck-dl1m-4821',
+    territoryId: '',
+    territoryName: 'Delhi',
+    greenCredits: 0,
+    lifetimeXp: 0,
+    level: 1,
+    rankTitle: '',
+    streakDays: 0,
   },
   admin: {
-    userId: 'admin-ward34-01',
-    email: 'admin.ward34@mcd.delhi.gov.in',
-    displayName: 'Ward 34 Zonal Officer',
+    userId: 'loading',
+    email: DEMO_ACCOUNTS.admin,
+    displayName: 'Ward Officer',
     role: 'ward_admin',
-    territoryId: 'mcd-south-34',
-    territoryName: 'MCD South 34 (Lajpat Nagar)',
-    greenCredits: 120,
-    lifetimeXp: 800,
-    level: 2,
-    rankTitle: 'Prashasak',
-    streakDays: 3,
+    territoryId: '',
+    territoryName: 'Delhi',
+    greenCredits: 0,
+    lifetimeXp: 0,
+    level: 1,
+    rankTitle: '',
+    streakDays: 0,
   },
 };
+
+function toUiProfile(p: BackendProfile, persona: PersonaKey): UserProfile {
+  const xp = p.lifetimeXP || 0;
+  const tier = getUserTier(xp);
+  const role: UserRole = persona === 'admin' ? 'ward_admin' : persona;
+  return {
+    userId: p.userId,
+    email: p.email || DEMO_ACCOUNTS[persona],
+    displayName: p.displayName || (p.email || DEMO_ACCOUNTS[persona]).split('@')[0],
+    role,
+    territoryId: p.homeTerritoryId || '',
+    territoryName: 'Delhi',
+    greenCredits: p.balanceGC || 0,
+    lifetimeXp: xp,
+    level: Math.floor(xp / 500) + 1,
+    rankTitle: tier.currentTier.titleEn,
+    streakDays: p.streakDays || 0,
+    assignedSourceId: p.assignedSourceId,
+    assignedVehicleId: p.assignedVehicleId,
+  };
+}
 
 interface AuthContextType {
   user: UserProfile | null;
   token: string | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
+  authError: string | null;
   activeRole: UserRole;
   language: 'en' | 'hi';
   setLanguage: (lang: 'en' | 'hi') => void;
-  switchPersona: (personaKey: 'citizen' | 'collector' | 'admin') => void;
+  /** Signs in to Cognito as the demo account for this persona and loads the real profile. */
+  switchPersona: (personaKey: PersonaKey) => Promise<void>;
+  /** Re-reads balance/XP/streak from the backend (call after any rewarded action). */
+  refreshProfile: () => Promise<void>;
+  /** Optimistic local update; the backend stays the source of truth. */
   updateCredits: (delta: number) => void;
   signOut: () => void;
 }
@@ -61,26 +104,69 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Default to citizen demo persona for immediate friction-free testing
-  const [user, setUser] = useState<UserProfile | null>(DEMO_PERSONAS.citizen);
-  const [token, setToken] = useState<string | null>('demo-jwt-token-aarav');
+  const [persona, setPersona] = useState<PersonaKey>('citizen');
+  const [user, setUser] = useState<UserProfile | null>(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [language, setLanguage] = useState<'en' | 'hi'>('en');
 
-  const switchPersona = (personaKey: 'citizen' | 'collector' | 'admin') => {
-    const selected = DEMO_PERSONAS[personaKey];
-    setUser(selected);
-    const mockToken = `demo-jwt-token-${personaKey}`;
-    setToken(mockToken);
-    api.setToken(mockToken);
-  };
+  const loadProfile = useCallback(
+    async (key: PersonaKey) => {
+      try {
+        return toUiProfile(await api.getProfile(), key);
+      } catch (err) {
+        // First sign-in: create the profile (home territory from default location)
+        if (err instanceof ApiError && err.status === 404) {
+          return toUiProfile(await api.onboard({ language, ...DEFAULT_LOCATION }), key);
+        }
+        throw err;
+      }
+    },
+    [language],
+  );
+
+  const switchPersona = useCallback(
+    async (key: PersonaKey) => {
+      setPersona(key);
+      setUser(DEMO_PERSONAS[key]);
+      setIsLoading(true);
+      setAuthError(null);
+      try {
+        if (!DEMO_PASSWORD) throw new Error('Set EXPO_PUBLIC_DEMO_PASSWORD (see apps/mobile/README-DEMO.md)');
+        const { idToken } = await api.signIn(DEMO_ACCOUNTS[key], DEMO_PASSWORD);
+        api.setToken(idToken);
+        setToken(idToken);
+        setUser(await loadProfile(key));
+      } catch (err: any) {
+        console.warn('[Auth] sign-in failed', err?.message);
+        setAuthError(err?.message || 'Sign-in failed');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [loadProfile],
+  );
+
+  const refreshProfile = useCallback(async () => {
+    if (!token) return;
+    try {
+      setUser(await loadProfile(persona));
+    } catch (err: any) {
+      console.warn('[Auth] profile refresh failed', err?.message);
+    }
+  }, [token, persona, loadProfile]);
+
+  // Sign in as the citizen demo account on launch
+  useEffect(() => {
+    switchPersona('citizen');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const updateCredits = (delta: number) => {
-    if (!user) return;
-    setUser({
-      ...user,
-      greenCredits: Math.max(0, user.greenCredits + delta),
-      lifetimeXp: user.lifetimeXp + Math.max(0, delta),
-    });
+    setUser((u) =>
+      u ? { ...u, greenCredits: Math.max(0, u.greenCredits + delta), lifetimeXp: u.lifetimeXp + Math.max(0, delta) } : u,
+    );
   };
 
   const signOut = () => {
@@ -95,10 +181,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         token,
         isAuthenticated: !!user,
+        isLoading,
+        authError,
         activeRole: user?.role || 'citizen',
         language,
         setLanguage,
         switchPersona,
+        refreshProfile,
         updateCredits,
         signOut,
       }}

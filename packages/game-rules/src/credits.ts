@@ -19,7 +19,8 @@ export const ACTION_BASE_REWARDS: Record<CivicActionType, ActionBaseReward> = {
   STATIC_BIN_SCAN: { baseGC: 10, baseXP: 25, defaultTrust: 'T1' },
   TRUCK_COLLECTOR_SCAN: { baseGC: 25, baseXP: 50, defaultTrust: 'T2' },
   E_WASTE_DROPOFF: { baseGC: 50, baseXP: 100, defaultTrust: 'T2' },
-  COMMUNITY_CLEANUP_PROOF: { baseGC: 100, baseXP: 250, defaultTrust: 'T3' },
+  // Photo proof is the least verifiable action, so it must never out-earn a QR handshake
+  COMMUNITY_CLEANUP_PROOF: { baseGC: 30, baseXP: 75, defaultTrust: 'T1' },
   HOTSPOT_REPORT: { baseGC: 15, baseXP: 35, defaultTrust: 'T2' },
 };
 

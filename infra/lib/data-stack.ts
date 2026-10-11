@@ -42,6 +42,7 @@ export class DataStack extends Stack {
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       encryption: s3.BucketEncryption.S3_MANAGED,
       enforceSSL: true,
+      eventBridgeEnabled: true, // "Object Created" events start the Step Functions AI workflow
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
       cors: [

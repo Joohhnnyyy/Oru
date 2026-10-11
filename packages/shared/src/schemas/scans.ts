@@ -5,6 +5,7 @@ export const ScanRequestSchema = z.object({
   qrPayload: z.string().optional(), // rotating QR token: "<timestampMs>.<hmacSignature>"
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
+  isMockLocation: z.boolean().optional(), // Android expo-location `mocked` flag
 });
 export type ScanRequest = z.infer<typeof ScanRequestSchema>;
 

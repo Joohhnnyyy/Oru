@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, BatchWriteCommand } from '@aws-sdk/lib-dynamodb';
 import { generateDelhiTerritories } from '@saafsafari/game-rules';
@@ -207,6 +208,19 @@ export function generateSeedItems(): SeedDataResult {
     GSI1SK: `QR#${qr.sourceId}`,
     ...qr,
   }));
+
+  // Security: every source gets a random 256-bit signing secret at seed time.
+  // (Predictable secrets committed to git would let anyone forge QR tokens.)
+  // Trucks are assigned round-robin to the seeded collectors so each handover
+  // rewards the right driver. Re-running the seed rotates all secrets.
+  const SEEDED_COLLECTORS = ['collector_ramesh_kumar', 'collector_suresh_yadav', 'collector_mohan_lal'];
+  let truckIdx = 0;
+  for (const src of qrSources) {
+    src.secretKey = randomBytes(32).toString('hex');
+    if (src.type === 'truck_rotating') {
+      src.collectorId = SEEDED_COLLECTORS[truckIdx++ % SEEDED_COLLECTORS.length];
+    }
+  }
 
   // 3. 6 Eco-Merchants
   const merchants: Merchant[] = [

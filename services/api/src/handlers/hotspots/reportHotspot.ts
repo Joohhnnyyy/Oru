@@ -8,6 +8,9 @@ import {
   createErrorResponse,
 } from '@saafsafari/shared';
 import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
+import { clampTerritoryHealth } from '../../utils/territory.js';
+
+const MAX_REPORTS_PER_DAY = 3;
 
 export const handler = async (
   event: APIGatewayProxyEventV2,
@@ -62,6 +65,7 @@ export const handler = async (
     const nowIso = now.toISOString();
     const expiresAt = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
     const healthPenalty = -5;
+    const todayStr = nowIso.slice(0, 10);
 
     // Execute atomic TransactWriteItems:
     // 1. Hotspot record
@@ -70,6 +74,21 @@ export const handler = async (
     await docClient.send(
       new TransactWriteCommand({
         TransactItems: [
+          // Per-user daily cap so one account can't spam reports to sink a rival territory
+          {
+            Update: {
+              TableName: TABLE_NAME,
+              Key: { PK: `USER#${userId}`, SK: `HOTSPOT_LIMIT#${todayStr}` },
+              UpdateExpression: 'ADD reportCount :one SET #ttl = :ttl',
+              ConditionExpression: 'attribute_not_exists(reportCount) OR reportCount < :max',
+              ExpressionAttributeNames: { '#ttl': 'ttl' },
+              ExpressionAttributeValues: {
+                ':one': 1,
+                ':max': MAX_REPORTS_PER_DAY,
+                ':ttl': Math.floor(now.getTime() / 1000) + 2 * 24 * 3600,
+              },
+            },
+          },
           {
             Put: {
               TableName: TABLE_NAME,
@@ -102,9 +121,10 @@ export const handler = async (
                 PK: `TERRITORY#${territoryId}`,
                 SK: 'METADATA',
               },
-              UpdateExpression: 'SET health = if_not_exists(health, :initialHealth) - :penalty, lastUpdated = :now',
+              UpdateExpression: 'SET health = health - :penalty, lastUpdated = :now',
+              // Only real (seeded) territories; never create ghost territory items
+              ConditionExpression: 'attribute_exists(PK)',
               ExpressionAttributeValues: {
-                ':initialHealth': 100,
                 ':penalty': 5,
                 ':now': nowIso,
               },
@@ -135,6 +155,8 @@ export const handler = async (
       }),
     );
 
+    await clampTerritoryHealth(territoryId);
+
     const response: ReportHotspotResponse = {
       hotspotId,
       territoryId,
@@ -154,6 +176,19 @@ export const handler = async (
       body: JSON.stringify(response),
     };
   } catch (error: any) {
+    if (error?.name === 'TransactionCanceledException') {
+      const reasons: Array<{ Code?: string }> = error.CancellationReasons || [];
+      const limitHit = reasons[0]?.Code === 'ConditionalCheckFailed';
+      return {
+        statusCode: limitHit ? 429 : 400,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(
+          limitHit
+            ? createErrorResponse('DAILY_LIMIT_REACHED', `You can report up to ${MAX_REPORTS_PER_DAY} hotspots per day.`)
+            : createErrorResponse('OUTSIDE_TERRITORY', 'This location is outside the active Oru territories.'),
+        ),
+      };
+    }
     console.error('Error reporting hotspot:', error);
     return {
       statusCode: 500,

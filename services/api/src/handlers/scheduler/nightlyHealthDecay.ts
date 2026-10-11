@@ -1,4 +1,4 @@
-import { ScanCommand, BatchWriteCommand } from '@aws-sdk/lib-dynamodb';
+import { ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { applyNightlyDecay, getMoodState } from '@saafsafari/game-rules';
 import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
 
@@ -53,8 +53,8 @@ export const handler = async (): Promise<NightlyDecayResult> => {
 
   // 2. Compute decayed health and new mood for each territory
   const updatedTerritories = territories.map((item) => {
-    const currentHealth = typeof item.health === 'number' ? item.health : 100;
-    const newHealth = applyNightlyDecay(currentHealth, 0.03);
+    const currentHealth = Math.min(100, Math.max(0, typeof item.health === 'number' ? item.health : 100));
+    const newHealth = Math.min(100, Math.max(0, applyNightlyDecay(currentHealth, 0.03)));
     const newMood = getMoodState(newHealth);
 
     totalHealthBefore += currentHealth;
@@ -68,24 +68,25 @@ export const handler = async (): Promise<NightlyDecayResult> => {
     };
   });
 
-  // 3. Batch write updated items back to DynamoDB in 25-item chunks
-  const CHUNK_SIZE = 25;
-  for (let i = 0; i < updatedTerritories.length; i += CHUNK_SIZE) {
-    const chunk = updatedTerritories.slice(i, i + CHUNK_SIZE);
-    const writeRequests = chunk.map((item) => ({
-      PutRequest: {
-        Item: item,
-      },
-    }));
-
-    await docClient.send(
-      new BatchWriteCommand({
-        RequestItems: {
-          [TABLE_NAME]: writeRequests,
-        },
-      }),
-    );
+  // 3. Update only health/mood per territory (no whole-item Put, so scans that land
+  //    during the job keep their other fields).
+  let failed = 0;
+  for (const item of updatedTerritories) {
+    try {
+      await docClient.send(
+        new UpdateCommand({
+          TableName: TABLE_NAME,
+          Key: { PK: item.PK, SK: item.SK },
+          UpdateExpression: 'SET health = :h, moodState = :m, mood = :m, lastUpdated = :now',
+          ExpressionAttributeValues: { ':h': item.health, ':m': item.moodState, ':now': nowIso },
+        }),
+      );
+    } catch (err: any) {
+      failed++;
+      console.error('[nightlyHealthDecay] territory update failed', { pk: item.PK, error: err?.message });
+    }
   }
+  if (failed) console.warn(`[nightlyHealthDecay] ${failed} territories failed to update`);
 
   const result: NightlyDecayResult = {
     processed: updatedTerritories.length,

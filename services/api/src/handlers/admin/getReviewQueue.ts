@@ -4,7 +4,10 @@ import {
   ReviewQueueItem,
   createErrorResponse,
 } from '@saafsafari/shared';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
+import { s3Client, PROOFS_BUCKET_NAME } from '../../utils/s3.js';
 import { evaluateCedarPolicy } from '../../utils/cedar.js';
 
 export const handler = async (
@@ -42,19 +45,22 @@ export const handler = async (
 
     const items = (result.Items || []).filter((item) => item.PK?.startsWith('SUBMISSION#'));
 
-    const reviewQueue: ReviewQueueItem[] = items.map((item) => ({
+    const reviewQueue: ReviewQueueItem[] = await Promise.all(items.map(async (item) => ({
       submissionId: item.submissionId,
       userId: item.userId,
       territoryId: item.territoryId,
       actionType: item.actionType,
       s3Key: item.s3Key,
-      photoUrl: item.photoUrl,
-      aiConfidence: item.aiEvaluation?.confidenceScore ?? item.confidenceScore ?? 50,
+      // Private bucket: give the officer a 15-minute signed link to the actual photo
+      photoUrl: item.s3Key
+        ? await getSignedUrl(s3Client, new GetObjectCommand({ Bucket: PROOFS_BUCKET_NAME, Key: item.s3Key }), { expiresIn: 900 })
+        : item.photoUrl,
+      aiConfidence: item.aiEvaluation?.confidenceScore ?? item.confidenceScore ?? 0.5,
       moderationFlags: item.aiEvaluation?.moderationFlags ?? item.moderationFlags ?? [],
-      bedrockReasoning: item.aiEvaluation?.bedrockReasoning ?? item.bedrockReasoning ?? 'Pending human review',
+      bedrockReasoning: item.aiEvaluation?.reasoning ?? item.aiEvaluation?.bedrockReasoning ?? 'Pending human review',
       taskToken: item.taskToken,
       submittedAt: item.createdAt || new Date().toISOString(),
-    }));
+    })));
 
     return {
       statusCode: 200,

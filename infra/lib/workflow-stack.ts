@@ -1,6 +1,8 @@
 import * as path from 'path';
 import { CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
@@ -13,6 +15,15 @@ export interface WorkflowStackProps extends StackProps {
   proofsBucket: s3.IBucket;
 }
 
+/**
+ * Photo-proof verification:
+ *   S3 upload (proofs/<user>/<submission>.jpg)
+ *     → EventBridge "Object Created" rule
+ *     → Step Functions: Evaluate (Rekognition + Bedrock Nova, fail-closed)
+ *        ├─ AUTO_APPROVED → Approved
+ *        ├─ REJECTED      → Rejected
+ *        └─ FLAGGED       → AwaitHumanReview (task token; paused until a ward officer resolves)
+ */
 export class WorkflowStack extends Stack {
   public readonly stateMachine: sfn.StateMachine;
   public readonly evaluateSubmissionFn: TsLambda;
@@ -23,29 +34,27 @@ export class WorkflowStack extends Stack {
     const { table, proofsBucket } = props;
     const apiBasePath = path.resolve(__dirname, '../../services/api/src');
 
-    // 1. Multimodal AI Evaluation Lambda Function
+    // 1. Multimodal AI evaluation Lambda
     this.evaluateSubmissionFn = new TsLambda(this, 'EvaluateSubmissionFunction', {
       entry: path.join(apiBasePath, 'handlers/submissions/evaluateSubmission.ts'),
       serviceName: 'saafsafari-evaluate-submission',
       timeout: Duration.seconds(60),
+      memorySize: 512,
       environment: {
         TABLE_NAME: table.tableName,
         PROOFS_BUCKET_NAME: proofsBucket.bucketName,
+        NOVA_MODEL_ID: 'apac.amazon.nova-lite-v1:0',
       },
     });
-
     table.grantReadWriteData(this.evaluateSubmissionFn);
     proofsBucket.grantRead(this.evaluateSubmissionFn);
-
-    // Grant Rekognition permissions
     this.evaluateSubmissionFn.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ['rekognition:DetectModerationLabels', 'rekognition:DetectLabels'],
         resources: ['*'],
       }),
     );
-
-    // Grant Bedrock Nova Lite inference permissions
+    // Converse uses bedrock:InvokeModel; cross-region inference profiles route to other APAC regions
     this.evaluateSubmissionFn.addToRolePolicy(
       new iam.PolicyStatement({
         actions: ['bedrock:InvokeModel'],
@@ -53,46 +62,73 @@ export class WorkflowStack extends Stack {
       }),
     );
 
-    // 2. Step Functions Task: AI Vision & Moderation Evaluation
+    // 2. Lambda that parks the Step Functions task token on a flagged submission
+    const awaitReviewFn = new TsLambda(this, 'AwaitReviewFunction', {
+      entry: path.join(apiBasePath, 'handlers/submissions/awaitReview.ts'),
+      serviceName: 'saafsafari-await-review',
+      environment: { TABLE_NAME: table.tableName },
+    });
+    table.grantWriteData(awaitReviewFn);
+
+    // 3. State machine
     const evaluateTask = new tasks.LambdaInvoke(this, 'EvaluateSubmissionTask', {
       lambdaFunction: this.evaluateSubmissionFn,
       outputPath: '$.Payload',
       retryOnServiceExceptions: true,
     });
 
-    // 3. Choice State: Check Evaluation Result
-    const isApproved = sfn.Condition.stringEquals('$.status', 'AUTO_APPROVED');
-    const isFlagged = sfn.Condition.stringEquals('$.status', 'FLAGGED_FOR_REVIEW');
-
     const approvedState = new sfn.Succeed(this, 'SubmissionApproved', {
-      comment: 'Submission successfully verified and approved by multimodal AI.',
+      comment: 'Verified by Rekognition + Bedrock Nova and rewarded.',
     });
+    const rejectedState = new sfn.Succeed(this, 'SubmissionRejected', {
+      comment: 'Rejected (duplicate, moderation, or not genuine). Not an execution failure.',
+    });
+    const reviewedState = new sfn.Succeed(this, 'HumanReviewCompleted');
 
-    const flaggedState = new sfn.Pass(this, 'AwaitingHumanReview', {
-      comment: 'Submission suspended in municipal review queue awaiting admin decision.',
-    });
-
-    const rejectedState = new sfn.Fail(this, 'SubmissionRejected', {
-      cause: 'Submission failed AI verification or content moderation.',
-      error: 'AiVerificationFailed',
-    });
+    const awaitHumanReview = new tasks.LambdaInvoke(this, 'AwaitHumanReview', {
+      lambdaFunction: awaitReviewFn,
+      integrationPattern: sfn.IntegrationPattern.WAIT_FOR_TASK_TOKEN,
+      payload: sfn.TaskInput.fromObject({
+        submissionId: sfn.JsonPath.stringAt('$.submissionId'),
+        taskToken: sfn.JsonPath.taskToken,
+      }),
+      taskTimeout: sfn.Timeout.duration(Duration.days(7)),
+    }).next(reviewedState);
 
     const choice = new sfn.Choice(this, 'EvaluationChoice')
-      .when(isApproved, approvedState)
-      .when(isFlagged, flaggedState)
+      .when(sfn.Condition.stringEquals('$.status', 'AUTO_APPROVED'), approvedState)
+      .when(sfn.Condition.stringEquals('$.status', 'FLAGGED_FOR_REVIEW'), awaitHumanReview)
       .otherwise(rejectedState);
 
-    const definition = evaluateTask.next(choice);
-
-    // 4. State Machine definition
     this.stateMachine = new sfn.StateMachine(this, 'AiVerificationStateMachine', {
       stateMachineName: 'saafsafari-ai-verification',
-      definitionBody: sfn.DefinitionBody.fromChainable(definition),
-      timeout: Duration.hours(24),
-      comment: 'Orchestrates Rekognition moderation, Bedrock Nova Lite evaluation, and review queue callbacks.',
+      definitionBody: sfn.DefinitionBody.fromChainable(evaluateTask.next(choice)),
+      timeout: Duration.days(8),
+      comment: 'Rekognition moderation + Bedrock Nova vision, with human-in-the-loop review.',
     });
 
-    // CloudFormation Outputs
+    // 4. Start an execution for every uploaded proof photo
+    new events.Rule(this, 'ProofUploadedRule', {
+      ruleName: 'saafsafari-proof-uploaded',
+      description: 'Starts AI verification when a proof photo lands in S3',
+      eventPattern: {
+        source: ['aws.s3'],
+        detailType: ['Object Created'],
+        detail: {
+          bucket: { name: [proofsBucket.bucketName] },
+          object: { key: [{ prefix: 'proofs/' }] },
+        },
+      },
+      targets: [
+        new targets.SfnStateMachine(this.stateMachine, {
+          input: events.RuleTargetInput.fromObject({
+            s3Bucket: events.EventField.fromPath('$.detail.bucket.name'),
+            s3Key: events.EventField.fromPath('$.detail.object.key'),
+          }),
+        }),
+      ],
+    });
+
     new CfnOutput(this, 'StateMachineArnOutput', {
       value: this.stateMachine.stateMachineArn,
       description: 'Step Functions AI Verification State Machine ARN',

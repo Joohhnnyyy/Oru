@@ -45,7 +45,6 @@ export const handler = async (
 
     const hotspots = items.map((item) => ({
       hotspotId: item.hotspotId,
-      reporterUserId: item.reporterUserId,
       territoryId: item.territoryId,
       latitude: item.latitude,
       longitude: item.longitude,

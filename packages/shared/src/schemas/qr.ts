@@ -17,5 +17,6 @@ export const QrSourceSchema = z.object({
   secretKey: z.string().min(8, 'Secret key must be at least 8 chars'),
   geofenceRadiusMeters: z.number().int().positive(),
   isActive: z.boolean().default(true),
+  collectorId: z.string().optional(), // userId of the collector who displays this rotating QR
 });
 export type QrSource = z.infer<typeof QrSourceSchema>;

@@ -355,9 +355,11 @@ export class ApiStack extends Stack {
       serviceName: 'saafsafari-admin-review-queue-get',
       environment: {
         TABLE_NAME: table.tableName,
+        PROOFS_BUCKET_NAME: proofsBucket.bucketName,
       },
     });
     table.grantReadData(getReviewQueueFn);
+    proofsBucket.grantRead(getReviewQueueFn); // presigned GET so officers can see the photo
 
     this.addSecuredRoute(
       '/v1/admin/review-queue',
@@ -385,6 +387,31 @@ export class ApiStack extends Stack {
       '/v1/admin/review-queue/resolve',
       [apigwv2.HttpMethod.POST],
       new HttpLambdaIntegration('ResolveReviewQueueIntegration', resolveReviewQueueFn),
+    );
+
+    // 20. Collector Rotating QR Token Handler (GET /v1/collector/qr-token)
+    const getCollectorQrTokenFn = new TsLambda(this, 'GetCollectorQrTokenFunction', {
+      entry: path.join(apiBasePath, 'handlers/collector/getQrToken.ts'),
+      serviceName: 'saafsafari-collector-qr-token',
+      environment: {
+        TABLE_NAME: table.tableName,
+        TRACKER_NAME: 'saafsafari-truck-tracker',
+      },
+    });
+    table.grantReadWriteData(getCollectorQrTokenFn);
+    if (trackerArn) {
+      getCollectorQrTokenFn.addToRolePolicy(
+        new iam.PolicyStatement({
+          actions: ['geo:BatchUpdateDevicePosition'],
+          resources: [trackerArn],
+        }),
+      );
+    }
+
+    this.addSecuredRoute(
+      '/v1/collector/qr-token',
+      [apigwv2.HttpMethod.GET],
+      new HttpLambdaIntegration('GetCollectorQrTokenIntegration', getCollectorQrTokenFn),
     );
 
     // CloudFormation Outputs

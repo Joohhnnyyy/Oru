@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, StyleSheet, Pressable, Modal, ActivityIndicator } from 'react-native';
+import { CameraView, useCameraPermissions, BarcodeScanningResult } from 'expo-camera';
+import * as Location from 'expo-location';
 import { Icon } from '../../components/Icon';
 import { Confetti, PopIn, CountUp } from '../../components/Motion';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,6 +11,30 @@ import { useTheme } from '../../context/ThemeContext';
 import { Icon3D } from '../../components/Icon3D';
 import { ChunkyButton, ChunkyCard } from '../../components/Chunky';
 import { typography } from '../../theme/tokens';
+import { api, ApiError, ScanResult } from '../../services/api';
+
+/** QR codes encode {"v":1,"sourceId":"…","token":"…"} (bins: HMAC signature, trucks: rotating token). */
+function parseOruQr(data: string): { sourceId: string; token: string } | null {
+  try {
+    const parsed = JSON.parse(data);
+    if (typeof parsed?.sourceId === 'string' && typeof parsed?.token === 'string') {
+      return { sourceId: parsed.sourceId, token: parsed.token };
+    }
+  } catch {
+    /* not an Oru code */
+  }
+  return null;
+}
+
+const FRIENDLY_ERRORS: Record<string, string> = {
+  GEOFENCE_BREACH: 'You need to be standing next to this bin.',
+  TRUCK_PROXIMITY_EXCEEDED: 'You need to be next to the collector.',
+  INVALID_OR_EXPIRED_TOKEN: 'This QR has expired. Ask the collector to refresh it.',
+  INVALID_QR_SIGNATURE: 'This is not a genuine Oru QR code.',
+  COOLDOWN_ACTIVE: 'You scanned this recently. Try again in 4 hours.',
+  MOCK_LOCATION: 'Turn off mock / fake GPS to scan.',
+  QR_SOURCE_NOT_FOUND: 'This QR code is not registered.',
+};
 
 /** Four L-shaped corners instead of a full box, so it reads as a viewfinder. */
 const Corners: React.FC<{ color: string; size: number }> = ({ color, size }) => {
@@ -25,32 +51,65 @@ const Corners: React.FC<{ color: string; size: number }> = ({ color, size }) => 
 };
 
 export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-  const { updateCredits } = useAuth();
+  const { refreshProfile } = useAuth();
   const { theme } = useTheme();
   const insets = useSafeAreaInsets();
+  const [permission, requestPermission] = useCameraPermissions();
   const [flashOn, setFlashOn] = useState(false);
   const [successVisible, setSuccessVisible] = useState(false);
-  const [verifiedCredits, setVerifiedCredits] = useState(10);
-  const [taskName, setTaskName] = useState('Scan a waste bin');
+  const [verifiedCredits, setVerifiedCredits] = useState(0);
+  const [taskName, setTaskName] = useState('');
+  const [result, setResult] = useState<ScanResult | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const lockRef = useRef(false);
 
-  const handleSimulateScan = (task: string = 'Scan a waste bin', credits: number = 10) => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-    setTaskName(task);
-    setVerifiedCredits(credits);
-    updateCredits(credits);
-    setSuccessVisible(true);
+  const handleBarcode = async ({ data }: BarcodeScanningResult) => {
+    if (lockRef.current) return;
+    const qr = parseOruQr(data);
+    if (!qr) {
+      setError('That QR code is not an Oru code.');
+      return;
+    }
+    lockRef.current = true;
+    setBusy(true);
+    setError(null);
+    try {
+      const loc = await Location.requestForegroundPermissionsAsync();
+      if (loc.status !== 'granted') throw new Error('Location permission is needed to verify you are at the bin.');
+      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.High });
+
+      const res = await api.verifyScan({
+        sourceId: qr.sourceId,
+        qrPayload: qr.token,
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+        isMockLocation: pos.mocked === true,
+      });
+
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+      setResult(res);
+      setTaskName(res.sourceName);
+      setVerifiedCredits(res.creditsEarned);
+      setSuccessVisible(true);
+      refreshProfile();
+    } catch (err: any) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+      const msg = err instanceof ApiError ? FRIENDLY_ERRORS[err.code] || err.message : err?.message;
+      setError(msg || 'Scan failed. Please try again.');
+      // allow another attempt after a short pause
+      setTimeout(() => {
+        lockRef.current = false;
+      }, 2500);
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
     <View style={styles.container}>
       <View style={[styles.topBar, { paddingTop: Math.max(insets.top, 20) + 10 }]}>
-        <Pressable
-          style={styles.roundBtn}
-          onPress={() => navigation.goBack()}
-          hitSlop={10}
-          accessibilityRole="button"
-          accessibilityLabel="Close scanner"
-        >
+        <Pressable style={styles.roundBtn} onPress={() => navigation.goBack()} hitSlop={10}>
           <Icon name="close" color="#F7FFFF" size={22} strokeWidth={3} />
         </Pressable>
       </View>
@@ -60,12 +119,35 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         <Text style={styles.subtitle}>Point at the QR sticker on the bin</Text>
       </View>
 
-      <Pressable style={styles.finder} onPress={() => handleSimulateScan('Scan a waste bin', 10)}>
-        <Corners color={theme.accentTurquoise} size={260} />
-        <View style={styles.finderHint}>
-          <Text style={styles.finderHintText}>Tap to simulate a scan</Text>
+      <View style={styles.finder}>
+        {permission?.granted ? (
+          <CameraView
+            style={styles.camera}
+            facing="back"
+            enableTorch={flashOn}
+            barcodeScannerSettings={{ barcodeTypes: ['qr'] }}
+            onBarcodeScanned={successVisible || busy ? undefined : handleBarcode}
+          />
+        ) : (
+          <Pressable style={styles.camera} onPress={requestPermission}>
+            <Text style={styles.finderHintText}>Tap to allow camera</Text>
+          </Pressable>
+        )}
+        <View style={StyleSheet.absoluteFill} pointerEvents="none">
+          <View style={styles.cornersWrap}>
+            <Corners color={theme.accentTurquoise} size={260} />
+          </View>
         </View>
-      </Pressable>
+        <View style={styles.finderHint}>
+          {busy ? (
+            <ActivityIndicator color="#B5C0CF" />
+          ) : (
+            <Text style={[styles.finderHintText, error ? { color: '#FF8A8A' } : null]}>
+              {error || 'Point at an Oru QR code'}
+            </Text>
+          )}
+        </View>
+      </View>
 
       <View style={[styles.controls, { paddingBottom: Math.max(insets.bottom, 20) + 96 }]}>
         <ChunkyButton
@@ -76,14 +158,7 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           <Icon name="bolt" color={flashOn ? '#05070C' : theme.textPrimary} size={18} filled={flashOn} strokeWidth={3} />
           <Text style={[styles.ctrlText, { color: flashOn ? '#05070C' : theme.textPrimary }]}>Flash</Text>
         </ChunkyButton>
-        <ChunkyButton
-          variant="secondary"
-          style={styles.ctrl}
-          onPress={() => handleSimulateScan('Drop Plastic at Smart MCD Bin', 20)}
-        >
-          <Icon name="image" color={theme.textPrimary} size={18} strokeWidth={3} />
-          <Text style={[styles.ctrlText, { color: theme.textPrimary }]}>Gallery</Text>
-        </ChunkyButton>
+
       </View>
 
       {/* Success */}
@@ -104,7 +179,9 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               </ChunkyCard>
               <ChunkyCard style={styles.rewardCard} tint={theme.accentLime}>
                 <Text style={[styles.rewardLabel, { color: theme.inkAccent.accentLime }]}>STATUS</Text>
-                <Text style={[styles.rewardValue, { color: theme.textPrimary, fontSize: 20 }]}>Verified</Text>
+                <Text style={[styles.rewardValue, { color: theme.textPrimary, fontSize: 20 }]}>
+                  {result?.collectorReward ? `+${result.collectorReward.creditsEarned} to collector` : 'Verified'}
+                </Text>
               </ChunkyCard>
             </View>
 
@@ -114,7 +191,9 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
               </View>
               <View style={{ flex: 1 }}>
                 <Text style={[styles.summaryName, { color: theme.textPrimary }]}>{taskName}</Text>
-                <Text style={[styles.summaryTime, { color: theme.textMuted }]}>Today</Text>
+                <Text style={[styles.summaryTime, { color: theme.textMuted }]}>
+                  {result ? `Territory health ${Math.round(result.territoryHealth)} · ${result.tier.currentTier.titleEn}` : 'Today'}
+                </Text>
               </View>
             </ChunkyCard>
 
@@ -125,6 +204,7 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 variant="success"
                 onPress={() => {
                   setSuccessVisible(false);
+                  lockRef.current = false;
                   navigation.navigate('Home');
                 }}
               />
@@ -133,6 +213,7 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
                 variant="secondary"
                 onPress={() => {
                   setSuccessVisible(false);
+                  lockRef.current = false;
                   navigation.navigate('Tasks');
                 }}
               />
@@ -152,7 +233,9 @@ const styles = StyleSheet.create({
   titleBlock: { alignItems: 'center', paddingHorizontal: 20 },
   title: { fontFamily: typography.fontDisplayExtraBold, fontSize: 30, color: '#F7FFFF', letterSpacing: -0.6 },
   subtitle: { fontFamily: typography.fontBodyMedium, fontSize: 15, color: '#8E9AA8', marginTop: 6 },
-  finder: { alignItems: 'center', justifyContent: 'center' },
+  finder: { alignItems: 'center', justifyContent: 'center', width: 260, height: 260, alignSelf: 'center' },
+  camera: { width: 260, height: 260, borderRadius: 28, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.06)' },
+  cornersWrap: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   finderHint: { position: 'absolute', bottom: -44, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 50, backgroundColor: 'rgba(255,255,255,0.10)' },
   finderHintText: { fontFamily: typography.fontBodySemiBold, fontSize: 12.5, color: '#B5C0CF' },
   controls: { flexDirection: 'row', gap: 12, paddingHorizontal: 20 },

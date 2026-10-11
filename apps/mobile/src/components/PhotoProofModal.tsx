@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, Modal, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, Modal, StyleSheet, ActivityIndicator, Image } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
+import { api, SubmissionStatus } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { PressableScale } from './PressableScale';
 import { colors, radii, spacing } from '../theme/tokens';
@@ -14,27 +17,80 @@ export const PhotoProofModal: React.FC<{
   taskTitle: string;
   onClose: () => void;
 }> = ({ visible, taskTitle, onClose }) => {
-  const { updateCredits } = useAuth();
+  const { refreshProfile } = useAuth();
   const [step, setStep] = useState<'rubric' | 'capture' | 'review' | 'uploading' | 'done'>('rubric');
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [verdict, setVerdict] = useState<SubmissionStatus | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleCapture = () => {
+  const handleCapture = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
+    setError(null);
+    const perm = await ImagePicker.requestCameraPermissionsAsync();
+    if (!perm.granted) {
+      setError('Camera permission is needed for photo proof.');
+      return;
+    }
+    // Camera only (no gallery) so the proof is taken now, on the spot
+    const shot = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.6, exif: false });
+    if (shot.canceled || !shot.assets?.[0]) return;
+    setPhotoUri(shot.assets[0].uri);
     setStep('review');
   };
 
-  const handleUpload = () => {
+  /** Upload to S3 (presigned URL) → S3 event starts Step Functions → poll for Bedrock's verdict. */
+  const handleUpload = async () => {
+    if (!photoUri) return;
     setStep('uploading');
-    setTimeout(() => {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    setError(null);
+    try {
+      const loc = await Location.requestForegroundPermissionsAsync();
+      if (loc.status !== 'granted') throw new Error('Location permission is needed to tag your proof.');
+      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
+
+      const sub = await api.createSubmission({
+        actionType: 'COMMUNITY_CLEANUP_PROOF',
+        latitude: pos.coords.latitude,
+        longitude: pos.coords.longitude,
+        description: taskTitle,
+      });
+      await api.uploadPhoto(sub.uploadUrl, photoUri);
+
+      // Poll up to ~60 s for the AI decision
+      let status: SubmissionStatus | null = null;
+      for (let i = 0; i < 30; i++) {
+        await new Promise((r) => setTimeout(r, 2000));
+        status = await api.getSubmission(sub.submissionId);
+        if (status.status !== 'PENDING_UPLOAD') break;
+      }
+      setVerdict(status);
+      Haptics.notificationAsync(
+        status?.status === 'AUTO_APPROVED' ? Haptics.NotificationFeedbackType.Success : Haptics.NotificationFeedbackType.Warning,
+      ).catch(() => {});
       setStep('done');
-      updateCredits(50);
-    }, 1500);
+      refreshProfile();
+    } catch (err: any) {
+      setError(err?.message || 'Upload failed');
+      setStep('review');
+    }
   };
 
   const handleReset = () => {
     setStep('rubric');
+    setPhotoUri(null);
+    setVerdict(null);
+    setError(null);
     onClose();
   };
+
+  const verdictTitle =
+    verdict?.status === 'AUTO_APPROVED'
+      ? 'Proof verified by AI!'
+      : verdict?.status === 'FLAGGED_FOR_REVIEW'
+        ? 'Sent to a ward officer'
+        : verdict?.status === 'REJECTED'
+          ? 'Proof not accepted'
+          : 'Still checking…';
 
   return (
     <Modal visible={visible} animationType="fade" transparent>
@@ -54,8 +110,8 @@ export const PhotoProofModal: React.FC<{
                 <Text style={styles.rubricHeading}>AI VERIFICATION RULES (Bedrock Nova Lite):</Text>
                 <Text style={styles.rubricItem}>• Ensure clear daylight lighting</Text>
                 <Text style={styles.rubricItem}>• Show separated wet & dry waste containers</Text>
-                <Text style={styles.rubricItem}>• GPS metadata is matched against your current territory</Text>
-                <Text style={styles.rubricItem}>• Stock or duplicate photos are auto-rejected by hash check</Text>
+                <Text style={styles.rubricItem}>• Your location tags the proof to your territory</Text>
+                <Text style={styles.rubricItem}>• Duplicate photos are auto-rejected by hash check</Text>
               </View>
               <PressableScale style={styles.primaryBtn} onPress={() => setStep('capture')} haptic="light">
                 <Text style={styles.primaryBtnText}>Open Camera Capture →</Text>
@@ -69,6 +125,7 @@ export const PhotoProofModal: React.FC<{
                 <Icon3D name="camera" size={54} />
                 <Text style={styles.cameraHint}>Ghost outline active: Align waste bins within frame</Text>
               </View>
+              {error && <Text style={styles.cameraHint}>{error}</Text>}
               <PressableScale style={styles.captureBtn} onPress={handleCapture} haptic={false}>
                 <Text style={styles.captureBtnText}>Snap Proof Photo</Text>
               </PressableScale>
@@ -78,9 +135,13 @@ export const PhotoProofModal: React.FC<{
           {step === 'review' && (
             <View style={styles.content}>
               <View style={styles.cameraPreview}>
-                <Icon3D name="shield" size={54} />
-                <Text style={styles.cameraHint}>Photo captured • High quality • GPS attached</Text>
+                {photoUri ? (
+                  <Image source={{ uri: photoUri }} style={styles.photo} resizeMode="cover" />
+                ) : (
+                  <Icon3D name="shield" size={54} />
+                )}
               </View>
+              {error && <Text style={styles.cameraHint}>{error}</Text>}
               <View style={styles.buttonsRow}>
                 <PressableScale style={styles.secondaryBtn} onPress={() => setStep('capture')} haptic="light">
                   <Text style={styles.secondaryBtnText}>Retake</Text>
@@ -98,7 +159,7 @@ export const PhotoProofModal: React.FC<{
                 <Blobatar preset="safari-mint" animation="working" size={72} />
               </View>
               <ActivityIndicator size="small" color={colors.surfaceRaised} />
-              <Text style={styles.loadingText}>Uploading to S3 & Running AWS Bedrock AI multimodal audit...</Text>
+              <Text style={styles.loadingText}>Uploading to Amazon S3 · Step Functions is running Rekognition + Bedrock Nova…</Text>
             </View>
           )}
 
@@ -107,9 +168,15 @@ export const PhotoProofModal: React.FC<{
               <View style={{ alignItems: 'center', marginVertical: 6 }}>
                 <Blobatar preset="safari-mint" animation="celebrate" size={84} interactive={true} />
               </View>
-              <Text style={styles.doneTitle}>Proof Verified by AI!</Text>
-              <Text style={styles.doneText}>Bedrock verified source segregation confidence at 98.4%.</Text>
-              <Text style={styles.doneReward}>+50 Green Credits Awarded</Text>
+              <Text style={styles.doneTitle}>{verdictTitle}</Text>
+              {verdict?.aiEvaluation && (
+                <Text style={styles.doneText}>
+                  {verdict.aiEvaluation.reasoning} ({Math.round(verdict.aiEvaluation.confidenceScore * 100)}% confidence)
+                </Text>
+              )}
+              {verdict?.status === 'AUTO_APPROVED' && (
+                <Text style={styles.doneReward}>+{verdict.creditsAwarded ?? 0} Green Credits Awarded</Text>
+              )}
               <PressableScale style={styles.primaryBtn} onPress={handleReset} haptic="light">
                 <Text style={styles.primaryBtnText}>Done</Text>
               </PressableScale>
@@ -206,6 +273,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 16,
     gap: 8,
+  },
+  photo: {
+    width: '100%',
+    height: '100%',
+    borderRadius: radii.md,
   },
   cameraIcon: {
     fontSize: 40,

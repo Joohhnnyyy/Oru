@@ -2,6 +2,7 @@ import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda
 import { GetCommand } from '@aws-sdk/lib-dynamodb';
 import { SubmissionMetadata, createErrorResponse } from '@saafsafari/shared';
 import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
+import { hasGroup } from '../../utils/territory.js';
 
 export const handler = async (
   event: APIGatewayProxyEventV2,
@@ -45,7 +46,16 @@ export const handler = async (
       };
     }
 
-    const { PK, SK, GSI1PK, GSI1SK, GSI2PK, GSI2SK, ...metadata } = res.Item;
+    // Only the owner (or a ward admin) may read a submission. 404 avoids confirming it exists.
+    if (res.Item.userId !== userId && !hasGroup(claims, 'ward_admin')) {
+      return {
+        statusCode: 404,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createErrorResponse('SUBMISSION_NOT_FOUND', `Submission '${submissionId}' was not found.`)),
+      };
+    }
+
+    const { PK, SK, GSI1PK, GSI1SK, GSI2PK, GSI2SK, taskToken, ...metadata } = res.Item;
 
     return {
       statusCode: 200,
@@ -53,6 +63,7 @@ export const handler = async (
       body: JSON.stringify(metadata as SubmissionMetadata),
     };
   } catch (error: any) {
+    console.error('[getSubmission] failed', { submissionId, error: error?.message });
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

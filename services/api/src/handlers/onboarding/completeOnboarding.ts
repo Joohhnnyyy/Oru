@@ -1,5 +1,5 @@
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import { PutCommand } from '@aws-sdk/lib-dynamodb';
+import { GetCommand, PutCommand } from '@aws-sdk/lib-dynamodb';
 import * as h3 from 'h3-js';
 import { OnboardingRequestSchema, UserProfile, createErrorResponse } from '@saafsafari/shared';
 import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
@@ -72,6 +72,8 @@ export const handler = async (
       new PutCommand({
         TableName: TABLE_NAME,
         Item: item,
+        // Never overwrite an existing profile (would wipe balance, XP and streak)
+        ConditionExpression: 'attribute_not_exists(PK)',
       }),
     );
 
@@ -81,6 +83,19 @@ export const handler = async (
       body: JSON.stringify(profile),
     };
   } catch (error: any) {
+    if (error?.name === 'ConditionalCheckFailedException') {
+      // Already onboarded: return the existing profile unchanged (idempotent)
+      const existing = await docClient.send(
+        new GetCommand({ TableName: TABLE_NAME, Key: { PK: `USER#${userId}`, SK: 'PROFILE' } }),
+      );
+      const { PK, SK, GSI1PK, GSI1SK, ...existingProfile } = existing.Item || {};
+      return {
+        statusCode: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(existingProfile),
+      };
+    }
+    console.error('[completeOnboarding] failed', { userId, error: error?.message });
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },

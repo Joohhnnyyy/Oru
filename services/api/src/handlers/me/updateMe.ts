@@ -69,6 +69,8 @@ export const handler = async (
         UpdateExpression: `SET ${updateExpressions.join(', ')}`,
         ExpressionAttributeNames: expressionAttributeNames,
         ExpressionAttributeValues: expressionAttributeValues,
+        // Don't create a partial "ghost" profile for users who haven't onboarded
+        ConditionExpression: 'attribute_exists(PK)',
         ReturnValues: 'ALL_NEW',
       }),
     );
@@ -81,6 +83,14 @@ export const handler = async (
       body: JSON.stringify(profile as UserProfile),
     };
   } catch (error: any) {
+    if (error?.name === 'ConditionalCheckFailedException') {
+      return {
+        statusCode: 404,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createErrorResponse('USER_NOT_FOUND', 'Complete onboarding before updating your profile.')),
+      };
+    }
+    console.error('[updateMe] failed', { userId, error: error?.message });
     return {
       statusCode: 500,
       headers: { 'Content-Type': 'application/json' },
