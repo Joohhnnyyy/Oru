@@ -11,6 +11,7 @@ for (const file of ['frontend/.env.local', '.env.local', '.env']) {
 const base = env.VITE_API_URL?.replace(/\/$/, '');
 const client = env.VITE_COGNITO_CLIENT_ID;
 if (!base || !client) throw new Error('Run pnpm export-env first to configure the deployed API.');
+if (!env.VITE_DEMO_PASSWORD) throw new Error('Set VITE_DEMO_PASSWORD to check demo accounts.');
 const region = env.VITE_COGNITO_REGION || 'ap-south-1';
 let failed = false;
 async function read(path, token) {
@@ -24,7 +25,7 @@ for (const path of ['/v1/coupons', '/v1/leaderboards?type=citywide', '/v1/trucks
 for (const persona of ['citizen', 'admin', 'collector']) {
   const response = await fetch(`https://cognito-idp.${region}.amazonaws.com/`, {
     method: 'POST', headers: { 'Content-Type': 'application/x-amz-json-1.1', 'X-Amz-Target': 'AWSCognitoIdentityProviderService.InitiateAuth' },
-    body: JSON.stringify({ AuthFlow: 'USER_PASSWORD_AUTH', ClientId: client, AuthParameters: { USERNAME: `demo-${persona}@saafsafari.local`, PASSWORD: env.VITE_DEMO_PASSWORD || 'REMOVED_CREDENTIAL' } }), signal: AbortSignal.timeout(15000),
+    body: JSON.stringify({ AuthFlow: 'USER_PASSWORD_AUTH', ClientId: client, AuthParameters: { USERNAME: `demo-${persona}@saafsafari.local`, PASSWORD: env.VITE_DEMO_PASSWORD } }), signal: AbortSignal.timeout(15000),
   });
   const auth = await response.json();
   if (!response.ok || !auth.AuthenticationResult?.IdToken) { failed = true; console.log(`Cognito ${persona}: FAIL (${response.status}, ${auth.__type || 'challenge'})`); continue; }

@@ -7,7 +7,7 @@ const DEMO_ACCOUNTS: Record<Persona, string> = {
   citizen: 'demo-citizen@saafsafari.local',
   admin: 'demo-admin@saafsafari.local',
 };
-const DEMO_PASSWORD: string = import.meta.env.VITE_DEMO_PASSWORD || 'REMOVED_CREDENTIAL';
+const DEMO_PASSWORD: string = import.meta.env.VITE_DEMO_PASSWORD || '';
 
 /** Decodes the ID token's `cognito:groups` claim — the real authorization source.
  *  The DynamoDB profile's `role` field can lag behind group membership (it did for

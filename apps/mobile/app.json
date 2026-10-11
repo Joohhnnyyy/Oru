@@ -22,7 +22,7 @@
       },
       "config": {
         "googleMaps": {
-          "apiKey": "REMOVED_CREDENTIAL"
+          "apiKey": ""
         }
       },
       "permissions": [
@@ -37,8 +37,8 @@
       "apiUrl": "https://dp029jx9uf.execute-api.ap-south-1.amazonaws.com",
       "cognitoUserPoolId": "ap-south-1_KZcMN2CaO",
       "cognitoClientId": "2g4b36dekkv7f0lu9ad4h4s7oa",
-      "googleMapsApiKey": "REMOVED_CREDENTIAL",
-      "demoPassword": "REMOVED_CREDENTIAL"
+      "googleMapsApiKey": "",
+      "demoPassword": ""
     },
     "web": {
       "favicon": "./assets/favicon.png"

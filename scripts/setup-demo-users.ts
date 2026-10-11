@@ -147,8 +147,10 @@ async function setupUser(email: string, pass: string, groups: string[], role: st
 }
 
 async function main() {
+  const demoPassword = process.env.ORU_DEMO_PASSWORD;
+  if (!demoPassword) throw new Error('Set ORU_DEMO_PASSWORD before provisioning demo users.');
   if (process.argv.includes('--collector-only')) {
-    const collector = await setupUser('demo-collector@saafsafari.local', 'REMOVED_CREDENTIAL', ['collector'], 'collector');
+    const collector = await setupUser('demo-collector@saafsafari.local', demoPassword, ['collector'], 'collector');
     await linkCollectorToTruck(subFromIdToken(collector.idToken));
     return;
   }
@@ -156,30 +158,28 @@ async function main() {
 
   const citizen = await setupUser(
     'demo-citizen@saafsafari.local',
-    'REMOVED_CREDENTIAL',
+    demoPassword,
     ['citizen'],
     'citizen'
   );
 
   const admin = await setupUser(
     'demo-admin@saafsafari.local',
-    'REMOVED_CREDENTIAL',
+    demoPassword,
     ['ward_admin', 'citizen'],
     'ward_admin'
   );
 
   const collector = await setupUser(
     'demo-collector@saafsafari.local',
-    'REMOVED_CREDENTIAL',
+    demoPassword,
     ['collector'],
     'collector'
   );
   await linkCollectorToTruck(subFromIdToken(collector.idToken));
 
   console.log('\n--- Live Persona Setup Complete ---');
-  console.log('Citizen: demo-citizen@saafsafari.local / REMOVED_CREDENTIAL');
-  console.log('Admin:   demo-admin@saafsafari.local / REMOVED_CREDENTIAL');
-  console.log('Collector: demo-collector@saafsafari.local / REMOVED_CREDENTIAL');
+  console.log('Demo accounts provisioned using ORU_DEMO_PASSWORD.');
 }
 
 main().catch((error) => { console.error(error); process.exitCode = 1; });
