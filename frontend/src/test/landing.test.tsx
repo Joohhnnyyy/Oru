@@ -79,6 +79,10 @@ describe('Home page', () => {
     expect(within(hero as HTMLElement).getByRole('link', { name: /Enter your world/ })).toHaveAttribute('href', '/home');
     expect(hero.querySelectorAll('img')).toHaveLength(4);
     expect(hero.querySelector('.opening-buddy')).toHaveAttribute('src', '/media/characters/buddy.png');
+    expect(hero.querySelector('.opening-scene')).not.toHaveAttribute('string', 'parallax');
+    expect(hero.querySelector('.opening-buddy')).not.toHaveAttribute('string', 'parallax');
+    expect(hero.querySelector('.opening-leopard')).toHaveAttribute('string', 'parallax');
+    expect(hero.querySelector('.opening-dolphin')).toHaveAttribute('string', 'parallax');
   });
 
   it('links the pills and section buttons to their pages', () => {

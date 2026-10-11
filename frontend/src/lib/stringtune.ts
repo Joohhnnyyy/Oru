@@ -1,6 +1,7 @@
 import { prefersReducedMotion } from '../hooks/useReducedMotion';
 import StringTune, {
   StringProgress,
+  StringParallax,
   StringMagnetic,
   StringCursor,
   StringSpotlight,
@@ -12,7 +13,7 @@ let isStarted = false;
 
 /**
  * Initializes the StringTune scroll and interaction runtime on the client.
- * Registers StringProgress, StringMagnetic, StringCursor,
+ * Registers StringProgress, StringParallax, StringMagnetic, StringCursor,
  * and StringSpotlight.
  */
 export function initStringTune(): StringTune | null {
@@ -35,7 +36,7 @@ export function initStringTune(): StringTune | null {
 
     // Register modules
     stringTuneInstance.use(StringProgress);
-    // CSS timelines and Framer Motion own parallax; avoid a second transform writer.
+    stringTuneInstance.use(StringParallax, { parallax: 0.15 });
     stringTuneInstance.use(StringMagnetic, { strength: 0.35, radius: 100 });
     stringTuneInstance.use(StringCursor, { lerp: 0.25 });
     stringTuneInstance.use(StringSpotlight, { lerp: 0.4 });
