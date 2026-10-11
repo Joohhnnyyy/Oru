@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { QrSourceTypeSchema } from './qr.js';
+import { QrSourceTypeSchema } from './qr';
 
 export const AdminTerritorySummarySchema = z.object({
   territoryId: z.string(),

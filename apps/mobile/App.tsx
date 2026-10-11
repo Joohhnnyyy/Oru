@@ -1,3 +1,4 @@
+import './src/polyfills/h3TextDecoderFix';
 import React from 'react';
 import { StatusBar } from 'react-native';
 import { registerRootComponent } from 'expo';

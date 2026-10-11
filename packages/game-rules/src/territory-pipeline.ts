@@ -5,7 +5,7 @@ import {
   TerritoryMascot,
   MASCOT_REGISTRY,
 } from '@saafsafari/shared';
-import { getMoodState } from './health.js';
+import { getMoodState } from './health';
 
 // Curated authentic Delhi NCR municipal neighborhoods
 export const DELHI_NEIGHBORHOODS: Array<{ name: string; ward: string; baseLat: number; baseLng: number }> = [
