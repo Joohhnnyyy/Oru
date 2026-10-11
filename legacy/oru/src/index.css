@@ -1,0 +1,145 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-oru-white: #FAFAFA;
+  --color-oru-off-white: #F7F7F7;
+  --color-oru-black: #1E1E1E;
+  --color-oru-true-black: #0F0F0F;
+  --color-oru-charcoal: #3C3C3C;
+  --color-oru-light-grey: #EDEDED;
+  --color-oru-dark-grey: #E2E2E2;
+  --color-oru-red: #FF3333;
+  --color-oru-blue: #4DC5E5;
+  --color-oru-green: #63AD45;
+  --color-oru-yellow: #E9D352;
+  --color-oru-pink: #F9ABFF;
+
+  /* Backward-compatible Butter aliases */
+  --color-butter-white: var(--color-oru-white);
+  --color-butter-off-white: var(--color-oru-off-white);
+  --color-butter-black: var(--color-oru-black);
+  --color-butter-true-black: var(--color-oru-true-black);
+  --color-butter-charcoal: var(--color-oru-charcoal);
+  --color-butter-light-grey: var(--color-oru-light-grey);
+  --color-butter-dark-grey: var(--color-oru-dark-grey);
+  --color-butter-red: var(--color-oru-red);
+  --color-butter-blue: var(--color-oru-blue);
+  --color-butter-green: var(--color-oru-green);
+  --color-butter-yellow: var(--color-oru-yellow);
+  --color-butter-pink: var(--color-oru-pink);
+
+  --font-heading: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+}
+
+:root { --radius: 0.75rem; }
+
+html { background: var(--color-butter-white); color: var(--color-butter-black); font-family: var(--font-body); }
+h1, h2, h3 { font-family: var(--font-heading); }
+
+.skip-link { position: absolute; left: -9999px; }
+.skip-link:focus { left: 1rem; top: 1rem; z-index: 100; background: var(--color-butter-black); color: var(--color-butter-white); padding: .5rem 1rem; border-radius: .5rem; }
+
+@media (prefers-reduced-motion: reduce) { * { animation-duration: .001ms !important; transition-duration: .001ms !important; scroll-behavior: auto !important; } }
+
+/* Easings extracted from the original (design-tokens.md) */
+:root {
+  --ease-in: cubic-bezier(0.815, 0.005, 0.81, 0.195);
+  --ease-out: cubic-bezier(0.2, 0.715, 0.205, 0.99);
+  --ease-in-out: cubic-bezier(0.835, 0.12, 0.225, 0.77);
+  --color-oru-light: #EBEBEB;
+  --color-butter-light: var(--color-oru-light);
+}
+
+.logo-marquee {
+  overflow: hidden;
+  width: 100%;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
+
+.logo-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: logo-marquee-scroll 36s linear infinite;
+}
+
+.logo-marquee:hover .logo-marquee-track {
+  animation-play-state: paused;
+}
+
+.logo-marquee-group {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: clamp(2.5rem, 6vw, 5.5rem);
+  padding-right: clamp(2.5rem, 6vw, 5.5rem);
+}
+
+.logo-marquee-image {
+  width: auto;
+  height: 2rem;
+  max-width: 8rem;
+  object-fit: contain;
+  opacity: 0.58;
+  filter: grayscale(1);
+  transition: opacity 180ms ease, filter 180ms ease, transform 450ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.logo-marquee-image:hover {
+  opacity: 1;
+  filter: grayscale(0);
+  transform: scale(1.025);
+}
+
+.site-header a,
+.site-header button {
+  transition: transform 300ms cubic-bezier(0.16, 1, 0.3, 1), opacity 250ms ease;
+}
+
+.site-header a:hover,
+.site-header button:hover {
+  transform: translate3d(0, -1px, 0);
+}
+
+.template-carousel-track > * {
+  position: relative;
+  transition: transform 450ms cubic-bezier(0.16, 1, 0.3, 1), opacity 350ms ease;
+}
+
+.template-carousel-track > *:hover {
+  z-index: 2;
+  transform: scale(1.025);
+}
+
+@keyframes logo-marquee-scroll {
+  to { transform: translateX(-50%); }
+}
+
+@media (min-width: 768px) {
+  .logo-marquee-image {
+    height: 2.5rem;
+    max-width: 10rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-marquee-track {
+    animation: none;
+  }
+
+  .logo-marquee-image,
+  .site-header a,
+  .site-header button,
+  .template-carousel-track > * {
+    transition: none;
+    transform: none;
+  }
+}
