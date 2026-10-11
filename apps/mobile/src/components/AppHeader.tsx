@@ -1,105 +1,78 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image, Pressable } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Icon } from './Icon';
+import { Wiggle, Bounce } from './Motion';
 import { useAuth } from '../context/AuthContext';
-import { PersonaSwitcher } from './PersonaSwitcher';
-import { colors, radii } from '../theme/tokens';
+import { useTheme } from '../context/ThemeContext';
+import { typography } from '../theme/tokens';
 
-import { Icon3D } from './Icon3D';
-
-export const AppHeader: React.FC<{ title?: string }> = ({ title }) => {
-  const { user, activeRole } = useAuth();
+/**
+ * Top bar: logo on the left, streak + credits chips and avatar on the right.
+ * With `title` it becomes a plain titled bar.
+ */
+export const AppHeader: React.FC<{
+  title?: string;
+  onNotificationPress?: () => void;
+  onProfilePress?: () => void;
+}> = ({ title, onNotificationPress, onProfilePress }) => {
+  const { user } = useAuth();
+  const { theme, isDark } = useTheme();
+  const insets = useSafeAreaInsets();
+  const credits = user?.greenCredits ?? 420;
 
   return (
-    <View style={styles.header}>
-      <View style={styles.titleContainer}>
-        <View style={styles.logoRow}>
-          <Text style={styles.logo}>
-            Saaf<Text style={styles.logoBold}>Safari</Text>
-          </Text>
-          <View style={styles.brandDot} />
-        </View>
-        {title && <Text style={styles.subtitle}>{title}</Text>}
+    <View style={[styles.header, { backgroundColor: theme.bg, paddingTop: Math.max(insets.top, 12) + 4 }]}>
+      <View style={{ flex: 1 }}>
+        {title ? (
+          <Text style={[styles.title, { color: theme.textPrimary }]}>{title}</Text>
+        ) : (
+          <Image
+            source={require('../../assets/Oru_color.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        )}
       </View>
 
-      <View style={styles.actions}>
-        {activeRole === 'citizen' && user && (
-          <View style={styles.creditsBadge}>
-            <Icon3D name="credit" size={18} />
-            <Text style={styles.creditsText}>{user.greenCredits} GC</Text>
-          </View>
-        )}
-        <PersonaSwitcher />
+      <Pressable
+        style={styles.chip}
+        onPress={onNotificationPress}
+        hitSlop={8}
+        accessibilityRole="button"
+        accessibilityLabel={`Daily streak, 7 days. View notifications`}
+      >
+        <Wiggle loop>
+          <Icon name="flame" size={22} color="#FF9F1C" filled strokeWidth={2} />
+        </Wiggle>
+        <Text style={[styles.chipText, { color: '#FF9F1C' }]}>7</Text>
+      </Pressable>
+
+      <View style={styles.chip}>
+        <Bounce trigger={credits}>
+          <Icon name="gem" size={20} color={theme.accentCyan} filled strokeWidth={2} />
+        </Bounce>
+        <Text style={[styles.chipText, { color: theme.inkAccent.accentCyan }]}>{credits.toLocaleString()}</Text>
       </View>
+
+      <Pressable
+        onPress={onProfilePress}
+        style={[styles.avatar, { backgroundColor: theme.accentTurquoise, borderColor: isDark ? '#00A99C' : '#0D9488' }]}
+        accessibilityRole="button"
+        accessibilityLabel="Open profile"
+      >
+        <Text style={styles.avatarText}>{user?.displayName ? user.displayName.charAt(0).toUpperCase() : 'A'}</Text>
+      </Pressable>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  header: {
-    backgroundColor: '#FFFFFF',
-    paddingTop: 52,
-    paddingBottom: 14,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderSubtle,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  titleContainer: {
-    flex: 1,
-  },
-  logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  logo: {
-    color: colors.textPrimary,
-    fontSize: 20,
-    fontWeight: '800',
-    letterSpacing: -0.4,
-  },
-  logoBold: {
-    color: '#059669',
-  },
-  brandDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.surfaceRaised,
-    marginBottom: 4,
-  },
-  subtitle: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    marginTop: 2,
-    fontWeight: '600',
-  },
-  actions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  creditsBadge: {
-    backgroundColor: colors.surfaceAccentSubtle,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.borderAccentSubtle,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 5,
-  },
-  creditsText: {
-    color: '#0D9488',
-    fontSize: 12,
-    fontWeight: '800',
-  },
+  header: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 20, paddingBottom: 10 },
+  logo: { width: 72, height: 42 },
+  title: { fontFamily: typography.fontDisplayExtraBold, fontSize: 24 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  chipText: { fontFamily: typography.fontDisplayExtraBold, fontSize: 16, fontVariant: ['tabular-nums'] },
+  avatar: { width: 38, height: 38, borderRadius: 19, alignItems: 'center', justifyContent: 'center', borderBottomWidth: 4 },
+  avatarText: { fontFamily: typography.fontDisplayExtraBold, fontSize: 16, color: '#05070C' },
 });

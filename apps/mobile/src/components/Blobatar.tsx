@@ -206,6 +206,8 @@ export const Blobatar: React.FC<BlobatarProps> = ({
       onPress={handleTap}
       disabled={!interactive}
       style={[styles.container, { width: size, height: size }, style]}
+      accessibilityRole={interactive ? 'button' : undefined}
+      accessibilityLabel={interactive ? 'Avatar, tap to react' : undefined}
     >
       <RNWebView
         ref={webViewRef}

@@ -1,174 +1,144 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Modal } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Modal } from 'react-native';
+import { Icon } from '../../components/Icon';
+import { Confetti, PopIn, CountUp } from '../../components/Motion';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../context/AuthContext';
-import { AppHeader } from '../../components/AppHeader';
-import { PressableScale } from '../../components/PressableScale';
-import { colors, radii, spacing } from '../../theme/tokens';
-
+import { useTheme } from '../../context/ThemeContext';
 import { Icon3D } from '../../components/Icon3D';
-import { Blobatar } from '../../components/Blobatar';
+import { ChunkyButton, ChunkyCard } from '../../components/Chunky';
+import { typography } from '../../theme/tokens';
+
+/** Four L-shaped corners instead of a full box, so it reads as a viewfinder. */
+const Corners: React.FC<{ color: string; size: number }> = ({ color, size }) => {
+  const arm = 44;
+  const base = { position: 'absolute' as const, width: arm, height: arm, borderColor: color, borderWidth: 6 };
+  return (
+    <View style={{ width: size, height: size }}>
+      <View style={[base, { top: 0, left: 0, borderRightWidth: 0, borderBottomWidth: 0, borderTopLeftRadius: 28 }]} />
+      <View style={[base, { top: 0, right: 0, borderLeftWidth: 0, borderBottomWidth: 0, borderTopRightRadius: 28 }]} />
+      <View style={[base, { bottom: 0, left: 0, borderRightWidth: 0, borderTopWidth: 0, borderBottomLeftRadius: 28 }]} />
+      <View style={[base, { bottom: 0, right: 0, borderLeftWidth: 0, borderTopWidth: 0, borderBottomRightRadius: 28 }]} />
+    </View>
+  );
+};
 
 export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { updateCredits } = useAuth();
-  const [torchOn, setTorchOn] = useState(false);
-  const [scanResult, setScanResult] = useState<{
-    credits: number;
-    source: string;
-    breakdown: { base: number; streak: number; explorer: number; territoryNeed: number };
-  } | null>(null);
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const [flashOn, setFlashOn] = useState(false);
+  const [successVisible, setSuccessVisible] = useState(false);
+  const [verifiedCredits, setVerifiedCredits] = useState(10);
+  const [taskName, setTaskName] = useState('Scan a waste bin');
 
-  const toggleTorch = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-    setTorchOn(!torchOn);
-  };
-
-  const handleSimulateScan = (type: 'truck' | 'bin') => {
+  const handleSimulateScan = (task: string = 'Scan a waste bin', credits: number = 10) => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-    const credits = type === 'truck' ? 30 : 20;
-    const result = {
-      credits,
-      source: type === 'truck' ? 'MCD Sanitation Truck DL-1M-4821' : 'Central Market Smart Bin #402',
-      breakdown: {
-        base: type === 'truck' ? 20 : 15,
-        streak: 5,
-        explorer: 3,
-        territoryNeed: 2,
-      },
-    };
+    setTaskName(task);
+    setVerifiedCredits(credits);
     updateCredits(credits);
-    setScanResult(result);
+    setSuccessVisible(true);
   };
 
   return (
     <View style={styles.container}>
-      <AppHeader title="Camera QR Scanner" />
-
-      {/* Viewfinder Canvas */}
-      <View style={styles.cameraBox}>
-        {/* Top Controls */}
-        <View style={styles.cameraTopBar}>
-          <View style={styles.gpsPill}>
-            <View style={styles.gpsDot} />
-            <Text style={styles.gpsText}>GPS ±4m Accuracy (In Range)</Text>
-          </View>
-          <PressableScale
-            style={[styles.torchBtn, torchOn && styles.torchBtnActive]}
-            onPress={toggleTorch}
-            haptic={false}
-          >
-            <Text style={styles.torchText}>Torch: {torchOn ? 'ON' : 'OFF'}</Text>
-          </PressableScale>
-        </View>
-
-        {/* Viewfinder Reticle */}
-        <View style={styles.reticleContainer}>
-          <View style={styles.reticleFrame}>
-            <View style={[styles.corner, styles.topLeft]} />
-            <View style={[styles.corner, styles.topRight]} />
-            <View style={[styles.corner, styles.bottomLeft]} />
-            <View style={[styles.corner, styles.bottomRight]} />
-            <Text style={styles.reticleHint}>Align QR code inside box</Text>
-          </View>
-        </View>
-
-        {/* Scan Assistant Blobatar */}
-        <View style={styles.scannerBuddyBox}>
-          <Blobatar
-            preset="citrus"
-            animation="searching"
-            size={52}
-            interactive={true}
-          />
-          <Text style={styles.scannerBuddyText}>Citrus is scouting for smart bin & MCD truck QR codes...</Text>
-        </View>
-
-        {/* Bottom Testing Shortcuts */}
-        <View style={styles.scanControls}>
-          <Text style={styles.helperText}>Scan dynamic QR on MCD truck or static decal on smart bins</Text>
-          
-          <View style={styles.testActions}>
-            <PressableScale
-              style={styles.simulateBtn}
-              onPress={() => handleSimulateScan('truck')}
-              haptic={false}
-            >
-              <Text style={styles.simulateBtnText}>Simulate Truck Scan (+30 GC)</Text>
-            </PressableScale>
-
-            <PressableScale
-              style={[styles.simulateBtn, styles.binBtn]}
-              onPress={() => handleSimulateScan('bin')}
-              haptic={false}
-            >
-              <Text style={[styles.simulateBtnText, { color: colors.textPrimary }]}>
-                Simulate Smart Bin Scan (+20 GC)
-              </Text>
-            </PressableScale>
-          </View>
-        </View>
+      <View style={[styles.topBar, { paddingTop: Math.max(insets.top, 20) + 10 }]}>
+        <Pressable
+          style={styles.roundBtn}
+          onPress={() => navigation.goBack()}
+          hitSlop={10}
+          accessibilityRole="button"
+          accessibilityLabel="Close scanner"
+        >
+          <Icon name="close" color="#F7FFFF" size={22} strokeWidth={3} />
+        </Pressable>
       </View>
 
-      {/* Result Modal Sheet */}
-      <Modal visible={!!scanResult} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={styles.resultCard}>
-            <View style={styles.celebrateWrapper}>
-              <Blobatar
-                preset="citrus"
-                animation="celebrate"
-                size={84}
-                interactive={true}
-              />
-            </View>
-            <Text style={styles.resultTitle}>Action Verified!</Text>
-            <Text style={styles.resultCredits}>+{scanResult?.credits} Green Credits</Text>
-            <Text style={styles.resultSource}>{scanResult?.source}</Text>
+      <View style={styles.titleBlock}>
+        <Text style={styles.title}>Scan the bin</Text>
+        <Text style={styles.subtitle}>Point at the QR sticker on the bin</Text>
+      </View>
 
-            <View style={styles.breakdownBox}>
-              <Text style={styles.breakdownTitle}>REWARD BREAKDOWN</Text>
-              <View style={styles.breakdownRow}>
-                <Text style={styles.breakdownLabel}>Base Verified Action:</Text>
-                <Text style={styles.breakdownVal}>+{scanResult?.breakdown.base} GC</Text>
+      <Pressable style={styles.finder} onPress={() => handleSimulateScan('Scan a waste bin', 10)}>
+        <Corners color={theme.accentTurquoise} size={260} />
+        <View style={styles.finderHint}>
+          <Text style={styles.finderHintText}>Tap to simulate a scan</Text>
+        </View>
+      </Pressable>
+
+      <View style={[styles.controls, { paddingBottom: Math.max(insets.bottom, 20) + 96 }]}>
+        <ChunkyButton
+          variant={flashOn ? 'warning' : 'secondary'}
+          style={styles.ctrl}
+          onPress={() => setFlashOn(!flashOn)}
+        >
+          <Icon name="bolt" color={flashOn ? '#05070C' : theme.textPrimary} size={18} filled={flashOn} strokeWidth={3} />
+          <Text style={[styles.ctrlText, { color: flashOn ? '#05070C' : theme.textPrimary }]}>Flash</Text>
+        </ChunkyButton>
+        <ChunkyButton
+          variant="secondary"
+          style={styles.ctrl}
+          onPress={() => handleSimulateScan('Drop Plastic at Smart MCD Bin', 20)}
+        >
+          <Icon name="image" color={theme.textPrimary} size={18} strokeWidth={3} />
+          <Text style={[styles.ctrlText, { color: theme.textPrimary }]}>Gallery</Text>
+        </ChunkyButton>
+      </View>
+
+      {/* Success */}
+      <Modal visible={successVisible} transparent animationType="slide">
+        <View style={styles.overlay}>
+          <View style={[styles.sheet, { backgroundColor: theme.bg, borderColor: theme.border }]}>
+            <PopIn>
+              <View style={[styles.check, { backgroundColor: theme.accentLime, borderColor: '#2BA836' }]}>
+                <Icon name="check" color="#05070C" size={46} strokeWidth={4} />
               </View>
-              <View style={styles.breakdownRow}>
-                <Text style={styles.breakdownLabel}>Active Streak Multiplier (7 days):</Text>
-                <Text style={styles.breakdownVal}>+{scanResult?.breakdown.streak} GC</Text>
-              </View>
-              <View style={styles.breakdownRow}>
-                <Text style={styles.breakdownLabel}>Explorer Bonus:</Text>
-                <Text style={styles.breakdownVal}>+{scanResult?.breakdown.explorer} GC</Text>
-              </View>
-              <View style={styles.breakdownRow}>
-                <Text style={styles.breakdownLabel}>Territory Need Urgency:</Text>
-                <Text style={styles.breakdownVal}>+{scanResult?.breakdown.territoryNeed} GC</Text>
-              </View>
+            </PopIn>
+            <Text style={[styles.sheetTitle, { color: theme.textPrimary }]}>Quest complete!</Text>
+
+            <View style={styles.rewardRow}>
+              <ChunkyCard style={styles.rewardCard} tint={theme.accentYellow}>
+                <Text style={[styles.rewardLabel, { color: theme.inkAccent.accentYellow }]}>CREDITS</Text>
+                <CountUp to={verifiedCredits} duration={700} format={(n) => `+${Math.round(n)}`} style={[styles.rewardValue, { color: theme.textPrimary }]} />
+              </ChunkyCard>
+              <ChunkyCard style={styles.rewardCard} tint={theme.accentLime}>
+                <Text style={[styles.rewardLabel, { color: theme.inkAccent.accentLime }]}>STATUS</Text>
+                <Text style={[styles.rewardValue, { color: theme.textPrimary, fontSize: 20 }]}>Verified</Text>
+              </ChunkyCard>
             </View>
 
-            <View style={styles.territoryImpact}>
-              <Text style={styles.impactText}>Territory Eco-Health: +0.2% towards Thriving state</Text>
-            </View>
+            <ChunkyCard style={styles.summary}>
+              <View style={[styles.summaryIcon, { backgroundColor: theme.surface2 }]}>
+                <Icon3D name="bin" size={44} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.summaryName, { color: theme.textPrimary }]}>{taskName}</Text>
+                <Text style={[styles.summaryTime, { color: theme.textMuted }]}>Today</Text>
+              </View>
+            </ChunkyCard>
 
-            <View style={styles.modalButtons}>
-              <PressableScale
-                style={styles.modalPrimaryBtn}
+            <View style={styles.actions}>
+              <ChunkyButton
+                label="Continue"
+                icon="check"
+                variant="success"
                 onPress={() => {
-                  setScanResult(null);
+                  setSuccessVisible(false);
                   navigation.navigate('Home');
                 }}
-                haptic="light"
-              >
-                <Text style={styles.modalPrimaryBtnText}>Back to Home</Text>
-              </PressableScale>
-              <PressableScale
-                style={styles.modalSecondaryBtn}
-                onPress={() => setScanResult(null)}
-                haptic="light"
-              >
-                <Text style={styles.modalSecondaryBtnText}>Scan Again</Text>
-              </PressableScale>
+              />
+              <ChunkyButton
+                label="Do another quest"
+                variant="secondary"
+                onPress={() => {
+                  setSuccessVisible(false);
+                  navigation.navigate('Tasks');
+                }}
+              />
             </View>
           </View>
+          <Confetti active={successVisible} />
         </View>
       </Modal>
     </View>
@@ -176,271 +146,30 @@ export const ScanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.surfaceBase,
-  },
-  cameraBox: {
-    flex: 1,
-    backgroundColor: colors.surfaceBase,
-    justifyContent: 'space-between',
-    padding: spacing.s2,
-  },
-  cameraTopBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 8,
-  },
-  gpsPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surfaceCard,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-  },
-  gpsDot: {
-    width: 8,
-    height: 8,
-    borderRadius: radii.pill,
-    backgroundColor: colors.surfaceRaised,
-    marginRight: 6,
-  },
-  gpsText: {
-    color: colors.textSecondary,
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  torchBtn: {
-    backgroundColor: colors.surfaceCard,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-  },
-  torchBtnActive: {
-    backgroundColor: '#F59E0B',
-    borderColor: '#FBBF24',
-  },
-  torchText: {
-    color: colors.textPrimary,
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  reticleContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  reticleFrame: {
-    width: 250,
-    height: 250,
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  corner: {
-    position: 'absolute',
-    width: 32,
-    height: 32,
-    borderColor: colors.surfaceRaised,
-  },
-  topLeft: {
-    top: 0,
-    left: 0,
-    borderTopWidth: 4,
-    borderLeftWidth: 4,
-  },
-  topRight: {
-    top: 0,
-    right: 0,
-    borderTopWidth: 4,
-    borderRightWidth: 4,
-  },
-  bottomLeft: {
-    bottom: 0,
-    left: 0,
-    borderBottomWidth: 4,
-    borderLeftWidth: 4,
-  },
-  bottomRight: {
-    bottom: 0,
-    right: 0,
-    borderBottomWidth: 4,
-    borderRightWidth: 4,
-  },
-  reticleHint: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  scanControls: {
-    alignItems: 'center',
-    paddingBottom: spacing.s4,
-  },
-  helperText: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    textAlign: 'center',
-    marginBottom: spacing.s2,
-  },
-  testActions: {
-    width: '100%',
-    gap: 10,
-  },
-  simulateBtn: {
-    backgroundColor: colors.surfaceRaised,
-    paddingVertical: 14,
-    borderRadius: radii.pill,
-    alignItems: 'center',
-  },
-  binBtn: {
-    backgroundColor: colors.surfaceCard,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-  },
-  simulateBtnText: {
-    color: colors.textDark,
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.65)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: spacing.s3,
-  },
-  resultCard: {
-    backgroundColor: colors.surfaceCard,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    padding: spacing.s4,
-    width: '100%',
-    maxWidth: 380,
-    alignItems: 'center',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.15,
-    shadowRadius: 24,
-    elevation: 10,
-  },
-  celebrateWrapper: {
-    marginBottom: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scannerBuddyBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surfaceCard,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    marginHorizontal: 16,
-    gap: 10,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  scannerBuddyText: {
-    flex: 1,
-    color: colors.textSecondary,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  resultTitle: {
-    color: colors.textPrimary,
-    fontSize: 20,
-    fontWeight: '800',
-    marginBottom: 4,
-  },
-  resultCredits: {
-    color: '#0D9488',
-    fontSize: 26,
-    fontWeight: '800',
-    marginBottom: 4,
-  },
-  resultSource: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    textAlign: 'center',
-    marginBottom: spacing.s2,
-  },
-  breakdownBox: {
-    width: '100%',
-    backgroundColor: '#F1F5F9',
-    borderRadius: radii.md,
-    padding: spacing.s2,
-    marginBottom: spacing.s2,
-  },
-  breakdownTitle: {
-    color: colors.textTertiary,
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 1,
-    marginBottom: 10,
-  },
-  breakdownRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
-  breakdownLabel: {
-    color: colors.textSecondary,
-    fontSize: 12,
-  },
-  breakdownVal: {
-    color: colors.textPrimary,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  territoryImpact: {
-    backgroundColor: colors.surfaceAccentSubtle,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.borderAccentSubtle,
-    marginBottom: spacing.s3,
-    width: '100%',
-  },
-  impactText: {
-    color: colors.textAccent,
-    fontSize: 12,
-    fontWeight: '700',
-    textAlign: 'center',
-  },
-  modalButtons: {
-    width: '100%',
-    gap: 8,
-  },
-  modalPrimaryBtn: {
-    backgroundColor: colors.surfaceRaised,
-    paddingVertical: 14,
-    borderRadius: radii.pill,
-    alignItems: 'center',
-  },
-  modalPrimaryBtnText: {
-    color: colors.textDark,
-    fontWeight: '800',
-    fontSize: 14,
-  },
-  modalSecondaryBtn: {
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  modalSecondaryBtnText: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    fontWeight: '700',
-  },
+  container: { flex: 1, backgroundColor: '#05070C', justifyContent: 'space-between' },
+  topBar: { paddingHorizontal: 20, flexDirection: 'row' },
+  roundBtn: { width: 42, height: 42, borderRadius: 21, backgroundColor: 'rgba(255,255,255,0.12)', alignItems: 'center', justifyContent: 'center' },
+  titleBlock: { alignItems: 'center', paddingHorizontal: 20 },
+  title: { fontFamily: typography.fontDisplayExtraBold, fontSize: 30, color: '#F7FFFF', letterSpacing: -0.6 },
+  subtitle: { fontFamily: typography.fontBodyMedium, fontSize: 15, color: '#8E9AA8', marginTop: 6 },
+  finder: { alignItems: 'center', justifyContent: 'center' },
+  finderHint: { position: 'absolute', bottom: -44, paddingHorizontal: 14, paddingVertical: 7, borderRadius: 50, backgroundColor: 'rgba(255,255,255,0.10)' },
+  finderHintText: { fontFamily: typography.fontBodySemiBold, fontSize: 12.5, color: '#B5C0CF' },
+  controls: { flexDirection: 'row', gap: 12, paddingHorizontal: 20 },
+  ctrl: { flex: 1, flexDirection: 'row', gap: 8 },
+  ctrlText: { fontFamily: typography.fontDisplayExtraBold, fontSize: 14, letterSpacing: 0.8, textTransform: 'uppercase' },
+
+  overlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(5,7,12,0.7)' },
+  sheet: { borderTopLeftRadius: 32, borderTopRightRadius: 32, borderWidth: 2, borderBottomWidth: 0, padding: 24, paddingBottom: 36, alignItems: 'center' },
+  check: { width: 88, height: 88, borderRadius: 44, borderWidth: 0, borderBottomWidth: 6, alignItems: 'center', justifyContent: 'center', marginTop: -68, marginBottom: 14 },
+  sheetTitle: { fontFamily: typography.fontDisplayExtraBold, fontSize: 30, letterSpacing: -0.6, marginBottom: 18 },
+  rewardRow: { flexDirection: 'row', gap: 12, width: '100%', marginBottom: 12 },
+  rewardCard: { flex: 1, padding: 12, alignItems: 'center' },
+  rewardLabel: { fontFamily: typography.fontBodyBold, fontSize: 11, letterSpacing: 1.4 },
+  rewardValue: { fontFamily: typography.fontDisplayExtraBold, fontSize: 30, marginTop: 4, fontVariant: ['tabular-nums'] },
+  summary: { width: '100%', flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10, marginBottom: 20 },
+  summaryIcon: { width: 56, height: 56, borderRadius: 16, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  summaryName: { fontFamily: typography.fontBodyBold, fontSize: 15.5 },
+  summaryTime: { fontFamily: typography.fontBodyMedium, fontSize: 12.5, marginTop: 2 },
+  actions: { width: '100%', gap: 12 },
 });

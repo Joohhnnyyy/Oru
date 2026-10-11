@@ -1,61 +1,32 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
+import { typography } from '../../theme/tokens';
 
 export const SplashScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { isAuthenticated } = useAuth();
+  const { theme } = useTheme();
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (isAuthenticated) {
-        navigation.replace('Main');
-      } else {
-        navigation.replace('Welcome');
-      }
-    }, 1200);
-
+      navigation.replace(isAuthenticated ? 'Main' : 'Welcome');
+    }, 1800);
     return () => clearTimeout(timer);
   }, [isAuthenticated, navigation]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.emoji}>🐬</Text>
-      <Text style={styles.title}>SaafSafari</Text>
-      <Text style={styles.tagline}>Clean your area • Heal your mascot • Earn rewards</Text>
-      <Text style={styles.badge}>AWS Bharat Builds Hackathon</Text>
+    <View style={[styles.container, { backgroundColor: theme.bg }]}>
+      <Image source={require('../../../assets/Oru_color.png')} style={styles.logo} resizeMode="contain" />
+      <Text style={[styles.title, { color: theme.textPrimary }]}>Cleaner cities.{'\n'}Brighter tomorrows.</Text>
+      <Text style={[styles.subtitle, { color: theme.textSecondary }]}>Take action. Earn rewards. Create real impact.</Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0F172A',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-  },
-  emoji: {
-    fontSize: 72,
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#10B981',
-    marginBottom: 8,
-  },
-  tagline: {
-    fontSize: 14,
-    color: '#94A3B8',
-    textAlign: 'center',
-    marginBottom: 32,
-  },
-  badge: {
-    color: '#64748B',
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 1,
-    textTransform: 'uppercase',
-  },
+  container: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 32 },
+  logo: { width: 220, height: 130, marginBottom: 28 },
+  title: { fontFamily: typography.fontDisplayExtraBold, fontSize: 32, lineHeight: 38, letterSpacing: -0.8, textAlign: 'center' },
+  subtitle: { fontFamily: typography.fontBodyMedium, fontSize: 15, textAlign: 'center', marginTop: 12 },
 });

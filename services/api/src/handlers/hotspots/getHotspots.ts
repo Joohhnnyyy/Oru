@@ -13,19 +13,16 @@ export const handler = async (
     let items: any[] = [];
 
     if (territoryId) {
-      // Query GSI1 for all items in the territory with prefix HOTSPOT
+      // Query GSI2 for status and filter by territory
       const result = await docClient.send(
         new QueryCommand({
           TableName: TABLE_NAME,
-          IndexName: 'GSI1',
-          KeyConditionExpression: 'GSI1PK = :gsi1pk',
-          FilterExpression: '#st = :status',
-          ExpressionAttributeNames: {
-            '#st': 'status',
-          },
+          IndexName: 'GSI2',
+          KeyConditionExpression: 'GSI2PK = :gsi2pk',
+          FilterExpression: 'territoryId = :tid',
           ExpressionAttributeValues: {
-            ':gsi1pk': `TERRITORY#${territoryId}`,
-            ':status': status,
+            ':gsi2pk': `STATUS#${status}`,
+            ':tid': territoryId,
           },
         }),
       );

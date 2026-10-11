@@ -1,161 +1,145 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Pressable } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { AppHeader } from '../../components/AppHeader';
-import { PressableScale } from '../../components/PressableScale';
+import { ScreenHeader } from '../../components/ScreenHeader';
 import { Icon3D } from '../../components/Icon3D';
 import { Google3DMap } from '../../components/Google3DMap';
-import { colors, radii, spacing } from '../../theme/tokens';
+import { ChunkyButton, ChunkyCard, ChunkyProgress } from '../../components/Chunky';
+import { useTheme } from '../../context/ThemeContext';
+import { typography } from '../../theme/tokens';
 
 const GOOGLE_MAPS_KEY = 'REMOVED_CREDENTIAL';
 
 const DELHI_TERRITORIES = [
-  { id: '1', code: 'S34', name: 'MCD South 34 (Lajpat Nagar)', mascot: 'Dolphin Sanctuary', health: 72, mood: 'Recovering', cleanIndex: 7.2, trucks: 2, color: '#0D9488' },
-  { id: '2', code: 'C12', name: 'MCD Central 12 (Connaught Place)', mascot: 'Blackbuck Habitat', health: 88, mood: 'Thriving', cleanIndex: 8.8, trucks: 3, color: '#059669' },
-  { id: '3', code: 'E45', name: 'MCD East 45 (Mayur Vihar)', mascot: 'Peacock Zone', health: 64, mood: 'Recovering', cleanIndex: 6.4, trucks: 1, color: '#D97706' },
-  { id: '4', code: 'W23', name: 'MCD West 23 (Rajouri Garden)', mascot: 'Leopard Ridge', health: 48, mood: 'Critical', cleanIndex: 4.8, trucks: 1, color: '#DC2626' },
-  { id: '5', code: 'N08', name: 'MCD North 08 (Civil Lines)', mascot: 'Nilgai Grove', health: 92, mood: 'Legendary', cleanIndex: 9.2, trucks: 4, color: '#7C3AED' },
+  { id: '1', code: 'S34', name: 'MCD South 34 (Lajpat Nagar)', mascot: 'Dolphin Sanctuary', health: 72, mood: 'Recovering', cleanIndex: 7.2, trucks: 2, color: '#00CFFF' },
+  { id: '2', code: 'C12', name: 'MCD Central 12 (Connaught Place)', mascot: 'Blackbuck Habitat', health: 88, mood: 'Thriving', cleanIndex: 8.8, trucks: 3, color: '#43E34F' },
+  { id: '3', code: 'E45', name: 'MCD East 45 (Mayur Vihar)', mascot: 'Peacock Zone', health: 64, mood: 'Recovering', cleanIndex: 6.4, trucks: 1, color: '#FFE34D' },
+  { id: '4', code: 'W23', name: 'MCD West 23 (Rajouri Garden)', mascot: 'Leopard Ridge', health: 48, mood: 'Critical', cleanIndex: 4.8, trucks: 1, color: '#FF6B7A' },
+  { id: '5', code: 'N08', name: 'MCD North 08 (Civil Lines)', mascot: 'Nilgai Grove', health: 92, mood: 'Legendary', cleanIndex: 9.2, trucks: 4, color: '#B8A7FF' },
 ];
 
+const FILTERS = [
+  ['all', 'All', 'map'],
+  ['trucks', 'Trucks', 'truck'],
+  ['drop_points', 'Bins', 'recycle'],
+] as const;
+
 export const MapScreen: React.FC<{ navigation: any }> = () => {
+  const { theme } = useTheme();
   const [selectedTerritory, setSelectedTerritory] = useState(DELHI_TERRITORIES[0]);
   const [activeFilter, setActiveFilter] = useState<'all' | 'trucks' | 'drop_points'>('all');
 
-  const handleSelectTerritory = (t: typeof DELHI_TERRITORIES[0]) => {
+  const handleSelectTerritory = (t: (typeof DELHI_TERRITORIES)[0]) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
     setSelectedTerritory(t);
   };
 
   const handleSelectTerritoryById = (id: string) => {
     const found = DELHI_TERRITORIES.find((t) => t.id === id);
-    if (found) {
-      handleSelectTerritory(found);
-    }
+    if (found) handleSelectTerritory(found);
   };
 
-  const handleSelectFilter = (f: 'all' | 'trucks' | 'drop_points') => {
-    Haptics.selectionAsync().catch(() => {});
-    setActiveFilter(f);
-  };
+  const t = selectedTerritory;
 
   return (
-    <View style={styles.container}>
-      <AppHeader title="Delhi NCR Territory Map" />
+    <View style={[styles.container, { backgroundColor: theme.bg }]}>
+      <ScreenHeader title="Map" subtitle="Delhi NCR territories" />
 
-      {/* Photorealistic Google 3D Map Viewport */}
       <View style={styles.mapCanvas}>
         <Google3DMap
           apiKey={GOOGLE_MAPS_KEY}
-          selectedTerritoryId={selectedTerritory.id}
+          selectedTerritoryId={t.id}
           onSelectTerritory={handleSelectTerritoryById}
           activeFilter={activeFilter}
         />
 
-        {/* Floating Territory Node Selector */}
         <View style={styles.floatingOverlay}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.nodesWrapper}>
-            {DELHI_TERRITORIES.map((t) => (
-              <PressableScale
-                key={t.id}
-                style={[
-                  styles.territoryHex,
-                  { borderColor: t.color },
-                  selectedTerritory.id === t.id && styles.selectedHex,
-                ]}
-                onPress={() => handleSelectTerritory(t)}
-                haptic={false}
-              >
-                <Text style={[styles.hexCode, { color: t.color }]}>{t.code}</Text>
-                <Text style={styles.hexHealth}>{t.health}%</Text>
-              </PressableScale>
-            ))}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.nodes}>
+            {DELHI_TERRITORIES.map((d) => {
+              const on = d.id === t.id;
+              return (
+                <Pressable
+                  key={d.id}
+                  onPress={() => handleSelectTerritory(d)}
+                  style={[
+                    styles.node,
+                    { borderColor: d.color, backgroundColor: on ? d.color : theme.card, borderBottomWidth: on ? 2 : 5 },
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${d.name}, ${d.health}% health`}
+                  accessibilityState={{ selected: on }}
+                >
+                  <Text style={[styles.nodeCode, { color: on ? '#05070C' : d.color }]}>{d.code}</Text>
+                  <Text style={[styles.nodeHealth, { color: on ? '#05070C' : theme.textPrimary }]}>{d.health}%</Text>
+                </Pressable>
+              );
+            })}
           </ScrollView>
 
-          {/* Filter Bar in Butter Style */}
-          <View style={styles.filterBar}>
-            <PressableScale
-              style={[styles.filterPill, activeFilter === 'all' && styles.activeFilter]}
-              onPress={() => handleSelectFilter('all')}
-              haptic={false}
-            >
-              <Text style={[styles.filterText, activeFilter === 'all' && styles.activeFilterText]}>
-                All Layers
-              </Text>
-            </PressableScale>
-            <PressableScale
-              style={[styles.filterPill, activeFilter === 'trucks' && styles.activeFilter]}
-              onPress={() => handleSelectFilter('trucks')}
-              haptic={false}
-            >
-              <Text style={[styles.filterText, activeFilter === 'trucks' && styles.activeFilterText]}>
-                Live Trucks
-              </Text>
-            </PressableScale>
-            <PressableScale
-              style={[styles.filterPill, activeFilter === 'drop_points' && styles.activeFilter]}
-              onPress={() => handleSelectFilter('drop_points')}
-              haptic={false}
-            >
-              <Text style={[styles.filterText, activeFilter === 'drop_points' && styles.activeFilterText]}>
-                Smart Bins
-              </Text>
-            </PressableScale>
+          <View style={styles.filters}>
+            {FILTERS.map(([key, label, icon]) => (
+              <ChunkyButton
+                key={key}
+                small
+                icon={icon}
+                label={label}
+                variant={activeFilter === key ? 'primary' : 'secondary'}
+                style={{ flex: 1 }}
+                onPress={() => {
+                  Haptics.selectionAsync().catch(() => {});
+                  setActiveFilter(key);
+                }}
+              />
+            ))}
           </View>
         </View>
       </View>
 
-      {/* Bottom Sheet Detail */}
-      <View style={styles.detailSheet}>
-        <View style={styles.sheetHandle} />
+      <View style={[styles.sheet, { backgroundColor: theme.bg, borderColor: theme.border }]}>
+        <View style={[styles.handle, { backgroundColor: theme.border }]} />
         <View style={styles.sheetHeader}>
-          <View>
-            <Text style={styles.sheetTitle}>{selectedTerritory.name}</Text>
-            <Text style={styles.sheetMascot}>{selectedTerritory.mascot}</Text>
-          </View>
-          <View style={[styles.moodBadge, { backgroundColor: 'rgba(0, 229, 179, 0.15)' }]}>
-            <Text style={[styles.moodText, { color: selectedTerritory.color }]}>
-              {selectedTerritory.mood}
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.sheetTitle, { color: theme.textPrimary }]} numberOfLines={1}>
+              {t.name.replace(/ \(.*\)/, '')}
             </Text>
+            <Text style={[styles.sheetSub, { color: theme.textSecondary }]}>{t.mascot}</Text>
+          </View>
+          <View style={[styles.mood, { backgroundColor: t.color }]}>
+            <Text style={styles.moodText}>{t.mood}</Text>
           </View>
         </View>
 
-        <View style={styles.sheetStats}>
-          <View style={styles.sheetStatItem}>
-            <Text style={styles.sheetStatVal}>{selectedTerritory.health}/100</Text>
-            <Text style={styles.sheetStatLabel}>Health Index</Text>
-          </View>
-          <View style={styles.sheetStatItem}>
-            <Text style={styles.sheetStatVal}>{selectedTerritory.cleanIndex}/10</Text>
-            <Text style={styles.sheetStatLabel}>Clean Index</Text>
-          </View>
-          <View style={styles.sheetStatItem}>
-            <Text style={styles.sheetStatVal}>{selectedTerritory.trucks} Active</Text>
-            <Text style={styles.sheetStatLabel}>MCD Trucks</Text>
-          </View>
+        <ChunkyProgress value={t.health / 100} color={t.color} track={theme.surface3} height={14} />
+
+        <View style={styles.stats}>
+          {[
+            [`${t.health}`, 'Health'],
+            [`${t.cleanIndex}`, 'Clean idx'],
+            [`${t.trucks}`, 'Trucks'],
+          ].map(([v, l]) => (
+            <ChunkyCard key={l} style={styles.stat}>
+              <Text style={[styles.statVal, { color: theme.textPrimary }]}>{v}</Text>
+              <Text style={[styles.statLabel, { color: theme.textSecondary }]}>{l}</Text>
+            </ChunkyCard>
+          ))}
         </View>
 
-        <ScrollView showsVerticalScrollIndicator={false} style={styles.sheetList}>
-          <View style={styles.sheetItem}>
-            <View style={styles.itemIconBadge}>
-              <Icon3D name="truck" size={30} />
-            </View>
-            <View style={styles.itemTextContainer}>
-              <Text style={styles.itemTitle}>MCD Sanitation Truck DL-1M-4821</Text>
-              <Text style={styles.itemSub}>On Route • 120m away from your location</Text>
-            </View>
-            <Text style={styles.itemAction}>Live</Text>
-          </View>
-
-          <View style={styles.sheetItem}>
-            <View style={styles.itemIconBadge}>
-              <Icon3D name="bin" size={30} />
-            </View>
-            <View style={styles.itemTextContainer}>
-              <Text style={styles.itemTitle}>Central Market Smart MCD Bin #402</Text>
-              <Text style={styles.itemSub}>Static Decal • 350m away</Text>
-            </View>
-            <Text style={styles.itemAction}>Nav →</Text>
-          </View>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ gap: 10, paddingBottom: 110 }}>
+          {[
+            { icon: 'truck' as const, title: 'Truck DL-1M-4821', sub: 'On route · 120 m away', action: 'Live' },
+            { icon: 'bin' as const, title: 'Central Market Bin #402', sub: 'Smart bin · 350 m away', action: 'Go' },
+          ].map((r) => (
+            <ChunkyCard key={r.title} style={styles.row}>
+              <View style={[styles.rowIcon, { backgroundColor: theme.surface2 }]}>
+                <Icon3D name={r.icon} size={40} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.rowTitle, { color: theme.textPrimary }]} numberOfLines={1}>{r.title}</Text>
+                <Text style={[styles.rowSub, { color: theme.textSecondary }]}>{r.sub}</Text>
+              </View>
+              <ChunkyButton small label={r.action} variant={r.action === 'Live' ? 'success' : 'primary'} />
+            </ChunkyCard>
+          ))}
         </ScrollView>
       </View>
     </View>
@@ -163,189 +147,28 @@ export const MapScreen: React.FC<{ navigation: any }> = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.surfaceBase,
-  },
-  mapCanvas: {
-    flex: 1,
-    position: 'relative',
-    backgroundColor: '#F8FAFC',
-  },
-  floatingOverlay: {
-    position: 'absolute',
-    bottom: 8,
-    left: 8,
-    right: 8,
-    gap: 8,
-    zIndex: 10,
-  },
-  nodesWrapper: {
-    flexDirection: 'row',
-    gap: 8,
-    paddingVertical: 2,
-    paddingHorizontal: 4,
-  },
-  territoryHex: {
-    width: 62,
-    height: 62,
-    borderRadius: radii.pill,
-    backgroundColor: '#FFFFFF',
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  selectedHex: {
-    transform: [{ scale: 1.08 }],
-    backgroundColor: '#FFFFFF',
-    borderWidth: 3,
-  },
-  hexCode: {
-    fontSize: 12,
-    fontWeight: '800',
-    marginBottom: 2,
-  },
-  hexHealth: {
-    color: colors.textPrimary,
-    fontSize: 10,
-    fontWeight: '800',
-  },
-  filterBar: {
-    flexDirection: 'row',
-    gap: 8,
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
-  filterPill: {
-    backgroundColor: colors.surfaceCard,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.03,
-    shadowRadius: 3,
-    elevation: 1,
-  },
-  activeFilter: {
-    backgroundColor: colors.surfaceRaised,
-    borderColor: colors.borderAccent,
-  },
-  filterText: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  activeFilterText: {
-    color: colors.textDark,
-    fontWeight: '800',
-  },
-  detailSheet: {
-    backgroundColor: colors.surfaceCard,
-    borderTopLeftRadius: radii.lg,
-    borderTopRightRadius: radii.lg,
-    borderTopWidth: 1,
-    borderTopColor: colors.borderSubtle,
-    padding: spacing.s3,
-    maxHeight: 300,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: -3 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 6,
-  },
-  sheetHandle: {
-    width: 36,
-    height: 4,
-    backgroundColor: '#CBD5E1',
-    borderRadius: radii.pill,
-    alignSelf: 'center',
-    marginBottom: 14,
-  },
-  sheetHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 14,
-  },
-  sheetTitle: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  sheetMascot: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    marginTop: 2,
-  },
-  moodBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: radii.pill,
-  },
-  moodText: {
-    fontSize: 11,
-    fontWeight: '800',
-  },
-  sheetStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#F1F5F9',
-    borderRadius: radii.md,
-    paddingVertical: 10,
-    marginBottom: 14,
-  },
-  sheetStatItem: {
-    alignItems: 'center',
-  },
-  sheetStatVal: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  sheetStatLabel: {
-    color: colors.textTertiary,
-    fontSize: 10,
-    marginTop: 2,
-    fontWeight: '600',
-  },
-  sheetList: {
-    maxHeight: 120,
-  },
-  sheetItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.borderSubtle,
-  },
-  itemIconBadge: {
-    marginRight: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  itemTextContainer: {
-    flex: 1,
-  },
-  itemTitle: {
-    color: colors.textPrimary,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  itemSub: {
-    color: colors.textSecondary,
-    fontSize: 11,
-  },
-  itemAction: {
-    color: '#0D9488',
-    fontSize: 11,
-    fontWeight: '800',
-  },
+  container: { flex: 1 },
+  mapCanvas: { height: 250, position: 'relative', marginHorizontal: 0 },
+  floatingOverlay: { position: 'absolute', bottom: 10, left: 0, right: 0, gap: 8, zIndex: 10 },
+  nodes: { flexDirection: 'row', gap: 8, paddingHorizontal: 20 },
+  node: { width: 60, height: 60, borderRadius: 30, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  nodeCode: { fontFamily: typography.fontDisplayExtraBold, fontSize: 13 },
+  nodeHealth: { fontFamily: typography.fontBodyBold, fontSize: 11, fontVariant: ['tabular-nums'] },
+  filters: { flexDirection: 'row', gap: 8, paddingHorizontal: 20 },
+
+  sheet: { flex: 1, marginTop: -14, borderTopLeftRadius: 28, borderTopRightRadius: 28, borderWidth: 2, borderBottomWidth: 0, paddingHorizontal: 20, paddingTop: 10, gap: 14 },
+  handle: { alignSelf: 'center', width: 44, height: 5, borderRadius: 3 },
+  sheetHeader: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  sheetTitle: { fontFamily: typography.fontDisplayExtraBold, fontSize: 24, letterSpacing: -0.5 },
+  sheetSub: { fontFamily: typography.fontBodyMedium, fontSize: 13.5, marginTop: 2 },
+  mood: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 50 },
+  moodText: { fontFamily: typography.fontBodyBold, fontSize: 12.5, color: '#05070C' },
+  stats: { flexDirection: 'row', gap: 10 },
+  stat: { flex: 1, padding: 10, alignItems: 'center' },
+  statVal: { fontFamily: typography.fontDisplayExtraBold, fontSize: 24, fontVariant: ['tabular-nums'] },
+  statLabel: { fontFamily: typography.fontBodyMedium, fontSize: 11.5, marginTop: 2 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10 },
+  rowIcon: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  rowTitle: { fontFamily: typography.fontBodyBold, fontSize: 14.5 },
+  rowSub: { fontFamily: typography.fontBodyMedium, fontSize: 12.5, marginTop: 2 },
 });

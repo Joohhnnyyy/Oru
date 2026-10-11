@@ -98,7 +98,7 @@ export const handler = async (
 
     // 4. Verification by QR type
     let actionType: CivicActionType = 'STATIC_BIN_SCAN';
-    const collectorId = qrSource.collectorId || 'usr_delhi_rajesh_kumar';
+    const collectorId = qrSource.collectorId || 'collector_ramesh_kumar';
 
     if (qrSource.type === 'dustbin_static') {
       actionType = 'STATIC_BIN_SCAN';

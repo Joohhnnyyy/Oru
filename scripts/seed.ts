@@ -669,11 +669,19 @@ export async function batchWriteItems(
   tableName: string,
   items: Record<string, any>[],
 ): Promise<number> {
+  // Ensure unique primary keys across batch write
+  const uniqueMap = new Map<string, Record<string, any>>();
+  for (const item of items) {
+    const key = `${item.PK}##${item.SK}`;
+    uniqueMap.set(key, item);
+  }
+  const uniqueItems = Array.from(uniqueMap.values());
+
   const CHUNK_SIZE = 25; // DynamoDB maximum batch size
   let writtenCount = 0;
 
-  for (let i = 0; i < items.length; i += CHUNK_SIZE) {
-    const chunk = items.slice(i, i + CHUNK_SIZE);
+  for (let i = 0; i < uniqueItems.length; i += CHUNK_SIZE) {
+    const chunk = uniqueItems.slice(i, i + CHUNK_SIZE);
     const putRequests = chunk.map((item) => ({
       PutRequest: {
         Item: item,

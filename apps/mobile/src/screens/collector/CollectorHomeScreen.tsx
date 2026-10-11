@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../context/AuthContext';
 import { AppHeader } from '../../components/AppHeader';
-import { PressableScale } from '../../components/PressableScale';
+import { ChunkyButton, ChunkyCard, ChunkyProgress } from '../../components/Chunky';
+import { ScreenHeader } from '../../components/ScreenHeader';
+import { useTheme } from '../../context/ThemeContext';
 import { generateClientRotatingToken } from '../../utils/totp';
 import { telemetryService, TelemetryPoint } from '../../services/telemetry';
-import { colors, radii, spacing } from '../../theme/tokens';
+import { typography } from '../../theme/tokens';
 
 import { Icon3D } from '../../components/Icon3D';
 
 export const CollectorHomeScreen: React.FC = () => {
   const { user, switchPersona } = useAuth();
+  const { theme } = useTheme();
   const [isOnRoute, setIsOnRoute] = useState(true);
   const [scansCount, setScansCount] = useState(14);
   const [creditsEarned, setCreditsEarned] = useState(140);
@@ -52,276 +55,80 @@ export const CollectorHomeScreen: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <AppHeader title="सफाई संग्रहकर्ता (Collector Mode)" />
+    <View style={[styles.container, { backgroundColor: theme.bg }]}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ScreenHeader title="Collector" subtitle="सफाई संग्रहकर्ता · shift mode" />
 
-      <View style={styles.content}>
-        {/* Source Badge & Status */}
-        <View style={styles.badgeRow}>
-          <View style={styles.sourceBadgeContainer}>
-            <Icon3D name="truck" size={24} />
-            <Text style={styles.sourceBadge}>
-              {user?.assignedVehicleId || 'DL-1M-4821'} • {user?.territoryName || 'Ward 34'}
-            </Text>
-          </View>
-          <PressableScale
-            style={[styles.routeToggle, isOnRoute ? styles.routeActive : styles.routePaused]}
-            onPress={handleToggleRoute}
-            haptic={false}
-          >
-            <View style={[styles.routeDot, isOnRoute ? styles.routeDotActive : null]} />
-            <Text style={[styles.routeToggleText, isOnRoute ? styles.routeToggleTextActive : null]}>
-              {isOnRoute ? 'On Route (Streaming GPS)' : 'Shift Paused'}
-            </Text>
-          </PressableScale>
-        </View>
-
-        {/* Big Rotating QR Frame (~70% screen width) */}
-        <View style={styles.qrCard}>
-          <Text style={styles.qrHindiTitle}>नागरिक कचरा सत्यापन क्यूआर</Text>
-          <Text style={styles.qrEngSub}>Citizen Verification QR (Scan to award credits)</Text>
-
-          {/* High-Contrast Scannable QR Representation */}
-          <View style={styles.qrBox}>
-            <View style={styles.qrPattern}>
-              <Text style={styles.qrMatrixText}>■ □ ■ ■ □ ■</Text>
-              <Text style={styles.qrMatrixText}>□ ■ □ ■ ■ □</Text>
-              <Text style={styles.qrMatrixText}>■ □ ■ □ ■ ■</Text>
-              <Text style={styles.qrMatrixText}>□ ■ ■ ■ □ ■</Text>
-              <Text style={styles.qrTokenDisplay}>
-                HMAC TOKEN: {tokenData.token.slice(-16)}
+        <View style={styles.body}>
+          <ChunkyCard style={styles.vehicle} tint={isOnRoute ? theme.accentLime : undefined}>
+            <View style={[styles.truckIcon, { backgroundColor: theme.surface2 }]}>
+              <Icon3D name="truck" size={40} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.vehicleId, { color: theme.textPrimary }]}>{user?.assignedVehicleId || 'DL-1M-4821'}</Text>
+              <Text style={[styles.vehicleMeta, { color: isOnRoute ? theme.accentLime : theme.textSecondary }]}>
+                {isOnRoute ? 'On route · streaming GPS' : 'Shift paused'}
               </Text>
             </View>
-          </View>
+            <ChunkyButton small variant={isOnRoute ? 'secondary' : 'success'} label={isOnRoute ? 'Pause' : 'Start'} onPress={handleToggleRoute} />
+          </ChunkyCard>
 
-          {/* Countdown Progress Ring */}
-          <View style={styles.countdownContainer}>
-            <Text style={styles.countdownText}>
-              Refreshes in: <Text style={styles.countdownSec}>{tokenData.secondsRemaining}s</Text>
-            </Text>
-            <View style={styles.progressTrack}>
-              <View
-                style={[
-                  styles.progressFill,
-                  { width: `${(tokenData.secondsRemaining / 30) * 100}%` },
-                ]}
-              />
+          <ChunkyCard style={styles.qrCard} tint={theme.accentCyan}>
+            <Text style={[styles.qrTitle, { color: theme.textPrimary }]}>Citizen verification QR</Text>
+            <Text style={[styles.qrSub, { color: theme.textSecondary }]}>Citizens scan this to award credits</Text>
+
+            <View style={styles.qrBox}>
+              {['■ □ ■ ■ □ ■', '□ ■ □ ■ ■ □', '■ □ ■ □ ■ ■', '□ ■ ■ ■ □ ■'].map((row) => (
+                <Text key={row} style={styles.qrRow}>{row}</Text>
+              ))}
+              <Text style={styles.qrToken}>{tokenData.token.slice(-16)}</Text>
             </View>
+
+            <View style={styles.refresh}>
+              <Text style={[styles.refreshText, { color: theme.textSecondary }]}>
+                Refreshes in <Text style={{ color: theme.inkAccent.accentCyan }}>{tokenData.secondsRemaining}s</Text>
+              </Text>
+              <ChunkyProgress value={tokenData.secondsRemaining / 30} color={theme.accentCyan} track={theme.surface3} height={12} />
+            </View>
+          </ChunkyCard>
+
+          <View style={styles.metrics}>
+            <ChunkyCard style={styles.metric} tint={theme.accentYellow}>
+              <Text style={[styles.metricVal, { color: theme.textPrimary }]}>{scansCount}</Text>
+              <Text style={[styles.metricLabel, { color: theme.textSecondary }]}>Scans today</Text>
+            </ChunkyCard>
+            <ChunkyCard style={styles.metric} tint={theme.accentLime}>
+              <Text style={[styles.metricVal, { color: theme.inkAccent.accentLime }]}>+{creditsEarned}</Text>
+              <Text style={[styles.metricLabel, { color: theme.textSecondary }]}>Incentive (GC)</Text>
+            </ChunkyCard>
           </View>
+
+          <ChunkyButton label="Simulate handover (+10 GC)" variant="warning" onPress={handleSimulateScanReceived} />
+          <ChunkyButton label="Switch to citizen mode" variant="secondary" onPress={() => switchPersona('citizen')} />
         </View>
-
-        {/* Shift Metrics */}
-        <View style={styles.metricsRow}>
-          <View style={styles.metricBox}>
-            <Text style={styles.metricVal}>{scansCount}</Text>
-            <Text style={styles.metricLabel}>Citizen Scans Today</Text>
-          </View>
-
-          <View style={styles.metricBox}>
-            <Text style={[styles.metricVal, { color: '#0D9488' }]}>+{creditsEarned} GC</Text>
-            <Text style={styles.metricLabel}>Collector Incentive</Text>
-          </View>
-        </View>
-
-        {/* Quick simulation for demonstration */}
-        <PressableScale
-          style={styles.simulateScanBtn}
-          onPress={handleSimulateScanReceived}
-          haptic={false}
-        >
-          <Text style={styles.simulateScanBtnText}>Simulate Citizen Handover (+10 GC)</Text>
-        </PressableScale>
-
-        {/* Switch back to citizen mode */}
-        <PressableScale
-          style={styles.switchBtn}
-          onPress={() => switchPersona('citizen')}
-          haptic="light"
-        >
-          <Text style={styles.switchBtnText}>← Switch Back to Citizen Mode</Text>
-        </PressableScale>
-      </View>
+      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.surfaceBase,
-  },
-  content: {
-    flex: 1,
-    padding: spacing.s2,
-    justifyContent: 'space-between',
-  },
-  badgeRow: {
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 4,
-  },
-  sourceBadgeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  sourceBadge: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  routeToggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 7,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-  },
-  routeActive: {
-    backgroundColor: colors.surfaceAccentSubtle,
-    borderColor: colors.borderAccent,
-  },
-  routePaused: {
-    backgroundColor: colors.surfaceSubtle,
-    borderColor: colors.borderSubtle,
-  },
-  routeDot: {
-    width: 8,
-    height: 8,
-    borderRadius: radii.pill,
-    backgroundColor: colors.textTertiary,
-    marginRight: 6,
-  },
-  routeDotActive: {
-    backgroundColor: colors.surfaceRaised,
-  },
-  routeToggleText: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  routeToggleTextActive: {
-    color: colors.textAccent,
-  },
-  qrCard: {
-    backgroundColor: colors.surfaceCard,
-    borderRadius: radii.lg,
-    borderWidth: 1.5,
-    borderColor: colors.borderAccentSubtle,
-    padding: spacing.s3,
-    alignItems: 'center',
-  },
-  qrHindiTitle: {
-    color: colors.textPrimary,
-    fontSize: 18,
-    fontWeight: '800',
-    marginBottom: 2,
-  },
-  qrEngSub: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    marginBottom: 16,
-  },
-  qrBox: {
-    width: 220,
-    height: 220,
-    backgroundColor: '#FFFFFF',
-    borderRadius: radii.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
-    marginBottom: 16,
-  },
-  qrPattern: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  qrMatrixText: {
-    fontSize: 22,
-    letterSpacing: 4,
-    marginVertical: 1,
-    color: '#000000',
-  },
-  qrTokenDisplay: {
-    marginTop: 10,
-    fontSize: 9,
-    color: '#000000',
-    fontWeight: '800',
-    letterSpacing: 0.5,
-  },
-  countdownContainer: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  countdownText: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  countdownSec: {
-    color: colors.surfaceRaised,
-    fontWeight: '800',
-  },
-  progressTrack: {
-    width: '100%',
-    height: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    borderRadius: radii.pill,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.surfaceRaised,
-    borderRadius: radii.pill,
-  },
-  metricsRow: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  metricBox: {
-    flex: 1,
-    backgroundColor: colors.surfaceCard,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    borderRadius: radii.lg,
-    padding: spacing.s2,
-    alignItems: 'center',
-  },
-  metricVal: {
-    color: colors.textPrimary,
-    fontSize: 22,
-    fontWeight: '800',
-    marginBottom: 2,
-  },
-  metricLabel: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  simulateScanBtn: {
-    backgroundColor: colors.surfaceRaised,
-    paddingVertical: 14,
-    borderRadius: radii.pill,
-    alignItems: 'center',
-  },
-  simulateScanBtnText: {
-    color: colors.textDark,
-    fontSize: 14,
-    fontWeight: '800',
-  },
-  switchBtn: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    paddingVertical: 12,
-    borderRadius: radii.pill,
-    alignItems: 'center',
-  },
-  switchBtnText: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    fontWeight: '700',
-  },
+  container: { flex: 1 },
+  scroll: { paddingBottom: 60 },
+  body: { paddingHorizontal: 20, gap: 14 },
+  vehicle: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 },
+  truckIcon: { width: 52, height: 52, borderRadius: 16, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  vehicleId: { fontFamily: typography.fontDisplayBold, fontSize: 17 },
+  vehicleMeta: { fontFamily: typography.fontBodyBold, fontSize: 12.5, marginTop: 2 },
+  qrCard: { alignItems: 'center', gap: 4 },
+  qrTitle: { fontFamily: typography.fontDisplayExtraBold, fontSize: 20 },
+  qrSub: { fontFamily: typography.fontBodyMedium, fontSize: 13 },
+  qrBox: { marginVertical: 14, backgroundColor: '#F7FFFF', borderRadius: 20, padding: 20, alignItems: 'center', width: '80%' },
+  qrRow: { fontSize: 26, letterSpacing: 4, color: '#05070C', lineHeight: 32 },
+  qrToken: { marginTop: 8, fontFamily: typography.fontBodyBold, fontSize: 11, color: '#64748B', letterSpacing: 1 },
+  refresh: { width: '100%', gap: 8 },
+  refreshText: { fontFamily: typography.fontBodyBold, fontSize: 13, textAlign: 'center' },
+  metrics: { flexDirection: 'row', gap: 12 },
+  metric: { flex: 1, alignItems: 'center', padding: 14 },
+  metricVal: { fontFamily: typography.fontDisplayExtraBold, fontSize: 30, fontVariant: ['tabular-nums'] },
+  metricLabel: { fontFamily: typography.fontBodyMedium, fontSize: 12.5, marginTop: 2 },
 });

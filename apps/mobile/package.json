@@ -11,6 +11,10 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@expo-google-fonts/fredoka": "^0.4.1",
+    "@expo-google-fonts/nunito": "^0.4.2",
+    "@expo-google-fonts/outfit": "^0.4.3",
+    "@expo-google-fonts/plus-jakarta-sans": "^0.4.2",
     "@expo/metro-runtime": "^57.0.16",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
@@ -19,8 +23,10 @@
     "@saafsafari/shared": "workspace:*",
     "expo": "~57.0.27",
     "expo-constants": "~57.0.21",
+    "expo-font": "^57.0.4",
     "expo-haptics": "~57.0.3",
     "expo-status-bar": "~57.0.1",
+    "lucide-react-native": "^1.54.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-native": "0.86.3",

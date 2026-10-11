@@ -1,505 +1,227 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+import { View, Text, ScrollView, StyleSheet, Image, Animated, Easing, RefreshControl } from 'react-native';
+import Svg, { Path, Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
+import { typography } from '../../theme/tokens';
 import { AppHeader } from '../../components/AppHeader';
 import { PressableScale } from '../../components/PressableScale';
 import { Icon3D } from '../../components/Icon3D';
-import { Blobatar } from '../../components/Blobatar';
-import { AvatarAnimationKey } from '../../avatar/avatarRuntimeSource';
-import { colors, radii, spacing } from '../../theme/tokens';
+import { ChunkyButton, ChunkyCard, RainbowCard } from '../../components/Chunky';
+import { FadeInUp, CountUp, Pulse } from '../../components/Motion';
+import { Icon } from '../../components/Icon';
+
+const SvgComp = Svg as any;
+const PathComp = Path as any;
+const DefsComp = Defs as any;
+const GradComp = LinearGradient as any;
+const StopComp = Stop as any;
+const RectComp = Rect as any;
+
+/** Greeting from the local hour so it is never "Good morning" at midnight. */
+const greeting = () => {
+  const h = new Date().getHours();
+  return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+};
 
 export const HomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-  const { user, updateCredits } = useAuth();
-  const [streakChecked, setStreakChecked] = useState(false);
-  const [avatarAnim, setAvatarAnim] = useState<AvatarAnimationKey>('playful');
+  const { user } = useAuth();
+  const { theme, isDark } = useTheme();
+  const accent = isDark ? theme.accentCyan : theme.tabBarActive;
 
-  const handleQuickCheckin = () => {
-    if (streakChecked) return;
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-    setStreakChecked(true);
-    setAvatarAnim('celebrate');
-    updateCredits(15);
-  };
+  const floatAnim = useRef(new Animated.Value(0)).current;
+  const progressAnim = useRef(new Animated.Value(0)).current;
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    const floating = Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, { toValue: 1, duration: 2600, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+        Animated.timing(floatAnim, { toValue: 0, duration: 2600, easing: Easing.inOut(Easing.sin), useNativeDriver: true }),
+      ])
+    );
+    floating.start();
+    Animated.spring(progressAnim, { toValue: 0.78, speed: 10, bounciness: 3, useNativeDriver: false }).start();
+    return () => floating.stop();
+  }, []);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+    setTimeout(() => {
+      setRefreshing(false);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    }, 1200);
+  }, []);
+
+  const mascotY = floatAnim.interpolate({ inputRange: [0, 1], outputRange: [0, -6] });
+  const progressWidth = progressAnim.interpolate({ inputRange: [0, 1], outputRange: ['0%', '100%'] });
+  const userName = user?.displayName ? user.displayName.split(' ')[0] : 'Aarav';
+  const territory = user?.territoryName ? user.territoryName.replace(/ \(.*\)/, '') : 'MCD South 34';
+
+  // Hero is always an obsidian "object" with a cyan glow, in both themes (brand doc §1)
+  const heroTop = isDark ? '#0E2A36' : '#0B2A33';
+  const heroBottom = '#05070C';
 
   return (
-    <View style={styles.container}>
-      <AppHeader />
+    <View style={[styles.container, { backgroundColor: theme.bg }]}>
+      <AppHeader
+        onProfilePress={() => navigation.navigate('Profile')}
+        onNotificationPress={() => {
+          Haptics.selectionAsync().catch(() => {});
+          navigation.navigate('Leaderboard');
+        }}
+      />
+
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={accent} colors={[accent]} />}
       >
-        {/* Territory Hero Card */}
-        <View style={styles.heroCard}>
-          <View style={styles.heroHeader}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.territoryEyebrow}>TERRITORY STATUS</Text>
-              <Text style={styles.territoryName}>{user?.territoryName || 'MCD South 34'}</Text>
-              <Text style={styles.mascotLabel}>Ward Eco Companion • Recovering</Text>
+        <Text style={[styles.greetingSub, { color: theme.textSecondary }]}>{greeting()},</Text>
+        <Text style={[styles.greetingName, { color: theme.textPrimary }]}>{userName}</Text>
+
+        {/* Hero: territory health */}
+        <FadeInUp index={1}>
+        <RainbowCard style={styles.hero} onPress={() => navigation.navigate('Leaderboard')}>
+
+          <Animated.Image
+            source={require('../../../assets/earth_mascot.png')}
+            style={[styles.heroMascot, { transform: [{ translateY: mascotY }] }]}
+            resizeMode="contain"
+          />
+
+          <Text style={styles.heroEyebrow}>YOUR TERRITORY</Text>
+          <Text style={styles.heroTerritory} numberOfLines={1}>{territory}</Text>
+
+          <View style={styles.heroMetricRow}>
+            <CountUp to={78} style={styles.heroMetric} />
+            <Text style={styles.heroMetricUnit}>%</Text>
+            <View style={styles.heroPill}>
+              <View style={[styles.heroDot, { backgroundColor: theme.accentLime }]} />
+              <Text style={styles.heroPillText}>Healthy</Text>
             </View>
-            <View style={styles.avatarHeroWrapper}>
-              <Blobatar
-                preset="safari-mint"
-                animation={avatarAnim}
-                size={78}
-                interactive={true}
-                onPress={() => setAvatarAnim('laughing')}
-              />
-            </View>
+          </View>
+          <View style={styles.heroTrack}>
+            <Animated.View style={[styles.heroFill, { width: progressWidth, backgroundColor: theme.accentCyan }]} />
           </View>
 
-          <View style={styles.progressBarBg}>
-            <View style={[styles.progressBarFill, { width: '72%' }]} />
+          <View style={styles.heroStats}>
+            {[
+              ['1.2k', 'Citizens'],
+              ['#342', 'Your rank'],
+              ['+18%', 'This week'],
+            ].map(([v, l], i) => (
+              <View key={l} style={[styles.heroStat, i > 0 && styles.heroStatDivider]}>
+                <Text style={[styles.heroStatValue, i === 2 && { color: theme.accentLime }]}>{v}</Text>
+                <Text style={styles.heroStatLabel}>{l}</Text>
+              </View>
+            ))}
           </View>
-          <View style={styles.heroFooter}>
-            <Text style={styles.heroHint}>+3.4% health gain this week in your hex</Text>
-            <View style={styles.heroBadge}>
-              <Text style={styles.heroBadgeText}>LIVE</Text>
-            </View>
-          </View>
+        </RainbowCard>
+        </FadeInUp>
+
+        {/* Tasks */}
+        <FadeInUp index={2}>
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: theme.textPrimary }]}>Today</Text>
+          <PressableScale onPress={() => navigation.navigate('Tasks')} scaleTo={0.94} haptic="light">
+            <Text style={[styles.viewAll, { color: accent }]}>All tasks</Text>
+          </PressableScale>
         </View>
+        </FadeInUp>
 
-        {/* Status Strip */}
-        <View style={styles.statsRow}>
-          <View style={styles.statBox}>
-            <View style={styles.statIconWrapper}>
-              <Icon3D name="credit" size={28} />
-            </View>
-            <Text style={styles.statVal}>{user?.greenCredits || 0} GC</Text>
-            <Text style={styles.statLabel}>Green Credits</Text>
-          </View>
+        <FadeInUp index={3}>
+        <View style={styles.taskRow}>
+          <ChunkyCard
+            style={[styles.taskTile, !isDark && { backgroundColor: '#DDF6FF' }]}
+            tint="#0093B3"
+            onPress={() => navigation.navigate('Scan')}
+          >
+            <Icon3D name="bins_dual" size={64} style={styles.taskIcon} />
+            <Text style={[styles.taskTitle, { color: theme.textPrimary }]}>Scan a{'\n'}waste bin</Text>
+            <ChunkyButton small variant="primary" icon="scan" label="+10 credits" onPress={() => navigation.navigate('Scan')} />
+          </ChunkyCard>
 
-          <View style={styles.statBox}>
-            <View style={styles.statIconWrapper}>
-              <Icon3D name="flame" size={28} />
-            </View>
-            <Text style={styles.statVal}>{user?.streakDays || 1} Days</Text>
-            <Text style={styles.statLabel}>Active Streak</Text>
-          </View>
-
-          <View style={styles.statBox}>
-            <View style={styles.statIconWrapper}>
-              <Icon3D name="shield" size={28} />
-            </View>
-            <Text style={styles.statVal}>Lvl {user?.level || 1}</Text>
-            <Text style={styles.statLabel}>{user?.rankTitle || 'Beej'}</Text>
-          </View>
+          <ChunkyCard
+            style={[styles.taskTile, !isDark && { backgroundColor: '#FFF6C7' }]}
+            tint="#C9A800"
+            onPress={() => navigation.navigate('Tasks')}
+          >
+            <Icon3D name="dump_spot" size={64} style={styles.taskIcon} />
+            <Text style={[styles.taskTitle, { color: theme.textPrimary }]}>Report a{'\n'}dump spot</Text>
+            <ChunkyButton small variant="warning" icon="camera" label="+20 credits" onPress={() => navigation.navigate('Tasks')} />
+          </ChunkyCard>
         </View>
+        </FadeInUp>
 
-        {/* Live Incoming Truck Card */}
-        <PressableScale
-          style={styles.truckCard}
-          onPress={() => navigation.navigate('Scan')}
-          haptic="medium"
+        {/* Live truck */}
+        <FadeInUp index={4}>
+        <ChunkyCard
+          style={[styles.truck, !isDark && { backgroundColor: '#E4F9E3' }]}
+          onPress={() => navigation.navigate('Map')}
+          tint="#2BA836"
         >
-          <View style={styles.truckIconBadge}>
-            <Icon3D name="truck" size={40} />
+          <View style={[styles.truckIcon, { backgroundColor: theme.surface2 }]}>
+            <Icon3D name="truck" size={44} />
           </View>
           <View style={styles.truckInfo}>
-            <View style={styles.truckTitleRow}>
-              <Text style={styles.truckTitle}>MCD Sanitation Truck Approaching</Text>
-              <View style={styles.pulseDot} />
+            <View style={styles.liveRow}>
+              <Pulse><View style={[styles.liveDot, { backgroundColor: theme.accentLime }]} /></Pulse>
+              <Text style={[styles.liveText, { color: theme.inkAccent.accentLime }]}>LIVE</Text>
             </View>
-            <Text style={styles.truckMeta}>DL-1M-4821 • 120m away (ETA ~3 min)</Text>
+            <Text style={[styles.truckTitle, { color: theme.textPrimary }]}>Collection truck nearby</Text>
+            <Text style={[styles.truckMeta, { color: theme.textSecondary }]}>120 m away · ETA 3 min</Text>
           </View>
-          <View style={styles.truckScanBtn}>
-            <Text style={styles.truckScanBtnText}>Scan</Text>
-          </View>
-        </PressableScale>
-
-        {/* Daily Habit Segregation Check-In */}
-        <View style={styles.checkinCard}>
-          <View style={styles.checkinTextContainer}>
-            <Text style={styles.checkinTitle}>Daily Segregation Check-In</Text>
-            <Text style={styles.checkinSubtitle}>
-              I separated wet, dry and hazardous waste at home today
-            </Text>
-          </View>
-          <PressableScale
-            style={[styles.checkinBtn, streakChecked && styles.checkinBtnDone]}
-            onPress={handleQuickCheckin}
-            disabled={streakChecked}
-            haptic={streakChecked ? undefined : 'success'}
-          >
-            <Text style={[styles.checkinBtnText, streakChecked && styles.checkinBtnTextDone]}>
-              {streakChecked ? '✓ Completed (+15 GC)' : 'Claim +15 GC'}
-            </Text>
-          </PressableScale>
-        </View>
-
-        {/* Today's Tasks */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Today's Verified Tasks</Text>
-          <PressableScale onPress={() => navigation.navigate('Tasks')}>
-            <Text style={styles.seeAll}>See All →</Text>
-          </PressableScale>
-        </View>
-
-        <PressableScale
-          style={styles.taskCard}
-          onPress={() => navigation.navigate('Scan')}
-          haptic="light"
-        >
-          <View style={styles.taskIconBadge}>
-            <Icon3D name="recycle" size={36} />
-          </View>
-          <View style={styles.taskText}>
-            <Text style={styles.taskName}>Morning Wet & Dry Waste Handover</Text>
-            <Text style={styles.taskDesc}>Handover to MCD truck driver or kabadiwala</Text>
-          </View>
-          <View style={styles.taskRewardBadge}>
-            <Text style={styles.taskReward}>+30 GC</Text>
-          </View>
-        </PressableScale>
-
-        <PressableScale
-          style={styles.taskCard}
-          onPress={() => navigation.navigate('Scan')}
-          haptic="light"
-        >
-          <View style={styles.taskIconBadge}>
-            <Icon3D name="bin" size={36} />
-          </View>
-          <View style={styles.taskText}>
-            <Text style={styles.taskName}>Drop Plastic at Smart MCD Bin</Text>
-            <Text style={styles.taskDesc}>Scan decal at Central Market dustbin</Text>
-          </View>
-          <View style={styles.taskRewardBadge}>
-            <Text style={styles.taskReward}>+20 GC</Text>
-          </View>
-        </PressableScale>
-
-        <PressableScale
-          style={styles.taskCard}
-          onPress={() => navigation.navigate('Tasks')}
-          haptic="light"
-        >
-          <View style={styles.taskIconBadge}>
-            <Icon3D name="camera" size={36} />
-          </View>
-          <View style={styles.taskText}>
-            <Text style={styles.taskName}>Report Garbage Vulnerable Spot</Text>
-            <Text style={styles.taskDesc}>Submit photo of illegal dump spot for bounty</Text>
-          </View>
-          <View style={[styles.taskRewardBadge, styles.taskRewardBounty]}>
-            <Text style={[styles.taskReward, { color: '#B45309' }]}>+50 GC</Text>
-          </View>
-        </PressableScale>
+          <ChunkyButton small variant="success" icon="nav" label="Track" onPress={() => navigation.navigate('Map')} />
+        </ChunkyCard>
+        </FadeInUp>
       </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.surfaceBase,
-  },
-  scroll: {
-    padding: spacing.s2,
-    paddingBottom: spacing.s6,
-  },
-  heroCard: {
-    backgroundColor: colors.surfaceCard,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    padding: spacing.s3,
-    marginBottom: spacing.s2,
-  },
-  heroHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: spacing.s2,
-  },
-  territoryEyebrow: {
-    color: colors.textAccent,
-    fontSize: 10,
-    fontWeight: '800',
-    letterSpacing: 1.2,
-    marginBottom: 4,
-  },
-  territoryName: {
-    color: colors.textPrimary,
-    fontSize: 20,
-    fontWeight: '800',
-    marginBottom: 4,
-    letterSpacing: -0.4,
-  },
-  mascotLabel: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    fontWeight: '500',
-  },
-  avatarHeroWrapper: {
-    width: 84,
-    height: 84,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  healthCircle: {
-    width: 64,
-    height: 64,
-    borderRadius: radii.pill,
-    backgroundColor: colors.surfaceAccentSubtle,
-    borderWidth: 2,
-    borderColor: colors.borderAccent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  healthNumber: {
-    color: colors.surfaceRaised,
-    fontSize: 20,
-    fontWeight: '800',
-  },
-  healthSub: {
-    color: colors.textAccent,
-    fontSize: 9,
-    fontWeight: '800',
-    letterSpacing: 0.8,
-  },
-  progressBarBg: {
-    height: 6,
-    backgroundColor: '#E2E8F0',
-    borderRadius: radii.pill,
-    overflow: 'hidden',
-    marginBottom: 10,
-  },
-  progressBarFill: {
-    height: '100%',
-    backgroundColor: colors.surfaceRaised,
-    borderRadius: radii.pill,
-  },
-  heroFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  heroHint: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  heroBadge: {
-    backgroundColor: colors.surfaceAccentSubtle,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.borderAccentSubtle,
-  },
-  heroBadgeText: {
-    color: colors.textAccent,
-    fontSize: 9,
-    fontWeight: '800',
-    letterSpacing: 0.5,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: spacing.s2,
-  },
-  statBox: {
-    flex: 1,
-    backgroundColor: colors.surfaceCard,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    borderRadius: radii.md,
-    paddingVertical: 12,
-    paddingHorizontal: 6,
-    alignItems: 'center',
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  statIconWrapper: {
-    marginBottom: 6,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statVal: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontWeight: '800',
-    marginBottom: 2,
-  },
-  statLabel: {
-    color: colors.textSecondary,
-    fontSize: 10,
-    fontWeight: '600',
-  },
-  truckCard: {
-    backgroundColor: colors.surfaceCard,
-    borderWidth: 1.5,
-    borderColor: colors.borderAccent,
-    borderRadius: radii.lg,
-    padding: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: spacing.s2,
-    shadowColor: '#00E5B3',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-    elevation: 3,
-  },
-  truckIconBadge: {
-    width: 48,
-    height: 48,
-    borderRadius: radii.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  truckIcon: {
-    fontSize: 22,
-  },
-  truckInfo: {
-    flex: 1,
-  },
-  truckTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 3,
-  },
-  truckTitle: {
-    color: colors.textPrimary,
-    fontSize: 13,
-    fontWeight: '700',
-  },
-  pulseDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.surfaceRaised,
-  },
-  truckMeta: {
-    color: colors.textSecondary,
-    fontSize: 11,
-    fontWeight: '500',
-  },
-  truckScanBtn: {
-    backgroundColor: colors.surfaceRaised,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: radii.pill,
-  },
-  truckScanBtnText: {
-    color: colors.textDark,
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  checkinCard: {
-    backgroundColor: colors.surfaceCard,
-    borderRadius: radii.lg,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    padding: 18,
-    marginBottom: spacing.s3,
-    gap: 14,
-  },
-  checkinTextContainer: {
-    gap: 4,
-  },
-  checkinTitle: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  checkinSubtitle: {
-    color: colors.textSecondary,
-    fontSize: 12,
-    lineHeight: 17,
-  },
-  checkinBtn: {
-    backgroundColor: colors.surfaceRaised,
-    paddingVertical: 14,
-    borderRadius: radii.pill,
-    alignItems: 'center',
-  },
-  checkinBtnDone: {
-    backgroundColor: colors.surfaceSubtle,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-  },
-  checkinBtnText: {
-    color: colors.textDark,
-    fontWeight: '800',
-    fontSize: 14,
-  },
-  checkinBtnTextDone: {
-    color: colors.textSecondary,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    fontWeight: '800',
-  },
-  seeAll: {
-    color: colors.textAccent,
-    fontSize: 13,
-    fontWeight: '800',
-  },
-  taskCard: {
-    backgroundColor: colors.surfaceCard,
-    borderRadius: radii.md,
-    borderWidth: 1,
-    borderColor: colors.borderSubtle,
-    padding: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  taskIconBadge: {
-    width: 42,
-    height: 42,
-    borderRadius: radii.pill,
-    backgroundColor: colors.surfaceAccentSubtle,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  taskIcon: {
-    fontSize: 20,
-  },
-  taskText: {
-    flex: 1,
-  },
-  taskName: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: 2,
-  },
-  taskDesc: {
-    color: colors.textSecondary,
-    fontSize: 12,
-  },
-  taskRewardBadge: {
-    backgroundColor: colors.surfaceAccentSubtle,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    borderColor: colors.borderAccentSubtle,
-  },
-  taskRewardBounty: {
-    backgroundColor: 'rgba(245, 158, 11, 0.15)',
-    borderColor: 'rgba(245, 158, 11, 0.4)',
-  },
-  taskReward: {
-    color: colors.textAccent,
-    fontWeight: '800',
-    fontSize: 12,
-  },
+  container: { flex: 1 },
+  scroll: { paddingHorizontal: 20, paddingTop: 4, paddingBottom: 120 },
+
+  greetingSub: { fontFamily: typography.fontBodyMedium, fontSize: 15 },
+  greetingName: { fontFamily: typography.fontDisplayExtraBold, fontSize: 36, letterSpacing: -1, marginBottom: 18, marginTop: 2 },
+
+  hero: { padding: 22, marginBottom: 20 },
+  heroMascot: { position: 'absolute', right: -14, top: -10, width: 150, height: 150 },
+  heroEyebrow: { fontFamily: typography.fontBodyBold, fontSize: 11, letterSpacing: 1.6, color: '#7F8B9C' },
+  heroTerritory: { fontFamily: typography.fontDisplayBold, fontSize: 20, color: '#F7FFFF', marginTop: 4, maxWidth: '58%' },
+  heroMetricRow: { flexDirection: 'row', alignItems: 'flex-end', marginTop: 26, marginBottom: 12 },
+  heroMetric: { fontFamily: typography.fontDisplayExtraBold, fontSize: 68, lineHeight: 70, letterSpacing: -2, color: '#F7FFFF', fontVariant: ['tabular-nums'] },
+  heroMetricUnit: { fontFamily: typography.fontDisplayBold, fontSize: 26, color: '#B5C0CF', marginBottom: 9, marginLeft: 2 },
+  heroPill: { flexDirection: 'row', alignItems: 'center', gap: 6, marginLeft: 'auto', marginBottom: 12, paddingHorizontal: 11, paddingVertical: 6, borderRadius: 50, backgroundColor: 'rgba(67, 227, 79, 0.14)' },
+  heroDot: { width: 7, height: 7, borderRadius: 4 },
+  heroPillText: { fontFamily: typography.fontBodyBold, fontSize: 12.5, color: '#43E34F' },
+  heroTrack: { height: 8, borderRadius: 4, backgroundColor: 'rgba(247, 255, 255, 0.10)', overflow: 'hidden' },
+  heroFill: { height: '100%', borderRadius: 4 },
+  heroStats: { flexDirection: 'row', marginTop: 22, paddingTop: 16, borderTopWidth: 1, borderTopColor: 'rgba(247, 255, 255, 0.10)' },
+  heroStat: { flex: 1, paddingLeft: 4 },
+  heroStatDivider: { borderLeftWidth: 1, borderLeftColor: 'rgba(247, 255, 255, 0.10)', paddingLeft: 16 },
+  heroStatValue: { fontFamily: typography.fontDisplayBold, fontSize: 19, color: '#F7FFFF', fontVariant: ['tabular-nums'] },
+  heroStatLabel: { fontFamily: typography.fontBodyMedium, fontSize: 12, color: '#7F8B9C', marginTop: 2 },
+
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 },
+  sectionTitle: { fontFamily: typography.fontDisplayBold, fontSize: 22, letterSpacing: -0.4 },
+  viewAll: { fontFamily: typography.fontBodyBold, fontSize: 14 },
+
+  taskRow: { flexDirection: 'row', gap: 12, marginBottom: 14 },
+  taskTile: { flex: 1, gap: 12, padding: 14 },
+  taskIcon: { alignSelf: 'flex-start', borderRadius: 20, overflow: 'hidden' },
+  taskTitle: { fontFamily: typography.fontDisplayBold, fontSize: 19, lineHeight: 23, letterSpacing: -0.3 },
+
+  truck: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 },
+  truckIcon: { width: 56, height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  truckInfo: { flex: 1 },
+  liveRow: { flexDirection: 'row', alignItems: 'center', gap: 5, marginBottom: 3 },
+  liveDot: { width: 6, height: 6, borderRadius: 3 },
+  liveText: { fontFamily: typography.fontBodyBold, fontSize: 10.5, letterSpacing: 1.2 },
+  truckTitle: { fontFamily: typography.fontBodyBold, fontSize: 15.5 },
+  truckMeta: { fontFamily: typography.fontBodyMedium, fontSize: 13, marginTop: 2 },
 });

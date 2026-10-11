@@ -1,174 +1,80 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
 import { useAuth } from '../../context/AuthContext';
-import { api } from '../../services/api';
+import { useTheme } from '../../context/ThemeContext';
+import { Icon3D } from '../../components/Icon3D';
+import { ChunkyButton, ChunkyCard } from '../../components/Chunky';
+import { ScreenHeader } from '../../components/ScreenHeader';
+import { typography } from '../../theme/tokens';
+
+type RoleId = 'citizen' | 'collector' | 'admin' | 'merchant';
+
+const ROLES: { id: RoleId; title: string; description: string; icon: 'profile' | 'truck' | 'shield' | 'credit'; tint: 'accentLime' | 'accentYellow' | 'accentCyan' | 'accentPink' }[] = [
+  { id: 'citizen', title: 'Citizen', description: 'Complete quests, earn rewards, improve your area', icon: 'profile', tint: 'accentLime' },
+  { id: 'collector', title: 'Collector', description: 'Garbage collector, driver or kabadiwala', icon: 'truck', tint: 'accentYellow' },
+  { id: 'admin', title: 'Ward admin', description: 'Manage your ward and review submissions', icon: 'shield', tint: 'accentCyan' },
+  { id: 'merchant', title: 'Merchant', description: 'Offer rewards and coupons', icon: 'credit', tint: 'accentPink' },
+];
 
 export const SignInScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [selected, setSelected] = useState<RoleId>('citizen');
   const { switchPersona } = useAuth();
-
-  const handleSendCode = async () => {
-    if (!email || !email.includes('@')) {
-      setError('Please enter a valid email address');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-    try {
-      await api.sendOtp(email);
-      navigation.navigate('VerifyCode', { email });
-    } catch (err: any) {
-      // In demo mode, smoothly advance to OTP verify
-      navigation.navigate('VerifyCode', { email });
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
-    <View style={styles.container}>
-      <View>
-        <Text style={styles.header}>Sign In to SaafSafari</Text>
-        <Text style={styles.subtext}>Enter your email to receive a passwordless sign-in code.</Text>
-
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Email Address</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="e.g. aarav@saafsafari.in"
-            placeholderTextColor="#64748B"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            value={email}
-            onChangeText={setEmail}
-          />
+    <View style={[styles.container, { backgroundColor: theme.bg }]}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ScreenHeader title="I am a…" subtitle="Pick how you want to help your city." onBack={() => navigation.goBack()} />
+        <View style={styles.list}>
+          {ROLES.map((r) => {
+            const on = r.id === selected;
+            const tint = theme[r.tint];
+            return (
+              <ChunkyCard
+                key={r.id}
+                style={[styles.card, on && { backgroundColor: theme.surface2 }]}
+                tint={on ? tint : undefined}
+                onPress={() => {
+                  Haptics.selectionAsync().catch(() => {});
+                  setSelected(r.id);
+                }}
+              >
+                <View style={[styles.icon, { backgroundColor: theme.surface3 }]}>
+                  <Icon3D name={r.icon} size={44} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.title, { color: on ? tint : theme.textPrimary }]}>{r.title}</Text>
+                  <Text style={[styles.desc, { color: theme.textSecondary }]}>{r.description}</Text>
+                </View>
+              </ChunkyCard>
+            );
+          })}
         </View>
+      </ScrollView>
 
-        {error && <Text style={styles.errorText}>{error}</Text>}
-
-        <TouchableOpacity style={styles.primaryBtn} onPress={handleSendCode} disabled={loading}>
-          {loading ? (
-            <ActivityIndicator color="#FFFFFF" />
-          ) : (
-            <Text style={styles.primaryBtnText}>Send Verification Code</Text>
-          )}
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.personaSection}>
-        <Text style={styles.dividerText}>— OR QUICK TEST WITH DEMO PERSONAS —</Text>
-        
-        <TouchableOpacity
-          style={styles.personaBtn}
+      <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 20) + 8, borderTopColor: theme.border }]}>
+        <ChunkyButton
+          label="Continue"
           onPress={() => {
-            switchPersona('citizen');
-            navigation.replace('Main');
+            switchPersona(selected === 'collector' ? 'collector' : 'citizen');
+            navigation.navigate('LocationSetup');
           }}
-        >
-          <Text style={styles.personaTitle}>👤 Aarav Sharma (Citizen Persona)</Text>
-          <Text style={styles.personaSub}>Ward South 34 • 420 GC • Van Rakshak</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.personaBtn}
-          onPress={() => {
-            switchPersona('collector');
-            navigation.replace('Main');
-          }}
-        >
-          <Text style={styles.personaTitle}>🚛 Rajesh Kumar (Collector Persona)</Text>
-          <Text style={styles.personaSub}>MCD Truck DL-1M-4821 • Safai Senani</Text>
-        </TouchableOpacity>
+        />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0F172A',
-    padding: 24,
-    justifyContent: 'space-between',
-    paddingTop: 64,
-  },
-  header: {
-    fontSize: 26,
-    fontWeight: '800',
-    color: '#F8FAFC',
-    marginBottom: 8,
-  },
-  subtext: {
-    fontSize: 14,
-    color: '#94A3B8',
-    marginBottom: 32,
-    lineHeight: 20,
-  },
-  inputContainer: {
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#CBD5E1',
-    marginBottom: 6,
-    textTransform: 'uppercase',
-  },
-  input: {
-    backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#334155',
-    borderRadius: 12,
-    padding: 14,
-    color: '#FFFFFF',
-    fontSize: 16,
-  },
-  errorText: {
-    color: '#EF4444',
-    fontSize: 13,
-    marginBottom: 12,
-  },
-  primaryBtn: {
-    backgroundColor: '#10B981',
-    paddingVertical: 14,
-    borderRadius: 14,
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  primaryBtnText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  personaSection: {
-    gap: 10,
-    marginBottom: 20,
-  },
-  dividerText: {
-    color: '#64748B',
-    fontSize: 11,
-    fontWeight: '700',
-    textAlign: 'center',
-    marginBottom: 6,
-  },
-  personaBtn: {
-    backgroundColor: '#1E293B',
-    borderWidth: 1,
-    borderColor: '#334155',
-    padding: 14,
-    borderRadius: 14,
-  },
-  personaTitle: {
-    color: '#F8FAFC',
-    fontSize: 14,
-    fontWeight: '700',
-    marginBottom: 2,
-  },
-  personaSub: {
-    color: '#94A3B8',
-    fontSize: 12,
-  },
+  container: { flex: 1 },
+  scroll: { paddingBottom: 24 },
+  list: { paddingHorizontal: 20, gap: 14 },
+  card: { flexDirection: 'row', alignItems: 'center', gap: 14, padding: 14 },
+  icon: { width: 60, height: 60, borderRadius: 18, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  title: { fontFamily: typography.fontDisplayBold, fontSize: 18 },
+  desc: { fontFamily: typography.fontBodyMedium, fontSize: 13, lineHeight: 18, marginTop: 3 },
+  footer: { padding: 20, borderTopWidth: 2 },
 });

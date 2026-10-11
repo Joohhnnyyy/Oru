@@ -95,8 +95,9 @@ describe('Coupon Handlers (WALT-02)', () => {
 
       expect(res.statusCode).toBe(200);
       const body = JSON.parse(res.body);
-      expect(body).toHaveLength(1);
-      expect(body[0].couponId).toBe('c1');
+      expect(body.coupons).toHaveLength(1);
+      expect(body.coupons[0].couponId).toBe('c1');
+      expect(body.count).toBe(1);
     });
   });
 

@@ -41,11 +41,14 @@ export function evaluateCedarPolicy(context: CedarContext): CedarDecision {
   }
 
   // Extract user groups from Cognito JWT authorizer claims
-  const groups: string[] = Array.isArray(claims['cognito:groups'])
-    ? claims['cognito:groups']
-    : typeof claims['cognito:groups'] === 'string'
-      ? claims['cognito:groups'].split(',')
-      : [];
+  let rawGroups = claims['cognito:groups'];
+  let groups: string[] = [];
+  if (Array.isArray(rawGroups)) {
+    groups = rawGroups;
+  } else if (typeof rawGroups === 'string') {
+    const cleaned = rawGroups.replace(/[\[\]"]/g, '').trim();
+    groups = cleaned ? cleaned.split(/[\s,]+/) : [];
+  }
 
   const isWardAdmin = groups.includes('ward_admin');
   if (!isWardAdmin) {

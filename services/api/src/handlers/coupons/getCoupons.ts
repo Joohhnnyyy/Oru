@@ -1,5 +1,5 @@
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import { QueryCommand } from '@aws-sdk/lib-dynamodb';
+import { ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { Coupon, createErrorResponse } from '@saafsafari/shared';
 import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
 
@@ -8,12 +8,11 @@ export const handler = async (
 ): Promise<APIGatewayProxyResultV2> => {
   try {
     const res = await docClient.send(
-      new QueryCommand({
+      new ScanCommand({
         TableName: TABLE_NAME,
-        IndexName: 'GSI1',
-        KeyConditionExpression: 'GSI1PK = :gsi1pk',
+        FilterExpression: 'begins_with(SK, :skPrefix)',
         ExpressionAttributeValues: {
-          ':gsi1pk': 'COUPONS',
+          ':skPrefix': 'COUPON#',
         },
       }),
     );
@@ -37,7 +36,7 @@ export const handler = async (
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(availableCoupons),
+      body: JSON.stringify({ coupons: availableCoupons, count: availableCoupons.length }),
     };
   } catch (error: any) {
     return {

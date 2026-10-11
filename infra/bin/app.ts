@@ -10,8 +10,8 @@ import { SchedulerStack } from '../lib/scheduler-stack';
 const app = new App();
 
 const env = {
-  account: process.env.CDK_DEFAULT_ACCOUNT || '123456789012',
-  region: process.env.CDK_DEFAULT_REGION || 'ap-south-1',
+  account: process.env.CDK_DEFAULT_ACCOUNT || process.env.AWS_ACCOUNT_ID || '517025126295',
+  region: process.env.CDK_DEFAULT_REGION || process.env.AWS_REGION || 'ap-south-1',
 };
 
 // 1. Data Stack: DynamoDB Single Table + S3 Proofs Bucket

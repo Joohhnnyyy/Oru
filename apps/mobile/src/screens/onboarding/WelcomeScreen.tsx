@@ -1,151 +1,60 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '../../context/AuthContext';
-
-const { width } = Dimensions.get('window');
+import { useTheme } from '../../context/ThemeContext';
+import { ChunkyButton, RAINBOW } from '../../components/Chunky';
+import { typography } from '../../theme/tokens';
 
 const SLIDES = [
-  {
-    icon: '📍',
-    title: 'Do Real Civic Actions',
-    description: 'Segregate waste at home, drop e-waste at collection hubs, and hand over to municipal garbage trucks.',
-  },
-  {
-    icon: '📸',
-    title: 'Verify Instantly',
-    description: 'Scan dynamic rotating QR codes on trucks or upload AI-verified photos of cleanups.',
-  },
-  {
-    icon: '🌱',
-    title: 'Heal Mascot & Earn Rewards',
-    description: 'Earn Green Credits, evolve your Delhi territory animal from Sick to Legendary, and redeem grocery discounts.',
-  },
+  { title: 'Do real civic actions', description: 'Segregate waste at home, drop e-waste at hubs, and hand over to municipal trucks.' },
+  { title: 'Verify instantly', description: 'Scan the QR on a bin or truck, or upload a photo of your cleanup.' },
+  { title: 'Heal your territory', description: 'Earn Green Credits, level up your Delhi territory, and redeem real rewards.' },
 ];
 
 export const WelcomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-  const [slideIndex, setSlideIndex] = useState(0);
+  const [i, setI] = useState(0);
   const { switchPersona } = useAuth();
-
-  const handleNext = () => {
-    if (slideIndex < SLIDES.length - 1) {
-      setSlideIndex(slideIndex + 1);
-    } else {
-      navigation.navigate('SignIn');
-    }
-  };
+  const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
+  const last = i === SLIDES.length - 1;
 
   return (
-    <View style={styles.container}>
-      <View style={styles.slideCard}>
-        <Text style={styles.icon}>{SLIDES[slideIndex].icon}</Text>
-        <Text style={styles.title}>{SLIDES[slideIndex].title}</Text>
-        <Text style={styles.description}>{SLIDES[slideIndex].description}</Text>
+    <View style={[styles.container, { backgroundColor: theme.bg, paddingTop: Math.max(insets.top, 20) + 16, paddingBottom: Math.max(insets.bottom, 20) + 12 }]}>
+      <View style={styles.dots}>
+        {SLIDES.map((_, n) => (
+          <View key={n} style={[styles.dot, { backgroundColor: n <= i ? RAINBOW[(n * 2) % RAINBOW.length] : theme.surface3 }]} />
+        ))}
+      </View>
 
-        <View style={styles.dotsRow}>
-          {SLIDES.map((_, i) => (
-            <View
-              key={i}
-              style={[styles.dot, i === slideIndex ? styles.activeDot : null]}
-            />
-          ))}
-        </View>
+      <View style={styles.center}>
+        <Image source={require('../../../assets/earth_mascot.png')} style={styles.mascot} resizeMode="contain" />
+        <Text style={[styles.title, { color: theme.textPrimary }]}>{SLIDES[i].title}</Text>
+        <Text style={[styles.desc, { color: theme.textSecondary }]}>{SLIDES[i].description}</Text>
       </View>
 
       <View style={styles.actions}>
-        <TouchableOpacity style={styles.primaryBtn} onPress={handleNext}>
-          <Text style={styles.primaryBtnText}>
-            {slideIndex === SLIDES.length - 1 ? 'Get Started' : 'Next'}
-          </Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.demoBtn}
+        <ChunkyButton label={last ? 'Get started' : 'Continue'} onPress={() => (last ? navigation.navigate('SignIn') : setI(i + 1))} />
+        <ChunkyButton
+          variant="secondary"
+          label="Demo sign in (Aarav)"
           onPress={() => {
             switchPersona('citizen');
             navigation.replace('Main');
           }}
-        >
-          <Text style={styles.demoBtnText}>⚡ 1-Tap Demo Sign In (Aarav - Citizen)</Text>
-        </TouchableOpacity>
+        />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#0F172A',
-    justifyContent: 'space-between',
-    padding: 24,
-    paddingTop: 64,
-  },
-  slideCard: {
-    alignItems: 'center',
-    backgroundColor: '#1E293B',
-    padding: 32,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: '#334155',
-  },
-  icon: {
-    fontSize: 64,
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: '#F8FAFC',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  description: {
-    fontSize: 14,
-    color: '#94A3B8',
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  dotsRow: {
-    flexDirection: 'row',
-    marginTop: 24,
-    gap: 8,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#475569',
-  },
-  activeDot: {
-    width: 24,
-    backgroundColor: '#10B981',
-  },
-  actions: {
-    gap: 12,
-    marginBottom: 24,
-  },
-  primaryBtn: {
-    backgroundColor: '#10B981',
-    paddingVertical: 14,
-    borderRadius: 16,
-    alignItems: 'center',
-  },
-  primaryBtnText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  demoBtn: {
-    backgroundColor: '#1E293B',
-    paddingVertical: 14,
-    borderRadius: 16,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#10B981',
-  },
-  demoBtnText: {
-    color: '#10B981',
-    fontSize: 14,
-    fontWeight: '700',
-  },
+  container: { flex: 1, paddingHorizontal: 24 },
+  dots: { flexDirection: 'row', gap: 8 },
+  dot: { flex: 1, height: 10, borderRadius: 5 },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  mascot: { width: 240, height: 240, marginBottom: 20 },
+  title: { fontFamily: typography.fontDisplayExtraBold, fontSize: 30, letterSpacing: -0.6, textAlign: 'center' },
+  desc: { fontFamily: typography.fontBodyMedium, fontSize: 16, lineHeight: 24, textAlign: 'center', marginTop: 12, maxWidth: 320 },
+  actions: { gap: 12 },
 });

@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import {
+  StyleSheet,
   Pressable,
   Animated,
   StyleProp,
@@ -15,6 +16,8 @@ interface PressableScaleProps {
   scaleTo?: number; // default 0.97
   haptic?: boolean | 'light' | 'medium' | 'success';
   disabled?: boolean;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 /**
@@ -31,6 +34,8 @@ export const PressableScale: React.FC<PressableScaleProps> = ({
   scaleTo = 0.97,
   haptic = 'light',
   disabled = false,
+  accessibilityLabel,
+  accessibilityHint,
 }) => {
   const scale = useRef(new Animated.Value(1)).current;
 
@@ -65,13 +70,21 @@ export const PressableScale: React.FC<PressableScaleProps> = ({
     }).start();
   };
 
+  // Layout props belong on the outer Pressable, otherwise flex/width children collapse
+  const { flex, alignSelf, width } = StyleSheet.flatten(style) || {};
+
   return (
     <Pressable
+      style={{ flex, alignSelf, width }}
       onPress={onPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={disabled}
       hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled }}
     >
       <Animated.View style={[{ transform: [{ scale }] }, style]}>
         {children}
