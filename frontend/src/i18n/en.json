@@ -360,6 +360,119 @@
       "title": "This page wandered off",
       "body": "We could not find that page. It may have moved.",
       "home": "Go to the home page"
+    },
+    "faq": {
+      "title": "FAQ",
+      "intro": "Quick answers about playing Oru, your data, and getting started.",
+      "searchLabel": "Search questions",
+      "searchPlaceholder": "Search FAQ",
+      "noResults": "No questions match your search.",
+      "cat": {
+        "start": "Getting started",
+        "missions": "Missions and seeds",
+        "guardians": "Guardians and growth",
+        "privacy": "Privacy",
+        "access": "Accessibility and languages"
+      },
+      "q": {
+        "startWhat": {
+          "q": "What is Oru?",
+          "a": "A free pocket game for India. You log small things you really did for waste, heat, energy and water, grow a pixel city, and wake the guardian animal of your region."
+        },
+        "startFree": {
+          "q": "Is it free, and does it work on older phones?",
+          "a": "Yes. Oru is free and works on entry-level Android phones, even on a patchy connection."
+        },
+        "startAccount": {
+          "q": "Do I need to make an account?",
+          "a": "No. There is no sign-up or login. Your language choice is saved only on this device."
+        },
+        "missionsWhat": {
+          "q": "What are missions?",
+          "a": "Four everyday categories to log actions in: Waste, Heat, Energy and Water. Each has simple, real things you can do, like sorting waste or fixing a dripping tap."
+        },
+        "missionsSeeds": {
+          "q": "What are seeds?",
+          "a": "Seeds are what logged actions earn. Actions checked with a photo or a QR scan earn more seeds than a quick tap. You plant seeds in your pixel city to grow it."
+        },
+        "missionsVerify": {
+          "q": "Does every action need proof?",
+          "a": "No. A quick tap still counts, it just earns fewer seeds than an action you back up with a photo or scan."
+        },
+        "guardiansWhat": {
+          "q": "What is a guardian?",
+          "a": "Oru picks a guardian animal for your region based on where you are. As your pixel city grows, your guardian wakes up a little more at each stage."
+        },
+        "guardiansGrow": {
+          "q": "How does my pixel city grow?",
+          "a": "It follows the actions you log, not the calendar. A logged action plants a seed; keep logging and it grows from a seed to a sprout, patch, grove and forest."
+        },
+        "privacyData": {
+          "q": "What data does Oru collect?",
+          "a": "Oru uses no cookies, no trackers and no third-party scripts. Your language choice is saved only on this device."
+        },
+        "privacyExport": {
+          "q": "Can I export my data?",
+          "a": "Yes. Your record is yours: you can export every logged action as a JSON-LD file aligned with Mission LiFE and take it wherever you like."
+        },
+        "accessLang": {
+          "q": "What languages does Oru support?",
+          "a": "English and Hindi at launch, with more planned."
+        },
+        "accessA11y": {
+          "q": "Is Oru accessible?",
+          "a": "We aim for WCAG 2.2 AA in both languages. If something does not work for you, tell us on GitHub."
+        }
+      }
+    },
+    "privacy": {
+      "title": "Privacy",
+      "intro": "Oru is built to need as little of your data as possible.",
+      "p1Title": "What we collect",
+      "p1": "Oru uses no cookies, no trackers and no third-party scripts. The only thing saved is your language choice, and that is kept on this device only, never sent to a server.",
+      "p2Title": "Actions you log",
+      "p2": "When Oru launches, actions you log to play the game (and any photo you attach) are stored so your pixel city and guardian can reflect your progress. Your record is yours: you can export every logged action as a JSON-LD file aligned with Mission LiFE and take it wherever you like.",
+      "p3Title": "No account, no ads",
+      "p3": "There is no sign-up, no login and no advertising in Oru.",
+      "p4Title": "Questions",
+      "p4": "If anything here is unclear, open an issue on GitHub and we will answer."
+    },
+    "terms": {
+      "title": "Terms",
+      "intro": "Plain-language terms for a free, non-commercial game.",
+      "p1Title": "Use the game fairly",
+      "p1": "Log only things you really did. Oru's seeds and guardians are a game, not a currency; they cannot be bought, sold or exchanged for money.",
+      "p2Title": "No warranty",
+      "p2": "Oru is provided as-is, built for a hackathon, with no guarantee it will be available at all times or free of bugs.",
+      "p3Title": "Your content",
+      "p3": "Any photo you choose to attach to a logged action stays yours. Do not upload anything that is not yours to share.",
+      "p4Title": "Changes",
+      "p4": "These terms may change as Oru develops. The current version always applies."
+    },
+    "contact": {
+      "title": "Contact",
+      "intro": "Oru is an open-source hackathon project. The best way to reach the team is GitHub.",
+      "issuesTitle": "Report a bug or ask a question",
+      "issuesBody": "Open an issue on the Oru GitHub repository. That is where bugs, accessibility problems and feature ideas are tracked.",
+      "issuesCta": "Open an issue on GitHub"
     }
+  },
+  "immersive": {
+    "hero1": "Small acts.",
+    "hero2": "Wild possibilities.",
+    "heroLead": "A little good in your everyday. A whole world waking up around you.",
+    "enter": "Enter your world",
+    "scroll": "SCROLL TO WAKE A LITTLE WORLD",
+    "smallMatters": "THE SMALL THINGS MATTER",
+    "everyday": "Your everyday.",
+    "tomorrow": "Their tomorrow.",
+    "manifesto": "Turn the good you really do into a living world. Every action grows your corner of the city.",
+    "doLittle": "DO A LITTLE. CHANGE YOUR EVERYDAY.",
+    "fourWays": "Four ways to make it count.",
+    "waste": "Less waste. More life.",
+    "water": "Every drop has a future.",
+    "energy": "A lighter footprint.",
+    "heat": "A cooler place to call home.",
+    "explore": "Explore {{mission}}"
   }
 }

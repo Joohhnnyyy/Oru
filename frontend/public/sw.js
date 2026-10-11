@@ -25,6 +25,8 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
   if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+  // Account pages and API responses must stay fresh and never enter the offline cache.
+  if (url.pathname.startsWith('/v1/') || /^\/(signin|verify|onboarding|home|map|t|tasks|scan|wallet|coupons|rewards|leaderboard|community|proof|profile|collector|console|account|assistant|energy|error|session-expired)(\/|$)/.test(url.pathname)) return;
 
   // Pages: network first, and every successfully loaded page is kept for offline use.
   // Offline, a page falls back to its cached copy (with or without a trailing slash),

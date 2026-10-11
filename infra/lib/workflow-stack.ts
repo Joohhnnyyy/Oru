@@ -5,6 +5,7 @@ import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as sfn from 'aws-cdk-lib/aws-stepfunctions';
 import * as tasks from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import { Construct } from 'constructs';
@@ -19,7 +20,7 @@ export interface WorkflowStackProps extends StackProps {
  * Photo-proof verification:
  *   S3 upload (proofs/<user>/<submission>.jpg)
  *     → EventBridge "Object Created" rule
- *     → Step Functions: Evaluate (Rekognition + Bedrock Nova, fail-closed)
+ *     → Step Functions: Evaluate (Rekognition + Groq, fail-closed)
  *        ├─ AUTO_APPROVED → Approved
  *        ├─ REJECTED      → Rejected
  *        └─ FLAGGED       → AwaitHumanReview (task token; paused until a ward officer resolves)
@@ -43,7 +44,8 @@ export class WorkflowStack extends Stack {
       environment: {
         TABLE_NAME: table.tableName,
         PROOFS_BUCKET_NAME: proofsBucket.bucketName,
-        NOVA_MODEL_ID: 'apac.amazon.nova-lite-v1:0',
+        GROQ_MODEL_ID: 'qwen/qwen3.8-27b',
+        GROQ_SECRET_ID: 'oru/groq-api-key',
       },
     });
     table.grantReadWriteData(this.evaluateSubmissionFn);
@@ -54,13 +56,7 @@ export class WorkflowStack extends Stack {
         resources: ['*'],
       }),
     );
-    // Converse uses bedrock:InvokeModel; cross-region inference profiles route to other APAC regions
-    this.evaluateSubmissionFn.addToRolePolicy(
-      new iam.PolicyStatement({
-        actions: ['bedrock:InvokeModel'],
-        resources: ['*'],
-      }),
-    );
+    secretsmanager.Secret.fromSecretNameV2(this, 'GroqApiKey', 'oru/groq-api-key').grantRead(this.evaluateSubmissionFn);
 
     // 2. Lambda that parks the Step Functions task token on a flagged submission
     const awaitReviewFn = new TsLambda(this, 'AwaitReviewFunction', {
@@ -78,7 +74,7 @@ export class WorkflowStack extends Stack {
     });
 
     const approvedState = new sfn.Succeed(this, 'SubmissionApproved', {
-      comment: 'Verified by Rekognition + Bedrock Nova and rewarded.',
+      comment: 'Verified by Rekognition + Groq and rewarded.',
     });
     const rejectedState = new sfn.Succeed(this, 'SubmissionRejected', {
       comment: 'Rejected (duplicate, moderation, or not genuine). Not an execution failure.',
@@ -104,7 +100,7 @@ export class WorkflowStack extends Stack {
       stateMachineName: 'saafsafari-ai-verification',
       definitionBody: sfn.DefinitionBody.fromChainable(evaluateTask.next(choice)),
       timeout: Duration.days(8),
-      comment: 'Rekognition moderation + Bedrock Nova vision, with human-in-the-loop review.',
+      comment: 'Rekognition moderation + Groq vision, with human-in-the-loop review.',
     });
 
     // 4. Start an execution for every uploaded proof photo

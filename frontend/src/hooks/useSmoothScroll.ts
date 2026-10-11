@@ -1,7 +1,7 @@
 import Lenis from 'lenis';
 import 'lenis/dist/lenis.css';
 import { useEffect } from 'react';
-import { prefersReducedMotion } from './useReducedMotion';
+import { useReducedMotion } from './useReducedMotion';
 
 /** Pixels to stop above an anchor target, so the sticky header doesn't cover it. */
 const HEADER_OFFSET = 88;
@@ -27,8 +27,8 @@ export function setScrollLocked(locked: boolean) {
  * hash (other sections listen for `hashchange`) and move focus for keyboard users.
  */
 export function useSmoothScroll() {
+  const reduced = useReducedMotion();
   useEffect(() => {
-    const reduced = prefersReducedMotion();
     const lenis = reduced ? null : new Lenis({ autoRaf: true, lerp: 0.085, wheelMultiplier: 0.9 });
     instance = lenis;
     if (lenis && document.documentElement.classList.contains('scroll-locked')) lenis.stop();
@@ -67,5 +67,5 @@ export function useSmoothScroll() {
       lenis?.destroy();
       instance = null;
     };
-  }, []);
+  }, [reduced]);
 }

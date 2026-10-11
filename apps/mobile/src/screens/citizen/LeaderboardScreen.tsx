@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Image, RefreshControl, ActivityIndicator } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import { api, LeaderboardResponse } from '../../services/api';
+import { useApiData } from '../../hooks/useApiData';
 import { ChunkyButton, ChunkyCard } from '../../components/Chunky';
 import { FadeInUp, PopIn } from '../../components/Motion';
 import { Icon } from '../../components/Icon';
 import { ScreenHeader } from '../../components/ScreenHeader';
 import { typography } from '../../theme/tokens';
+import { CHARACTERS, CharacterId } from '../../theme/characters';
 
 interface LeaderboardItem {
   rank: number;
@@ -15,36 +19,67 @@ interface LeaderboardItem {
   score: string;
   change: string;
   isUser?: boolean;
+  character?: CharacterId;
 }
 
-const TERRITORY_RANKS: LeaderboardItem[] = [
-  { rank: 1, name: 'Green Park', subtitle: 'South Delhi', score: '78% Health', change: '+18%' },
-  { rank: 2, name: 'Lake View', subtitle: 'East Delhi', score: '74% Health', change: '+15%' },
-  { rank: 3, name: 'Sunrise Nagar', subtitle: 'Central Delhi', score: '71% Health', change: '+12%' },
-  { rank: 4, name: 'AIIMS Area', subtitle: 'South Delhi', score: '68% Health', change: '+10%' },
-  { rank: 5, name: 'Nehru Vihar', subtitle: 'North Delhi', score: '65% Health', change: '+9%' },
-  { rank: 6, name: 'Lajpat Nagar', subtitle: 'South Delhi', score: '62% Health', change: '+7%' },
-];
+const CHARACTER_IDS: CharacterId[] = ['dolphin', 'turtle', 'leopard', 'sparrow', 'bustard', 'crane'];
+const asCharacter = (mascot: string | undefined, rank: number): CharacterId =>
+  mascot && (CHARACTER_IDS as string[]).includes(mascot) ? (mascot as CharacterId) : CHARACTER_IDS[(rank - 1) % CHARACTER_IDS.length];
+const cap = (s?: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : '');
 
-const CITIZEN_RANKS: LeaderboardItem[] = [
-  { rank: 1, name: 'Priya Sharma', subtitle: 'Green Park', score: '3,450 credits', change: '+450' },
-  { rank: 2, name: 'Aarav Mehta', subtitle: 'Lake View', score: '3,120 credits', change: '+380' },
-  { rank: 3, name: 'Rohan Gupta', subtitle: 'Sunrise Nagar', score: '2,890 credits', change: '+320' },
-  { rank: 4, name: 'Ansh Johnson', subtitle: 'Green Park', score: '1,240 credits', change: '+210', isUser: true },
-  { rank: 5, name: 'Sneha Patel', subtitle: 'AIIMS Area', score: '1,180 credits', change: '+190' },
-];
+function toItems(res: LeaderboardResponse | null, kind: 'territories' | 'citizens', myId?: string): LeaderboardItem[] {
+  if (!res) return [];
+  return res.entries.map((e) =>
+    kind === 'territories'
+      ? {
+          rank: e.rank,
+          name: e.name,
+          subtitle: [cap(e.mood), e.mascot ? cap(e.mascot) : ''].filter(Boolean).join(' · '),
+          score: `${e.score}%`,
+          change: cap(e.mood),
+          character: asCharacter(e.mascot, e.rank),
+        }
+      : {
+          rank: e.rank,
+          name: e.name,
+          subtitle: e.tier,
+          score: `${e.score.toLocaleString()} XP`,
+          change: '',
+          isUser: e.id === myId,
+          character: e.id === myId ? 'buddy' : undefined,
+        },
+  );
+}
 
 const initials = (n: string) => n.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 
 export const LeaderboardScreen: React.FC<{ navigation?: any }> = ({ navigation }) => {
   const { theme } = useTheme();
+  const { user, token } = useAuth();
   const [activeTab, setActiveTab] = useState<'territories' | 'citizens'>('territories');
-  const list = activeTab === 'territories' ? TERRITORY_RANKS : CITIZEN_RANKS;
+  const [refreshing, setRefreshing] = useState(false);
+  const board = useApiData(
+    () => api.getLeaderboard(activeTab === 'territories' ? 'territories' : 'citywide'),
+    [token, activeTab],
+    !!token,
+  );
+  const list = toItems(board.data, activeTab, user?.userId);
+  const me = board.data?.userRank;
+  // Show the signed-in citizen at the bottom if they aren't in the top list
+  const extraMe =
+    activeTab === 'citizens' && me && !list.some((i) => i.isUser)
+      ? [{ ...toItems({ ...board.data!, entries: [me] }, 'citizens', user?.userId)[0], isUser: true, character: 'buddy' as CharacterId }]
+      : [];
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await board.reload();
+    setRefreshing(false);
+  };
   const palette = [theme.accentYellow, theme.accentCyan, theme.accentPink, theme.accentLavender, theme.accentLime, theme.accentTurquoise];
   const medal = ['#FFE34D', '#C9D3E0', '#FF9F5A'];
 
   // Podium order: 2nd, 1st, 3rd
-  const podium = [list[1], list[0], list[2]];
+  const podium = [list[1], list[0], list[2]].filter(Boolean) as LeaderboardItem[];
   const heights = [96, 128, 78];
 
   const Avatar = ({ item, size, ring }: { item: LeaderboardItem; size: number; ring?: string }) => (
@@ -58,18 +93,31 @@ export const LeaderboardScreen: React.FC<{ navigation?: any }> = ({ navigation }
         justifyContent: 'center',
         borderWidth: ring ? 3 : 0,
         borderColor: ring,
+        overflow: 'hidden',
       }}
     >
-      <Text style={{ fontFamily: typography.fontDisplayExtraBold, fontSize: size * 0.36, color: '#05070C' }}>{initials(item.name)}</Text>
+      {item.character ? (
+        <Image
+          source={CHARACTERS[item.character]}
+          style={{ width: size * 0.86, height: size * 0.86 }}
+          resizeMode="contain"
+        />
+      ) : (
+        <Text style={{ fontFamily: typography.fontDisplayExtraBold, fontSize: size * 0.36, color: '#05070C' }}>{initials(item.name)}</Text>
+      )}
     </View>
   );
 
   return (
     <View style={[styles.container, { backgroundColor: theme.bg }]}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+      >
         <ScreenHeader
           title="Leaderboard"
-          subtitle="Delhi NCR · this week"
+          subtitle={board.data ? `Delhi NCR · week ${board.data.periodKey.split('-W')[1] ?? ''}` : 'Delhi NCR · this week'}
           onBack={navigation?.canGoBack?.() ? () => navigation.goBack() : undefined}
         />
 
@@ -91,7 +139,9 @@ export const LeaderboardScreen: React.FC<{ navigation?: any }> = ({ navigation }
 
         {/* Podium */}
         <View style={styles.podium}>
-          {podium.map((item, i) => (
+          {podium.map((item) => {
+            const i = item.rank === 1 ? 1 : item.rank === 2 ? 0 : 2;
+            return (
             <View key={item.rank} style={styles.podiumCol}>
               {item.rank === 1 ? (
                 <PopIn delay={500}>
@@ -109,12 +159,17 @@ export const LeaderboardScreen: React.FC<{ navigation?: any }> = ({ navigation }
                 <Text style={styles.blockNum}>{item.rank}</Text>
               </View>
             </View>
-          ))}
+            );
+          })}
         </View>
 
         {/* Rest of the list */}
         <View style={styles.list}>
-          {list.slice(3).map((item, idx) => (
+          {board.loading && !board.data ? <ActivityIndicator color={theme.accentCyan} style={{ marginTop: 16 }} /> : null}
+          {board.error && !board.data ? (
+            <Text style={[styles.sub, { color: theme.textSecondary, textAlign: 'center' }]}>{board.error}</Text>
+          ) : null}
+          {[...list.slice(3), ...extraMe].map((item, idx) => (
             <FadeInUp key={`${item.rank}-${item.name}`} index={idx + 3}>
             <ChunkyCard
               style={styles.row}
@@ -131,7 +186,7 @@ export const LeaderboardScreen: React.FC<{ navigation?: any }> = ({ navigation }
               </View>
               <View style={{ alignItems: 'flex-end' }}>
                 <Text style={[styles.score, { color: theme.textPrimary }]}>{item.score.replace(' Health', '')}</Text>
-                <Text style={[styles.change, { color: theme.success }]}>{item.change}</Text>
+                {item.change ? <Text style={[styles.change, { color: theme.success }]}>{item.change}</Text> : null}
               </View>
             </ChunkyCard>
             </FadeInUp>

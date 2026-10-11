@@ -13,8 +13,8 @@ import { Container, InstallButton, LangSwitch, PlayLink } from './shared';
 function Closing() {
   const { t } = useTranslation();
   return (
-    <section aria-labelledby="closing-title" className="relative isolate overflow-hidden">
-      <img src={SCENE.plaza} alt="" width={1770} height={889} loading="lazy" className="absolute inset-0 -z-10 h-full w-full object-cover object-[50%_70%]" />
+    <section aria-labelledby="closing-title" className="cinematic-closing relative isolate overflow-hidden" {...{ string: 'progress', 'string-id': 'closing-section' }}>
+      <img src={SCENE.plaza} alt="" width={1770} height={889} loading="lazy" className="absolute inset-0 -z-10 h-full w-full object-cover object-[50%_70%]" {...{ string: 'parallax', 'string-speed': '0.08' }} />
       <div className="absolute inset-0 -z-10 bg-gradient-to-r from-white via-white/85 to-white/10" />
       <Container className="grid items-center gap-8 py-20 md:grid-cols-[1.2fr_1fr] md:py-28">
         <RiseIn>
@@ -65,13 +65,13 @@ function BigLogo() {
         ry.set(0);
       }}
       style={{ perspective: 1200 }}
-      className="bg-surface py-6 sm:py-10"
+      className="py-6 sm:py-10"
     >
       <motion.img
         src={BRAND.wordmarkLarge}
         alt="Oru"
-        width={1060}
-        height={644}
+        width={1630}
+        height={965}
         loading="lazy"
         decoding="async"
         style={{ rotateX, rotateY }}
@@ -79,8 +79,9 @@ function BigLogo() {
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ type: 'spring', stiffness: 70, damping: 14 }}
-        className="mx-auto block h-auto w-full max-w-[760px] mix-blend-multiply select-none"
+        className="mx-auto block h-auto w-full max-w-[760px] select-none"
         draggable={false}
+        {...{ string: 'parallax', 'string-speed': '0.04' }}
       />
     </div>
   );
@@ -91,11 +92,11 @@ export function Footer() {
   return (
     <>
       <Closing />
-      <footer className="overflow-hidden bg-surface">
+      <footer className="cinematic-footer overflow-hidden bg-surface">
         <Container className="flex flex-wrap items-center justify-between gap-4 pt-8">
           <div className="flex items-center">
             <Link to="/" aria-label={t('a11y.home')} className="rounded-lg">
-              <img src={BRAND.wordmark} alt="" width={120} height={71} loading="lazy" className="h-11 w-auto" />
+              <img src={BRAND.wordmark} alt="" width={1630} height={965} loading="lazy" className="h-11 w-auto" />
             </Link>
           </div>
           <div className="flex items-center gap-2">
@@ -109,8 +110,8 @@ export function Footer() {
         </Container>
 
         <Container>
-          <p className="mx-auto flex w-fit max-w-full items-center gap-2 rounded-full bg-white px-4 py-2 text-center font-semibold">
-            <svg viewBox="0 0 24 24" width={20} height={20} className="shrink-0" aria-hidden="true" focusable="false">
+          <p className="mx-auto flex w-fit max-w-full items-center gap-2 rounded-full bg-white px-4 py-2 text-center font-semibold text-ink shadow-sm">
+            <svg viewBox="0 0 24 24" width={20} height={20} className="shrink-0 text-primary" aria-hidden="true" focusable="false">
               <path d="M12 3 3 7v5c0 5 4 8 9 9 5-1 9-4 9-9V7Z" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinejoin="round" />
               <path d="m8.5 12 2.5 2.5 4.5-5" fill="none" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -118,21 +119,36 @@ export function Footer() {
           </p>
           <div className="mt-8 grid gap-6 text-sm sm:grid-cols-3">
             <div>
-              <h2 className="font-display text-base font-bold">{t('footer.privacyTitle')}</h2>
+              <h2 className="font-display text-base font-bold">
+                <Link to="/privacy" className="text-white hover:text-primary no-underline hover:underline">
+                  {t('footer.privacyTitle')}
+                </Link>
+              </h2>
               <p className="mt-1 text-muted">{t('footer.privacy')}</p>
             </div>
             <div>
-              <h2 className="font-display text-base font-bold">{t('footer.a11yTitle')}</h2>
+              <h2 className="font-display text-base font-bold text-white">{t('footer.a11yTitle')}</h2>
               <p className="mt-1 text-muted">{t('footer.a11y')}</p>
             </div>
             <div>
-              <h2 className="font-display text-base font-bold">{t('footer.sourceTitle')}</h2>
+              <h2 className="font-display text-base font-bold text-white">{t('footer.sourceTitle')}</h2>
               <a href={env.VITE_SOURCE_URL} className="inline-flex min-h-11 items-center font-bold text-primary underline underline-offset-4" rel="noopener">
                 {t('footer.source')}
               </a>
             </div>
           </div>
-          <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-line py-6 text-muted">
+          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 border-t border-line/40 pt-6 text-sm font-semibold">
+            <Link to="/faq" className="text-white/90 hover:text-primary no-underline hover:underline">
+              {t('pages.faq.title')}
+            </Link>
+            <Link to="/terms" className="text-white/90 hover:text-primary no-underline hover:underline">
+              {t('pages.terms.title')}
+            </Link>
+            <Link to="/contact" className="text-white/90 hover:text-primary no-underline hover:underline">
+              {t('pages.contact.title')}
+            </Link>
+          </div>
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-line py-6 text-muted">
             <p>{t('footer.rights')}</p>
             <p>
               {t('footer.languages')} <span lang="en">English</span>, <span lang="hi">हिन्दी</span>

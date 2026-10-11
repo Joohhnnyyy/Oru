@@ -5,13 +5,14 @@ frontend:
       commands:
         - npm install -g pnpm
         - pnpm install
+        - if [ -f cdk-outputs.json ]; then pnpm export-env --frontend-only; fi
         - pnpm --filter @saafsafari/shared build
         - pnpm --filter @saafsafari/game-rules build
     build:
       commands:
-        - pnpm --filter oru build
+        - pnpm --filter web build
   artifacts:
-    baseDirectory: apps/web/dist
+    baseDirectory: frontend/dist
     files:
       - '**/*'
   cache:

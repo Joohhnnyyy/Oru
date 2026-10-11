@@ -6,10 +6,12 @@ import { useTheme } from '../../context/ThemeContext';
 import { ChunkyButton, RAINBOW } from '../../components/Chunky';
 import { typography } from '../../theme/tokens';
 
+import { CHARACTERS } from '../../theme/characters';
+
 const SLIDES = [
-  { title: 'Do real civic actions', description: 'Segregate waste at home, drop e-waste at hubs, and hand over to municipal trucks.' },
-  { title: 'Verify instantly', description: 'Scan the QR on a bin or truck, or upload a photo of your cleanup.' },
-  { title: 'Heal your territory', description: 'Earn Green Credits, level up your Delhi territory, and redeem real rewards.' },
+  { title: 'Do real civic actions', description: 'Segregate waste at home, drop e-waste at hubs, and hand over to municipal trucks.', character: CHARACTERS.turtle },
+  { title: 'Verify instantly', description: 'Scan the QR on a bin or truck, or upload a photo of your cleanup.', character: CHARACTERS.dolphin },
+  { title: 'Heal your territory', description: 'Earn Green Credits, level up your Delhi territory, and redeem real rewards.', character: CHARACTERS.buddy },
 ];
 
 export const WelcomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
@@ -28,7 +30,7 @@ export const WelcomeScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
       </View>
 
       <View style={styles.center}>
-        <Image source={require('../../../assets/earth_mascot.png')} style={styles.mascot} resizeMode="contain" />
+        <Image source={SLIDES[i].character} style={styles.mascot} resizeMode="contain" />
         <Text style={[styles.title, { color: theme.textPrimary }]}>{SLIDES[i].title}</Text>
         <Text style={[styles.desc, { color: theme.textSecondary }]}>{SLIDES[i].description}</Text>
       </View>

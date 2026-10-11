@@ -33,7 +33,7 @@ describe('Live Collection Truck Tracking Handler (TRK-01)', () => {
     return event;
   };
 
-  it('returns live tracking coordinates and active status for municipal waste vehicles', async () => {
+  it('distinguishes live GPS from a registered location', async () => {
     const mockTrucks = [
       {
         PK: 'QR#qr_truck_ndmc_01',
@@ -59,7 +59,7 @@ describe('Live Collection Truck Tracking Handler (TRK-01)', () => {
         latitude: 28.525,
         longitude: 77.215,
         h3TerritoryId: '8760824b0ffffff',
-        isActive: false,
+        isActive: true,
       },
     ];
 
@@ -83,4 +83,11 @@ describe('Live Collection Truck Tracking Handler (TRK-01)', () => {
     expect(body.trucks[1].status).toBe('idle'); // no recent position
     expect(body.trucks[1].latitude).toBe(28.525);
   });
+  it('omits inactive trucks and follows index pagination', async () => {
+    vi.mocked(docClient.send).mockResolvedValueOnce({ Items: [{ type: 'truck_rotating', isActive: false }], LastEvaluatedKey: { PK: 'next' } } as any).mockResolvedValueOnce({ Items: [] } as any);
+    const res: any = await getLiveTrucks(createEvent());
+    expect(JSON.parse(res.body).trucks).toEqual([]);
+    expect(vi.mocked(docClient.send).mock.calls[1][0].input).toMatchObject({ ExclusiveStartKey: { PK: 'next' } });
+  });
+
 });

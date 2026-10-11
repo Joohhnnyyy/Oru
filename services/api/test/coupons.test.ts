@@ -58,6 +58,8 @@ describe('Coupon Handlers (WALT-02)', () => {
 
       const mockCoupons = [
         {
+          PK: 'MERCHANT#m1',
+          SK: 'COUPON#c1',
           couponId: 'c1',
           merchantId: 'm1',
           title: 'Valid Coupon',
@@ -67,6 +69,8 @@ describe('Coupon Handlers (WALT-02)', () => {
           expiresAt: futureDate,
         },
         {
+          PK: 'MERCHANT#m1',
+          SK: 'COUPON#c2',
           couponId: 'c2',
           merchantId: 'm1',
           title: 'Out of Stock Coupon',
@@ -76,6 +80,8 @@ describe('Coupon Handlers (WALT-02)', () => {
           expiresAt: futureDate,
         },
         {
+          PK: 'MERCHANT#m2',
+          SK: 'COUPON#c3',
           couponId: 'c3',
           merchantId: 'm2',
           title: 'Expired Coupon',
@@ -86,8 +92,12 @@ describe('Coupon Handlers (WALT-02)', () => {
         },
       ];
 
+      const merchantProfile = { PK: 'MERCHANT#m1', SK: 'PROFILE', merchantId: 'm1', name: 'Blue Tokai', category: 'food_beverage' };
+      // A user's redemption row also starts with COUPON# and must not appear in the catalog
+      const userRedemption = { PK: 'USER#u1', SK: 'COUPON#r1', couponId: 'c1', merchantId: 'm1', stock: 5, costGC: 50, expiresAt: futureDate };
+
       vi.mocked(docClient.send).mockResolvedValueOnce({
-        Items: mockCoupons,
+        Items: [...mockCoupons, merchantProfile, userRedemption],
       } as any);
 
       const event = createEvent('/v1/coupons', 'GET');
@@ -97,6 +107,8 @@ describe('Coupon Handlers (WALT-02)', () => {
       const body = JSON.parse(res.body);
       expect(body.coupons).toHaveLength(1);
       expect(body.coupons[0].couponId).toBe('c1');
+      expect(body.coupons[0].merchantName).toBe('Blue Tokai');
+      expect(body.coupons[0].category).toBe('food_beverage');
       expect(body.count).toBe(1);
     });
   });

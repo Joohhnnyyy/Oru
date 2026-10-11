@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from '../../context/ThemeContext';
 import { ChunkyButton, ChunkyCard, ChunkyProgress } from '../../components/Chunky';
 import { typography } from '../../theme/tokens';
+import { CHARACTERS } from '../../theme/characters';
 
 const TASKS = [
   ['Morning wet & dry waste handover', '+30 credits · Scan truck QR'],
@@ -22,7 +23,7 @@ export const HomeTerritoryRevealScreen: React.FC<{ navigation: any }> = ({ navig
       showsVerticalScrollIndicator={false}
     >
       <Text style={[styles.eyebrow, { color: theme.inkAccent.accentCyan }]}>YOUR TERRITORY</Text>
-      <Image source={require('../../../assets/earth_mascot.png')} style={styles.mascot} resizeMode="contain" />
+      <Image source={CHARACTERS.dolphin} style={styles.mascot} resizeMode="contain" />
       <Text style={[styles.name, { color: theme.textPrimary }]}>MCD South 34</Text>
       <Text style={[styles.sub, { color: theme.textSecondary }]}>Lajpat Nagar · Dolphin Sanctuary</Text>
 

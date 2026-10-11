@@ -201,12 +201,18 @@ export function generateSeedItems(): SeedDataResult {
     });
   });
 
-  const qrSourceItems = qrSources.map((qr) => ({
+  // Public bins start at a spread of fill levels so the live map shows every state
+  // (the API estimates fill from here: +2.5%/h, reset when a truck passes or a collector empties it).
+  const BIN_START_FILL = [12, 35, 58, 81, 94, 22, 47, 70];
+  const qrSourceItems = qrSources.map((qr, i) => ({
     PK: `QR#${qr.sourceId}`,
     SK: 'METADATA',
     GSI1PK: `TERRITORY#${qr.h3TerritoryId}`,
     GSI1SK: `QR#${qr.sourceId}`,
     ...qr,
+    ...(qr.type === 'dustbin_static'
+      ? { fillLevel: BIN_START_FILL[i % BIN_START_FILL.length], fillUpdatedAt: now }
+      : {}),
   }));
 
   // Security: every source gets a random 256-bit signing secret at seed time.

@@ -9,11 +9,14 @@ import {
   Dimensions,
   Platform,
   StatusBar,
+  Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import Svg, { Defs, LinearGradient as SvgLinearGradient, Stop, Rect } from 'react-native-svg';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
+import { useApiData } from '../../hooks/useApiData';
 import { useTheme } from '../../context/ThemeContext';
 import { Blobatar } from '../../components/Blobatar';
 import { ChunkyButton, ChunkyCard, ChunkyProgress, RainbowCard } from '../../components/Chunky';
@@ -21,6 +24,7 @@ import { typography } from '../../theme/tokens';
 import { Icon } from '../../components/Icon';
 import { FadeInUp, CountUp } from '../../components/Motion';
 import { AvatarPresetKey, AvatarAnimationKey } from '../../avatar/avatarRuntimeSource';
+import { CHARACTERS, GUARDIANS, GuardianInfo } from '../../theme/characters';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -189,11 +193,13 @@ const StopComponent = Stop as any;
 const RectComponent = Rect as any;
 
 export const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-  const { user, signOut } = useAuth();
+  const { user, token, signOut } = useAuth();
+  const rankBoard = useApiData(() => api.getLeaderboard('citywide'), [token], !!token);
   const { theme, isDark, toggleTheme } = useTheme();
   const [selectedPreset, setSelectedPreset] = useState<AvatarPresetKey>('safari-mint');
   const [avatarAnim, setAvatarAnim] = useState<AvatarAnimationKey>('proud');
   const [showAvatarLab, setShowAvatarLab] = useState(false);
+  const [activeGuardian, setActiveGuardian] = useState<GuardianInfo>(GUARDIANS[0]);
   const insets = useSafeAreaInsets();
 
   const handleSignOut = () => {
@@ -215,11 +221,13 @@ export const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
   const gradientStops = isDark ? currentPalette.darkGradient : currentPalette.brightGradient;
   const gradientId = `heroGrad-${selectedPreset}-${isDark ? 'dark' : 'bright'}`;
   const accent = isDark ? currentPalette.accentDark : currentPalette.accentBright;
-  const credits = user?.greenCredits ?? 520;
+  const credits = user?.greenCredits ?? 0;
+  const myRank = rankBoard.data?.userRank?.rank;
+  const territoryName = user?.territory?.name || user?.territoryName || 'Delhi';
 
   const stats: [string, string, keyof typeof theme.inkAccent][] = [
-    ['15', 'Rank', 'accentYellow'],
-    ['25', 'League', 'accentCyan'],
+    [myRank ? `#${myRank}` : '—', 'City rank', 'accentYellow'],
+    [`${user?.streakDays ?? 0}`, 'Day streak', 'accentCyan'],
     [credits.toLocaleString(), 'Credits', 'accentLime'],
   ];
 
@@ -261,7 +269,7 @@ export const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
         <View style={styles.identity}>
           <Text style={[styles.name, { color: theme.textPrimary }]}>{currentPresetObj.name}</Text>
           <Text style={[styles.role, { color: theme.textSecondary }]}>
-            {user?.displayName || 'Citizen'} · Green Park
+            {user?.displayName || 'Citizen'} · {territoryName}{user?.rankTitle ? ` · ${user.rankTitle}` : ''}
           </Text>
         </View>
 
@@ -318,6 +326,49 @@ export const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
           </ChunkyCard>
         )}
 
+        {/* Territory Guardian Companion */}
+        <ChunkyCard style={styles.guardianCard} tint={activeGuardian.accent}>
+          <View style={styles.guardianRow}>
+            <View style={{ flex: 1, gap: 4 }}>
+              <Text style={[styles.guardianEyebrow, { color: activeGuardian.accent }]}>TERRITORY GUARDIAN</Text>
+              <Text style={[styles.guardianTitle, { color: theme.textPrimary }]}>{activeGuardian.name}</Text>
+              <Text style={[styles.guardianSpecies, { color: theme.textSecondary }]}>{activeGuardian.species}</Text>
+              <Text style={[styles.guardianRoleText, { color: activeGuardian.accent }]}>{activeGuardian.role}</Text>
+              <Text style={[styles.guardianMission, { color: theme.textSecondary }]}>{activeGuardian.mission}</Text>
+            </View>
+            <View style={[styles.guardianImageWrap, { backgroundColor: isDark ? theme.surface2 : activeGuardian.bg }]}>
+              <Image source={CHARACTERS[activeGuardian.id]} style={styles.guardianImage} resizeMode="contain" />
+            </View>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.guardianSelectorTrack}>
+            {GUARDIANS.map((g) => {
+              const isSelected = activeGuardian.id === g.id;
+              return (
+                <TouchableOpacity
+                  key={g.id}
+                  activeOpacity={0.8}
+                  style={[
+                    styles.guardianPill,
+                    {
+                      backgroundColor: isSelected ? g.accent : (isDark ? theme.surface2 : '#FFFFFF'),
+                      borderColor: isSelected ? g.accent : theme.border,
+                    },
+                  ]}
+                  onPress={() => {
+                    Haptics.selectionAsync().catch(() => {});
+                    setActiveGuardian(g);
+                  }}
+                >
+                  <Image source={CHARACTERS[g.id]} style={styles.guardianPillIcon} resizeMode="contain" />
+                  <Text style={[styles.guardianPillText, { color: isSelected ? '#FFFFFF' : theme.textPrimary }]}>
+                    {g.name}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </ScrollView>
+        </ChunkyCard>
+
         {/* Settings */}
         <ChunkyCard style={styles.settings} onPress={() => { Haptics.selectionAsync().catch(() => {}); toggleTheme(); }}>
           <View style={styles.settingLeft}>
@@ -331,7 +382,7 @@ export const ProfileScreen: React.FC<{ navigation: any }> = ({ navigation }) => 
           </View>
         </ChunkyCard>
 
-        <ChunkyCard style={styles.settings} onPress={() => Alert.alert('Ward Notifications', 'Civic alert notifications are active for Green Park.')}>
+        <ChunkyCard style={styles.settings} onPress={() => Alert.alert('Ward notifications', `Civic alert notifications are active for ${territoryName}.`)}>
           <View style={styles.settingLeft}>
             <Icon name="bell" size={20} color={theme.textPrimary} />
             <Text style={[styles.settingLabel, { color: theme.textPrimary }]}>Notifications</Text>
@@ -365,6 +416,21 @@ const styles = StyleSheet.create({
   actions: { flexDirection: 'row', gap: 10 },
   lab: { gap: 12 },
   labTitle: { fontFamily: typography.fontBodyBold, fontSize: 15 },
+
+  guardianCard: { gap: 12, padding: 16 },
+  guardianRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  guardianEyebrow: { fontFamily: typography.fontBodyBold, fontSize: 10.5, letterSpacing: 1.4 },
+  guardianTitle: { fontFamily: typography.fontDisplayExtraBold, fontSize: 22, letterSpacing: -0.3 },
+  guardianSpecies: { fontFamily: typography.fontBodyMedium, fontSize: 12 },
+  guardianRoleText: { fontFamily: typography.fontBodyBold, fontSize: 13, marginTop: 2 },
+  guardianMission: { fontFamily: typography.fontBodyMedium, fontSize: 12, lineHeight: 16 },
+  guardianImageWrap: { width: 96, height: 96, borderRadius: 24, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  guardianImage: { width: 84, height: 84 },
+  guardianSelectorTrack: { gap: 8, paddingTop: 4 },
+  guardianPill: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 7, paddingHorizontal: 12, borderRadius: 30, borderWidth: 2 },
+  guardianPillIcon: { width: 24, height: 24 },
+  guardianPillText: { fontFamily: typography.fontBodyBold, fontSize: 12 },
+
   settings: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 14 },
   settingLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   settingLabel: { fontFamily: typography.fontBodyBold, fontSize: 16 },

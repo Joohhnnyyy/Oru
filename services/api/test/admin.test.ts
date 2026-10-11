@@ -19,6 +19,7 @@ vi.mock('@aws-sdk/client-sfn', () => ({
   SendTaskSuccessCommand: vi.fn().mockImplementation((input) => ({ input })),
 }));
 
+import { verifyStaticQrSignature } from '../src/utils/hmac.js';
 import { evaluateCedarPolicy } from '../src/utils/cedar.js';
 import { handler as getTerritoryOverviewHandler } from '../src/handlers/admin/getTerritoryOverview.js';
 import { handler as manageQrSourcesHandler } from '../src/handlers/admin/manageQrSources.js';
@@ -210,6 +211,11 @@ describe('Municipal Admin Console & Cedar Authorization (ADM-01, ADM-02, ADM-03)
       expect(putItem.PK).toBe(`QR#${body.qrId}`);
       expect(putItem.SK).toBe('METADATA');
       expect(putItem.geofenceRadiusMeters).toBe(75);
+      const printable = JSON.parse(body.qrPayload);
+      expect(printable.v).toBe(1);
+      expect(verifyStaticQrSignature(putItem.secretKey, body.qrId, printable.token).valid).toBe(true);
+      expect(body).not.toHaveProperty('secretKey');
+      expect(printable).not.toHaveProperty('secretKey');
     });
 
     it('lists registered QR sources', async () => {
@@ -221,6 +227,8 @@ describe('Municipal Admin Console & Cedar Authorization (ADM-01, ADM-02, ADM-03)
             sourceId: 'qr_112233445566',
             type: 'dustbin_static',
             name: 'Central Park Bin',
+            secretKey: 'test-signing-key',
+            qrPayload: 'legacy-format',
             h3TerritoryId: '8728308281fffff',
             latitude: 28.6139,
             longitude: 77.2090,
@@ -245,6 +253,8 @@ describe('Municipal Admin Console & Cedar Authorization (ADM-01, ADM-02, ADM-03)
       const body = JSON.parse(res.body);
       expect(body.count).toBe(1);
       expect(body.qrSources[0].qrId).toBe('qr_112233445566');
+      expect(verifyStaticQrSignature('test-signing-key', 'qr_112233445566', JSON.parse(body.qrSources[0].qrPayload).token).valid).toBe(true);
+      expect(JSON.stringify(body)).not.toContain('test-signing-key');
     });
   });
 

@@ -1,111 +1,15 @@
-import { motion, useScroll, useTransform, type MotionValue } from 'framer-motion';
-import { useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Parallax } from '../../../components/ScrollFx';
-import { CHARACTER, SCENE } from '../../../content/media';
-import { MissionIcon, type Mission as MissionId } from '../svg/Icons';
-import { ArrowIcon, Container } from './shared';
-
-const MISSIONS: { id: MissionId; dot: string }[] = [
-  { id: 'waste', dot: 'bg-waste' },
-  { id: 'heat', dot: 'bg-heat' },
-  { id: 'energy', dot: 'bg-energy' },
-  { id: 'water', dot: 'bg-water' },
-];
-
-/** One word whose ink fills in as the statement scrolls through the viewport. */
-function Word({ word, progress, range, strong }: { word: string; progress: MotionValue<number>; range: [number, number]; strong: boolean }) {
-  // Starts at a light grey that still passes 3:1 for large text, then fills to its final ink.
-  const color = useTransform(progress, range, ['#8b93a3', strong ? '#1d2330' : '#5a6375']);
-  return (
-    <motion.span style={{ color }}>
-      {word}{' '}
-    </motion.span>
-  );
-}
-
-function Statement() {
-  const { t } = useTranslation();
-  const ref = useRef<HTMLHeadingElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ['start 85%', 'end 45%'] });
-  const parts = [
-    { text: t('mission.quiet'), strong: false },
-    { text: t('mission.loud'), strong: true },
-    { text: t('mission.tail'), strong: false },
-  ];
-  const words = parts.flatMap((p) => p.text.split(/\s+/).filter(Boolean).map((w) => ({ w, strong: p.strong })));
-  const full = parts.map((p) => p.text).join(' ');
-  return (
-    <h2 ref={ref} id="mission-title" className="max-w-[60rem] text-[clamp(1.875rem,3.6vw,3rem)] leading-[1.15] font-bold">
-      <span className="sr-only">{full}</span>
-      <span aria-hidden="true">
-        {words.map((x, i) => (
-          <Word key={`${x.w}-${i}`} word={x.w} strong={x.strong} progress={scrollYProgress} range={[i / words.length, (i + 1) / words.length]} />
-        ))}
-      </span>
-    </h2>
-  );
-}
-
-const MotionLink = motion.create(Link);
-
-function ImageCard({ href, title, children, delay }: { href: string; title: string; children: ReactNode; delay: number }) {
-  return (
-    <MotionLink
-      to={href}
-      className="group relative block aspect-[16/10] overflow-hidden rounded-card bg-surface no-underline"
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.6, delay, ease: [0.2, 0.8, 0.2, 1] }}
-    >
-      <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-[1.04]">
-        <Parallax amount={28}>{children}</Parallax>
-      </div>
-      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/0 to-black/0" />
-      <div className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-4 p-6 sm:p-8">
-        <span className="font-display text-[clamp(1.5rem,2.4vw,2rem)] font-bold text-white drop-shadow">{title}</span>
-        <span className="arrow-badge">
-          <ArrowIcon />
-        </span>
-      </div>
-    </MotionLink>
-  );
-}
+import { RiseIn, Parallax } from '../../../components/ScrollFx';
+import { CHARACTER, TRUCK } from '../../../content/media';
+import { Container } from './shared';
 
 export function Mission() {
   const { t } = useTranslation();
-  return (
-    <section id="mission" aria-labelledby="mission-title" className="py-20 sm:py-28">
-      <Container>
-        <p className="mb-4 flex items-center gap-2 text-muted">
-          <span aria-hidden="true" className="size-2.5 rounded-full bg-butter" />
-          {t('mission.eyebrow')}
-        </p>
-        <Statement />
-
-        <h3 className="sr-only">{t('mission.missions')}</h3>
-        <ul className="mt-8 flex flex-wrap gap-3">
-          {MISSIONS.map((m) => (
-            <li key={m.id} className="flex items-center gap-2 rounded-full bg-surface py-1.5 pr-4 pl-1.5">
-              <MissionIcon mission={m.id} />
-              <span className="font-display text-lg font-bold">{t(`why.${m.id}.name`)}</span>
-            </li>
-          ))}
-        </ul>
-
-        <div className="mt-12 grid gap-6 md:grid-cols-2">
-          <ImageCard href="/how-it-works" title={t('mission.cardHow')} delay={0}>
-            <div className="relative h-full w-full bg-gradient-to-br from-butter via-[#ffe9a8] to-pink">
-              <img src={CHARACTER.buddy} alt="" width={401} height={403} loading="lazy" className="bob absolute top-1/2 left-1/2 h-[78%] w-auto -translate-x-1/2 -translate-y-[54%]" />
-            </div>
-          </ImageCard>
-          <ImageCard href="/guardians" title={t('mission.cardGuardians')} delay={0.12}>
-            <img src={SCENE.leopard} alt="" width={512} height={458} loading="lazy" className="h-full w-full object-cover" />
-          </ImageCard>
-        </div>
-      </Container>
-    </section>
-  );
+  const missions = [{id:'waste',art:TRUCK.hero},{id:'water',art:CHARACTER.turtle},{id:'energy',art:CHARACTER.sparrow},{id:'heat',art:CHARACTER.buddy}];
+  return <section id="mission" aria-labelledby="mission-title" {...{ string: 'progress', 'string-id': 'mission-section' }}><Container>
+    <div className="manifesto-layout"><RiseIn><p className="mb-6 text-xs tracking-widest text-muted">01 / {t('immersive.smallMatters')}</p><h2 id="mission-title">{t('immersive.everyday')}<br />{t('immersive.tomorrow')}</h2><p className="mt-6 max-w-2xl text-lg text-muted">{t('immersive.manifesto')}</p></RiseIn><Parallax amount={35}><img src={CHARACTER.turtle} alt="" width={340} height={360} className="h-[360px] w-full object-contain" {...{ string: 'parallax', 'string-speed': '0.1' }} /></Parallax></div>
+    <RiseIn className="mt-28"><p className="mb-6 text-xs tracking-widest text-muted">02 / {t('immersive.doLittle')}</p><h2>{t('immersive.fourWays')}</h2></RiseIn>
+    <div className="cinematic-missions">{missions.map((mission,i) => <RiseIn key={mission.id} delay={i%2*.08} className="cinematic-mission" {...{ string: 'spotlight' }}><p className="text-xs font-bold uppercase">{t(`why.${mission.id}.name`)}</p><h3 className="mt-6">{t(`immersive.${mission.id}`)}</h3><img src={mission.art} alt="" width={400} height={290} loading="lazy" {...{ string: 'parallax', 'string-speed': '0.06' }} /><Link className="btn btn-quiet" to={`/how-it-works#${mission.id}`} {...{ string: 'magnetic' }}>{t('immersive.explore', {mission:t(`why.${mission.id}.name`)})} ↗</Link></RiseIn>)}</div>
+  </Container></section>;
 }

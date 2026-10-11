@@ -2,10 +2,10 @@ import { StrictMode } from 'react';
 import { renderToString } from 'react-dom/server';
 import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router-dom/server';
 import i18n from './i18n';
-import { PRERENDER_PATHS, routes } from './app/routes';
+import { APP_PATHS, PRERENDER_PATHS, routes } from './app/routes';
 import { documentTitle, type RouteHandle } from './app/title';
 
-export { PRERENDER_PATHS };
+export { APP_PATHS, PRERENDER_PATHS };
 
 /** Build time only: render one URL of the site to HTML (English) plus its document title. */
 export async function render(path: string): Promise<{ html: string; title: string }> {

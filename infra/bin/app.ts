@@ -42,6 +42,7 @@ const apiStack = new ApiStack(app, 'SaafSafari-ApiStack', {
   userPoolClient: authStack.userPoolClient,
   geofenceCollectionArn: geoStack.geofenceCollection.attrArn,
   trackerArn: geoStack.tracker.attrArn,
+  mapsApiKeyName: geoStack.mapsApiKey.keyName,
 });
 
 // 5. Workflow Stack: Step Functions Multimodal AI Pipeline

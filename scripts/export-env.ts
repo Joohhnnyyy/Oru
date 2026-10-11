@@ -79,6 +79,7 @@ export function parseOutputs(outputsPath: string): Record<string, string> {
     COGNITO_USER_POOL_ARN: userPoolArn,
     VITE_COGNITO_USER_POOL_ID: userPoolId,
     VITE_COGNITO_CLIENT_ID: userPoolClientId,
+    VITE_COGNITO_REGION: region,
     EXPO_PUBLIC_COGNITO_USER_POOL_ID: userPoolId,
     EXPO_PUBLIC_COGNITO_CLIENT_ID: userPoolClientId,
     TABLE_NAME: tableName,
@@ -116,6 +117,7 @@ export function formatEnvContent(vars: Record<string, string>): string {
     `COGNITO_USER_POOL_ARN=${vars.COGNITO_USER_POOL_ARN}`,
     `VITE_COGNITO_USER_POOL_ID=${vars.VITE_COGNITO_USER_POOL_ID}`,
     `VITE_COGNITO_CLIENT_ID=${vars.VITE_COGNITO_CLIENT_ID}`,
+    `VITE_COGNITO_REGION=${vars.VITE_COGNITO_REGION}`,
     `EXPO_PUBLIC_COGNITO_USER_POOL_ID=${vars.EXPO_PUBLIC_COGNITO_USER_POOL_ID}`,
     `EXPO_PUBLIC_COGNITO_CLIENT_ID=${vars.EXPO_PUBLIC_COGNITO_CLIENT_ID}`,
     '',
@@ -136,13 +138,14 @@ export function formatEnvContent(vars: Record<string, string>): string {
   return lines.join('\n');
 }
 
-export function writeEnvFiles(vars: Record<string, string>, rootDir = process.cwd()) {
+export function writeEnvFiles(vars: Record<string, string>, rootDir = process.cwd(), frontendOnly = false) {
   const envContent = formatEnvContent(vars);
 
-  const targets = [
+  const targets = frontendOnly ? [path.join(rootDir, 'frontend/.env.local')] : [
     path.join(rootDir, '.env'),
     path.join(rootDir, 'services/api/.env'),
     path.join(rootDir, 'apps/web/.env'),
+    path.join(rootDir, 'frontend/.env.local'),
     path.join(rootDir, 'apps/mobile/.env'),
   ];
 
@@ -151,18 +154,26 @@ export function writeEnvFiles(vars: Record<string, string>, rootDir = process.cw
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
-    fs.writeFileSync(target, envContent, 'utf8');
+    let content = envContent;
+    if (target === path.join(rootDir, 'frontend/.env.local')) {
+      const publicVars = Object.entries(vars).filter(([key]) => key.startsWith('VITE_'));
+      const keys = new Set(publicVars.map(([key]) => key));
+      const preserved = fs.existsSync(target) ? fs.readFileSync(target, 'utf8').split('\n').filter(line => !keys.has(line.split('=')[0].trim())).join('\n').trim() : '';
+      content = [preserved, ...publicVars.map(([key, value]) => `${key}=${value}`)].filter(Boolean).join('\n') + '\n';
+    }
+    fs.writeFileSync(target, content, 'utf8');
     console.log(`[EXPORT-ENV] Wrote environment config to: ${target}`);
   }
 }
 
 // CLI Execution
 if (process.argv[1]?.includes('export-env')) {
-  const outputsFile = process.argv[2] || path.join(process.cwd(), 'cdk-outputs.json');
+  const frontendOnly = process.argv.includes('--frontend-only');
+  const outputsFile = process.argv.slice(2).find(argument => argument !== '--frontend-only') || path.join(process.cwd(), 'cdk-outputs.json');
   try {
     console.log(`[EXPORT-ENV] Reading CDK outputs from ${outputsFile}...`);
     const vars = parseOutputs(outputsFile);
-    writeEnvFiles(vars);
+    writeEnvFiles(vars, process.cwd(), frontendOnly);
     console.log(`[EXPORT-ENV] Successfully exported environment variables!`);
   } catch (err: any) {
     console.error(`[EXPORT-ENV ERROR]: ${err.message}`);

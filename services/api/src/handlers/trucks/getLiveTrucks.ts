@@ -1,32 +1,17 @@
 import type { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda';
-import { ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { listMetadata } from '../../utils/catalog.js';
+import { isLatLng } from '../../utils/http.js';
 import {
   LiveTruck,
   LiveTrucksResponse,
   createErrorResponse,
 } from '@saafsafari/shared';
-import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
 
 export const handler = async (
   _event: APIGatewayProxyEventV2,
 ): Promise<APIGatewayProxyResultV2> => {
   try {
-    const res = await docClient.send(
-      new ScanCommand({
-        TableName: TABLE_NAME,
-        FilterExpression: 'begins_with(PK, :qrPrefix) AND SK = :sk AND #type = :truckType',
-        ExpressionAttributeNames: {
-          '#type': 'type',
-        },
-        ExpressionAttributeValues: {
-          ':qrPrefix': 'QR#',
-          ':sk': 'METADATA',
-          ':truckType': 'truck_rotating',
-        },
-      }),
-    );
-
-    const items = res.Items || [];
+    const items = (await listMetadata('QR#')).filter(item => item.type === 'truck_rotating' && item.isActive !== false && isLatLng(item.latitude, item.longitude));
     const nowIso = new Date().toISOString();
 
     // A truck is "live" if its collector app reported a position in the last 10 minutes
@@ -35,7 +20,8 @@ export const handler = async (
       const live =
         !!item.livePositionAt &&
         Date.now() - Date.parse(item.livePositionAt) <= LIVE_WINDOW_MS &&
-        typeof item.liveLatitude === 'number';
+        Date.now() >= Date.parse(item.livePositionAt) &&
+        isLatLng(item.liveLatitude, item.liveLongitude);
       return {
         truckId: item.sourceId.replace('qr_truck_', 'trk_'),
         sourceId: item.sourceId,
@@ -43,8 +29,11 @@ export const handler = async (
         latitude: live ? item.liveLatitude : item.latitude,
         longitude: live ? item.liveLongitude : item.longitude,
         h3TerritoryId: item.h3TerritoryId,
-        lastUpdated: live ? item.livePositionAt : item.updatedAt || nowIso,
+        lastUpdated: live ? item.livePositionAt : item.livePositionAt || item.updatedAt || item.createdAt || '',
         status: live ? 'active' : 'idle',
+        ...(live && typeof item.liveHeading === 'number' ? { heading: item.liveHeading } : {}),
+        ...(live && typeof item.liveSpeedKmh === 'number' ? { speedKmh: item.liveSpeedKmh } : {}),
+        ...(live && (item.currentTerritoryId || item.liveTerritoryId) ? { currentTerritoryId: item.currentTerritoryId || item.liveTerritoryId } : {}),
       };
     });
 

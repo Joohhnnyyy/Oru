@@ -1,0 +1,42 @@
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
+import { afterEach, expect, it, vi } from 'vitest';
+import { ExploreMap } from '../pages/citizen/Map';
+import { api } from '../lib/api';
+vi.mock('../components/CityMap', () => ({ CityMap: () => <div>Geographic map</div> }));
+vi.mock('../context/AuthContext', () => ({ useAuth: () => ({ groups: ['citizen'], profile: {} }) }));
+afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
+it('shows AWS territories and reports a bin only after requesting the user location', async () => {
+  vi.spyOn(api, 'getCityMap').mockResolvedValue({ territories: [{ territoryId: 'hex1', name: 'River ward', ward: 'Ward 1', health: 65, mood: 'recovering', guardian: { id: 'dolphin', name: 'Dolphin', role: 'River guardian' }, center: { latitude: 28, longitude: 77 }, boundary: [], openHotspots: 1, binsNeedingPickup: 1, lastTruckVisitAt: null }], bins: [{ sourceId: 'bin1', name: 'Market bin', kind: 'bin', latitude: 28, longitude: 77, territoryId: 'hex1', fillLevel: 85, status: 'NEEDS_PICKUP', lastEmptiedAt: null, lastReportAt: null }], mapStyle: null, generatedAt: new Date().toISOString() });
+  vi.spyOn(api, 'getLiveTrucks').mockResolvedValue({ trucks: [], count: 0, timestamp: '' });
+  vi.spyOn(api, 'getHotspots').mockResolvedValue({ hotspots: [], count: 0 });
+  const report = vi.spyOn(api, 'reportBin').mockResolvedValue({ message: 'Bin reported.' });
+  const getCurrentPosition = vi.fn((success) => success({ coords: { latitude: 28, longitude: 77 } }));
+  vi.stubGlobal('navigator', { ...navigator, geolocation: { getCurrentPosition } });
+  render(<MemoryRouter><ExploreMap /></MemoryRouter>);
+  expect(await screen.findByText('River ward')).toBeInTheDocument();
+  expect(screen.getByText(/85% estimated fill/)).toBeInTheDocument();
+  expect(getCurrentPosition).not.toHaveBeenCalled();
+  await userEvent.click(screen.getByRole('button', { name: 'View collection point' }));
+  await userEvent.click(screen.getByRole('button', { name: 'Report full' }));
+  await waitFor(() => expect(report).toHaveBeenCalledWith('bin1', 'FULL', { latitude: 28, longitude: 77 }));
+  expect(await screen.findByText('Bin reported.')).toBeInTheDocument();
+  expect(screen.queryByText('Confirm I emptied this bin')).not.toBeInTheDocument();
+});
+
+it('shares collector GPS only after starting and clears the watch when stopped', async () => {
+  const { default: Collector } = await import('../pages/collector/Collector');
+  vi.spyOn(api, 'getCollectorQr').mockRejectedValue(new Error('QR not needed for GPS test'));
+  const update = vi.spyOn(api, 'updateTruckLocation').mockResolvedValue({ recorded: true, trackerUpdated: true, recordedAt: new Date().toISOString() });
+  let onPosition: PositionCallback | undefined;
+  const clearWatch = vi.fn(), watchPosition = vi.fn((callback: PositionCallback) => { onPosition = callback; return 7; });
+  vi.stubGlobal('navigator', { ...navigator, geolocation: { watchPosition, clearWatch } });
+  render(<MemoryRouter><Collector /></MemoryRouter>);
+  expect(watchPosition).not.toHaveBeenCalled();
+  await userEvent.click(screen.getByRole('button', { name: 'Start sharing truck location' }));
+  onPosition?.({ timestamp: Date.now(), coords: { latitude: 28, longitude: 77, accuracy: 5, speed: 2, heading: 90 } } as GeolocationPosition);
+  await waitFor(() => expect(update).toHaveBeenCalledWith({ latitude: 28, longitude: 77, accuracy: 5, speedKmh: 7.2, heading: 90 }));
+  await userEvent.click(screen.getByRole('button', { name: 'Stop sharing truck location' }));
+  expect(clearWatch).toHaveBeenCalledWith(7);
+});

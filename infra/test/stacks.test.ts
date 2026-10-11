@@ -101,6 +101,15 @@ describe('AWS CDK Infrastructure Stacks', () => {
       TrackerName: 'saafsafari-truck-tracker',
       PositionFiltering: 'TimeBased',
     });
+
+    // Tracker → territory geofences, so trucks emit ENTER/EXIT events
+    template.resourceCountIs('AWS::Location::TrackerConsumer', 1);
+
+    // Read-only Maps API v2 key for the mobile map
+    template.hasResourceProperties('AWS::Location::APIKey', {
+      KeyName: 'saafsafari-maps-key',
+      Restrictions: Match.objectLike({ AllowActions: ['geo-maps:GetTile', 'geo-maps:GetStaticMap'] }),
+    });
   });
 
   it('ApiStack provisions HTTP API Gateway v2, Cognito JWT Authorizer, and all Phase 1-4 routes', () => {
@@ -116,9 +125,27 @@ describe('AWS CDK Infrastructure Stacks', () => {
       userPoolClient: authStack.userPoolClient,
       geofenceCollectionArn: geoStack.geofenceCollection.attrArn,
       trackerArn: geoStack.tracker.attrArn,
+      mapsApiKeyName: 'saafsafari-maps-key',
     });
 
     const template = Template.fromStack(apiStack);
+
+    // City map routes
+    for (const routeKey of [
+      'GET /v1/map',
+      'POST /v1/collector/location',
+      'GET /v1/trucks/{sourceId}/trail',
+      'POST /v1/bins/{sourceId}/report',
+      'POST /v1/collector/bins/{sourceId}/emptied',
+      'POST /v1/admin/geofences/sync',
+    ]) {
+      template.hasResourceProperties('AWS::ApiGatewayV2::Route', { RouteKey: routeKey, AuthorizationType: 'JWT' });
+    }
+
+    // Amazon Location geofence events → Lambda
+    template.hasResourceProperties('AWS::Events::Rule', {
+      EventPattern: Match.objectLike({ source: ['aws.geo'], 'detail-type': ['Location Geofence Event'] }),
+    });
 
     template.hasResourceProperties('AWS::ApiGatewayV2::Api', {
       Name: 'saafsafari-http-api',
@@ -172,9 +199,9 @@ describe('AWS CDK Infrastructure Stacks', () => {
         AuthorizationType: 'NONE',
       });
     }
-  }, 20000);
+  }, 90000); // bundles ~27 Lambdas with esbuild
 
-  it('WorkflowStack provisions Step Functions State Machine with Rekognition and Bedrock permissions', () => {
+  it('WorkflowStack provisions Step Functions State Machine with Rekognition and Groq secret permissions', () => {
     const app = new App();
     const dataStack = new DataStack(app, 'TestDataStackForWorkflow', { env });
     const workflowStack = new WorkflowStack(app, 'TestWorkflowStack', {
@@ -199,7 +226,7 @@ describe('AWS CDK Infrastructure Stacks', () => {
     const machine = Object.values(template.findResources('AWS::StepFunctions::StateMachine'))[0] as any;
     expect(JSON.stringify(machine.Properties.DefinitionString)).toContain('waitForTaskToken');
 
-    // Assert IAM policy for Rekognition and Bedrock
+    // Assert IAM policy for Rekognition and the scoped Groq credential
     template.hasResourceProperties('AWS::IAM::Policy', {
       PolicyDocument: {
         Statement: Match.arrayWith([
@@ -208,7 +235,7 @@ describe('AWS CDK Infrastructure Stacks', () => {
             Effect: 'Allow',
           }),
           Match.objectLike({
-            Action: 'bedrock:InvokeModel',
+            Action: ['secretsmanager:GetSecretValue', 'secretsmanager:DescribeSecret'],
             Effect: 'Allow',
           }),
         ]),

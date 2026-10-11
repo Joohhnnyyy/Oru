@@ -9,6 +9,9 @@ export const LiveTruckSchema = z.object({
   h3TerritoryId: z.string(),
   lastUpdated: z.string(),
   status: z.enum(['active', 'idle']),
+  heading: z.number().optional(),
+  speedKmh: z.number().optional(),
+  currentTerritoryId: z.string().optional(),
 });
 export type LiveTruck = z.infer<typeof LiveTruckSchema>;
 

@@ -9,6 +9,10 @@ import { Footer } from '../pages/landing/sections/Footer';
 import { Loader } from '../pages/landing/sections/Loader';
 import { StickyHeader } from '../pages/landing/sections/StickyHeader';
 import { documentTitle, type RouteHandle } from './title';
+import { AccountHeader } from '../components/AccountPage';
+import { useReducedMotion } from '../hooks/useReducedMotion';
+import { Link } from 'react-router-dom';
+import { initStringTune } from '../lib/stringtune';
 
 /** Keeps the browser tab title in step with the page and language. */
 function useDocumentTitle() {
@@ -58,8 +62,19 @@ export function RootLayout() {
   const { t } = useTranslation();
   const { pathname } = useLocation();
   const outlet = useOutlet();
+  const reduced = useReducedMotion();
+  const world = pathname === '/home' || pathname === '/signin' || pathname === '/verify' || pathname.startsWith('/onboarding');
+  const account = world || /^\/(tasks|scan|proof|wallet|coupons|rewards|leaderboard|community|profile|collector|console|map|t|account|assistant|energy|verify|error|offline|session-expired|accessibility)(\/|$)/.test(pathname);
   useSmoothScroll();
   useDocumentTitle();
+  useEffect(() => { document.documentElement.classList.toggle('oru-no-motion', reduced); }, [reduced]);
+  useEffect(() => {
+    initStringTune();
+    const timer = setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [pathname, reduced]);
 
   // New page: start at the top (in-page anchors are handled by useSmoothScroll).
   const lastPath = useRef(pathname);
@@ -69,28 +84,32 @@ export function RootLayout() {
   }, [pathname]);
 
   return (
-    <MotionConfig reducedMotion="user">
-      <Loader />
+    <MotionConfig reducedMotion={reduced ? 'always' : 'never'}>
+      <div className={account ? 'account-layout' : 'public-layout'}>
+      {!reduced && <div aria-hidden="true" className="string-top-bar" {...{ string: 'progress', 'string-id': 'global-top-bar' }} />}
+      {!account && <Loader />}
       <a href="#main" className="sr-only-focusable fixed top-2 left-2 z-[70] rounded-full bg-ink px-5 py-3 font-bold text-white">
         {t('a11y.skip')}
       </a>
-      <StickyHeader />
+      {!world && (account ? <AccountHeader /> : <StickyHeader />)}
       <main id="main" tabIndex={-1} className="outline-none">
         <AnimatePresence mode="wait" initial={false}>
           <motion.div
             key={pathname}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.35, ease: [0.2, 0.8, 0.2, 1] }}
+            initial={{ opacity: reduced ? 1 : 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: reduced ? 1 : 0 }}
+            transition={{ duration: reduced ? 0 : 0.18 }}
           >
             {outlet}
           </motion.div>
         </AnimatePresence>
       </main>
-      <Footer />
-      <ScrollProgress />
-      <RouteCurtain />
+      {!account && <Footer />}
+      {account && !world && <footer className="account-footer"><strong>Small acts. Shared progress.</strong><Link to="/privacy">Privacy</Link><Link to="/faq">Help</Link><Link to="/terms">Terms</Link></footer>}
+      {!account && !reduced && <ScrollProgress />}
+      {!account && !reduced && <RouteCurtain />}
+      </div>
     </MotionConfig>
   );
 }

@@ -63,6 +63,7 @@ export const Google3DMap: React.FC<Google3DMapProps> = ({
     html, body { width: 100%; height: 100%; overflow: hidden; background-color: #F8FAFC; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     #map3d, #mapFallback { width: 100%; height: 100%; position: absolute; top: 0; left: 0; }
     .hud-badge {
+      display: none !important; /* the screen draws its own header over the map */
       position: absolute;
       top: 12px;
       left: 12px;
@@ -166,22 +167,62 @@ export const Google3DMap: React.FC<Google3DMapProps> = ({
           });
         });
 
-        // Add live truck marker
-        var truckMarker = new google.maps.Marker({
-          position: { lat: 28.5710, lng: 77.2415 },
-          map: fallbackMap,
-          title: 'MCD Truck DL-1M-4821',
-          icon: {
-            path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
-            scale: 5,
-            fillColor: '#00E5B3',
-            fillOpacity: 1,
-            strokeWeight: 2,
-            strokeColor: '#FFFFFF',
-            rotation: 45
-          }
+        // Add live truck markers
+        var trucks = [
+          { lat: 28.5710, lng: 77.2415, title: 'MCD Truck DL-1M-4821' },
+          { lat: 28.6330, lng: 77.2190, title: 'MCD Truck DL-1M-7742' }
+        ];
+        trucks.forEach(function(tr) {
+          truckMarkers.push(new google.maps.Marker({
+            position: { lat: tr.lat, lng: tr.lng },
+            map: fallbackMap,
+            title: tr.title,
+            icon: {
+              path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+              scale: 5,
+              fillColor: '#00E5B3',
+              fillOpacity: 1,
+              strokeWeight: 2,
+              strokeColor: '#FFFFFF',
+              rotation: 45
+            }
+          }));
         });
+
+        // Add drop-point (bin) markers
+        var bins = [
+          { lat: 28.5718, lng: 77.2432, title: 'Central Market Bin #402' },
+          { lat: 28.6098, lng: 77.2965, title: 'Mayur Vihar Smart Bin #118' },
+          { lat: 28.6465, lng: 77.1248, title: 'Rajouri Garden Bin #271' }
+        ];
+        bins.forEach(function(b) {
+          binMarkers.push(new google.maps.Marker({
+            position: { lat: b.lat, lng: b.lng },
+            map: fallbackMap,
+            title: b.title,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 8,
+              fillColor: '#FFD64A',
+              fillOpacity: 1,
+              strokeWeight: 2,
+              strokeColor: '#0A0F1D'
+            }
+          }));
+        });
+
+        applyFilterToMarkers(window.__activeFilter || 'all');
       }
+    }
+
+    var truckMarkers = [];
+    var binMarkers = [];
+
+    function applyFilterToMarkers(filter) {
+      var showTrucks = filter === 'all' || filter === 'trucks';
+      var showBins = filter === 'all' || filter === 'drop_points';
+      truckMarkers.forEach(function(m) { m.setMap(showTrucks ? fallbackMap : null); });
+      binMarkers.forEach(function(m) { m.setMap(showBins ? fallbackMap : null); });
     }
 
     // Global camera flight handler
@@ -210,8 +251,10 @@ export const Google3DMap: React.FC<Google3DMapProps> = ({
       }
     };
 
+    window.__activeFilter = 'all';
     window.applyFilter = function(filter) {
-      // Filter logic if needed
+      window.__activeFilter = filter;
+      applyFilterToMarkers(filter);
     };
   </script>
 </body>

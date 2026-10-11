@@ -72,7 +72,8 @@ function toUiProfile(p: BackendProfile, persona: PersonaKey): UserProfile {
     displayName: p.displayName || (p.email || DEMO_ACCOUNTS[persona]).split('@')[0],
     role,
     territoryId: p.homeTerritoryId || '',
-    territoryName: 'Delhi',
+    territoryName: p.territory?.name || 'Delhi',
+    territory: p.territory ?? null,
     greenCredits: p.balanceGC || 0,
     lifetimeXp: xp,
     level: Math.floor(xp / 500) + 1,
@@ -98,6 +99,8 @@ interface AuthContextType {
   refreshProfile: () => Promise<void>;
   /** Optimistic local update; the backend stays the source of truth. */
   updateCredits: (delta: number) => void;
+  /** Apply the authoritative balance (and optional streak/XP) returned by an API call. */
+  applyServerBalance: (balanceGC: number, extra?: { streakDays?: number; lifetimeXp?: number }) => void;
   signOut: () => void;
 }
 
@@ -163,6 +166,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Cognito ID tokens last 1 hour: on a 401 the API client asks us to sign in again once.
+  useEffect(() => {
+    api.setReauthHandler(async () => {
+      if (!DEMO_PASSWORD) return null;
+      try {
+        const { idToken } = await api.signIn(DEMO_ACCOUNTS[persona], DEMO_PASSWORD);
+        setToken(idToken);
+        return idToken;
+      } catch {
+        return null;
+      }
+    });
+    return () => api.setReauthHandler(null);
+  }, [persona]);
+
+  /** Set the balance/streak the server just returned (no extra round trip). */
+  const applyServerBalance = useCallback((balanceGC: number, extra?: { streakDays?: number; lifetimeXp?: number }) => {
+    setUser((u) => (u ? { ...u, greenCredits: balanceGC, ...(extra || {}) } : u));
+  }, []);
+
   const updateCredits = (delta: number) => {
     setUser((u) =>
       u ? { ...u, greenCredits: Math.max(0, u.greenCredits + delta), lifetimeXp: u.lifetimeXp + Math.max(0, delta) } : u,
@@ -189,6 +212,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         switchPersona,
         refreshProfile,
         updateCredits,
+        applyServerBalance,
         signOut,
       }}
     >

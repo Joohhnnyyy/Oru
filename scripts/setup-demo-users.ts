@@ -121,7 +121,8 @@ async function setupUser(email: string, pass: string, groups: string[], role: st
   );
 
   const idToken = authRes.AuthenticationResult?.IdToken!;
-  console.log(`✓ Got live Cognito ID Token (first 20 chars): ${idToken.substring(0, 20)}...`);
+  if (!idToken) throw new Error('Cognito did not return an ID token');
+  console.log('✓ Authenticated with Cognito');
 
   // 5. Call live /v1/onboarding to provision user in DynamoDB
   console.log(`Calling live /v1/onboarding...`);
@@ -138,13 +139,19 @@ async function setupUser(email: string, pass: string, groups: string[], role: st
     }),
   });
 
-  const onboardData = await onboardRes.json();
-  console.log(`Onboarding HTTP status: ${onboardRes.status}`, onboardData);
+  await onboardRes.json();
+  if (!onboardRes.ok) throw new Error(`Onboarding failed: ${onboardRes.status}`);
+  console.log(`Onboarding HTTP status: ${onboardRes.status}`);
 
   return { email, password: pass, idToken };
 }
 
 async function main() {
+  if (process.argv.includes('--collector-only')) {
+    const collector = await setupUser('demo-collector@saafsafari.local', 'REMOVED_CREDENTIAL', ['collector'], 'collector');
+    await linkCollectorToTruck(subFromIdToken(collector.idToken));
+    return;
+  }
   console.log('--- Initializing Permanent Demo Personas in Cognito & DynamoDB ---');
 
   const citizen = await setupUser(
@@ -175,4 +182,4 @@ async function main() {
   console.log('Collector: demo-collector@saafsafari.local / REMOVED_CREDENTIAL');
 }
 
-main().catch(console.error);
+main().catch((error) => { console.error(error); process.exitCode = 1; });

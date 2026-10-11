@@ -6,6 +6,8 @@ import { HttpJwtAuthorizer } from 'aws-cdk-lib/aws-apigatewayv2-authorizers';
 import { HttpLambdaIntegration } from 'aws-cdk-lib/aws-apigatewayv2-integrations';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
@@ -18,6 +20,8 @@ export interface ApiStackProps extends StackProps {
   userPoolClient: cognito.UserPoolClient;
   geofenceCollectionArn?: string;
   trackerArn?: string;
+  /** Amazon Location Maps API key name (for the mobile map style URL). */
+  mapsApiKeyName?: string;
 }
 
 export class ApiStack extends Stack {
@@ -27,7 +31,7 @@ export class ApiStack extends Stack {
   constructor(scope: Construct, id: string, props: ApiStackProps) {
     super(scope, id, props);
 
-    const { table, proofsBucket, userPool, userPoolClient, trackerArn } = props;
+    const { table, proofsBucket, userPool, userPoolClient, trackerArn, geofenceCollectionArn, mapsApiKeyName } = props;
 
     // Cognito JWT Authorizer
     this.authorizer = new HttpJwtAuthorizer('SaafSafariJwtAuthorizer', userPool.userPoolProviderUrl, {
@@ -413,6 +417,124 @@ export class ApiStack extends Stack {
       [apigwv2.HttpMethod.GET],
       new HttpLambdaIntegration('GetCollectorQrTokenIntegration', getCollectorQrTokenFn),
     );
+
+    // ---------- City map: territories, guardians, bins, truck tracking (Amazon Location) ----------
+    const TRACKER_NAME = 'saafsafari-truck-tracker';
+    const GEOFENCE_COLLECTION_NAME = 'saafsafari-geofences';
+
+    // 21. City map (GET /v1/map)
+    const getMapFn = new TsLambda(this, 'GetMapFunction', {
+      entry: path.join(apiBasePath, 'handlers/map/getMap.ts'),
+      serviceName: 'saafsafari-map-get',
+      environment: { TABLE_NAME: table.tableName, ...(mapsApiKeyName ? { LOCATION_API_KEY_NAME: mapsApiKeyName } : {}) },
+    });
+    table.grantReadData(getMapFn);
+    if (mapsApiKeyName) {
+      getMapFn.addToRolePolicy(
+        new iam.PolicyStatement({
+          actions: ['geo:DescribeKey'],
+          resources: [this.formatArn({ service: 'geo', resource: 'api-key', resourceName: mapsApiKeyName })],
+        }),
+      );
+    }
+    this.addSecuredRoute('/v1/map', [apigwv2.HttpMethod.GET], new HttpLambdaIntegration('GetMapIntegration', getMapFn));
+
+    // 22. Collector GPS ping (POST /v1/collector/location) → DynamoDB + Amazon Location tracker
+    const updateLocationFn = new TsLambda(this, 'CollectorLocationFunction', {
+      entry: path.join(apiBasePath, 'handlers/collector/updateLocation.ts'),
+      serviceName: 'saafsafari-collector-location',
+      environment: { TABLE_NAME: table.tableName, TRACKER_NAME },
+    });
+    table.grantReadWriteData(updateLocationFn);
+    if (trackerArn) {
+      updateLocationFn.addToRolePolicy(
+        new iam.PolicyStatement({ actions: ['geo:BatchUpdateDevicePosition'], resources: [trackerArn] }),
+      );
+    }
+    this.addSecuredRoute(
+      '/v1/collector/location',
+      [apigwv2.HttpMethod.POST],
+      new HttpLambdaIntegration('CollectorLocationIntegration', updateLocationFn),
+    );
+
+    // 23. Truck route history (GET /v1/trucks/{sourceId}/trail) from the tracker
+    const getTruckTrailFn = new TsLambda(this, 'GetTruckTrailFunction', {
+      entry: path.join(apiBasePath, 'handlers/trucks/getTruckTrail.ts'),
+      serviceName: 'saafsafari-trucks-trail',
+      environment: { TRACKER_NAME },
+    });
+    if (trackerArn) {
+      getTruckTrailFn.addToRolePolicy(
+        new iam.PolicyStatement({ actions: ['geo:GetDevicePositionHistory'], resources: [trackerArn] }),
+      );
+    }
+    this.addSecuredRoute(
+      '/v1/trucks/{sourceId}/trail',
+      [apigwv2.HttpMethod.GET],
+      new HttpLambdaIntegration('GetTruckTrailIntegration', getTruckTrailFn),
+    );
+
+    // 24. Citizen bin report (POST /v1/bins/{sourceId}/report)
+    const reportBinFn = new TsLambda(this, 'ReportBinFunction', {
+      entry: path.join(apiBasePath, 'handlers/bins/reportBin.ts'),
+      serviceName: 'saafsafari-bins-report',
+      environment: { TABLE_NAME: table.tableName },
+    });
+    table.grantReadWriteData(reportBinFn);
+    this.addSecuredRoute(
+      '/v1/bins/{sourceId}/report',
+      [apigwv2.HttpMethod.POST],
+      new HttpLambdaIntegration('ReportBinIntegration', reportBinFn),
+    );
+
+    // 25. Collector confirms pickup (POST /v1/collector/bins/{sourceId}/emptied)
+    const emptyBinFn = new TsLambda(this, 'EmptyBinFunction', {
+      entry: path.join(apiBasePath, 'handlers/bins/emptyBin.ts'),
+      serviceName: 'saafsafari-bins-emptied',
+      environment: { TABLE_NAME: table.tableName },
+    });
+    table.grantReadWriteData(emptyBinFn);
+    this.addSecuredRoute(
+      '/v1/collector/bins/{sourceId}/emptied',
+      [apigwv2.HttpMethod.POST],
+      new HttpLambdaIntegration('EmptyBinIntegration', emptyBinFn),
+    );
+
+    // 26. Admin: push territory hexes into the Amazon Location geofence collection
+    const syncGeofencesFn = new TsLambda(this, 'SyncGeofencesFunction', {
+      entry: path.join(apiBasePath, 'handlers/geo/syncGeofences.ts'),
+      serviceName: 'saafsafari-geofences-sync',
+      environment: { TABLE_NAME: table.tableName, GEOFENCE_COLLECTION_NAME },
+      timeout: Duration.seconds(60),
+    });
+    table.grantReadData(syncGeofencesFn);
+    if (geofenceCollectionArn) {
+      syncGeofencesFn.addToRolePolicy(
+        new iam.PolicyStatement({ actions: ['geo:BatchPutGeofence'], resources: [geofenceCollectionArn] }),
+      );
+    }
+    this.addSecuredRoute(
+      '/v1/admin/geofences/sync',
+      [apigwv2.HttpMethod.POST],
+      new HttpLambdaIntegration('SyncGeofencesIntegration', syncGeofencesFn),
+    );
+
+    // 27. Amazon Location geofence ENTER/EXIT (via EventBridge) → territory truck visits
+    const onGeofenceEventFn = new TsLambda(this, 'OnGeofenceEventFunction', {
+      entry: path.join(apiBasePath, 'handlers/geo/onGeofenceEvent.ts'),
+      serviceName: 'saafsafari-geofence-events',
+      environment: { TABLE_NAME: table.tableName },
+    });
+    table.grantReadWriteData(onGeofenceEventFn);
+    new events.Rule(this, 'TruckGeofenceEventsRule', {
+      description: 'Collection trucks entering/leaving territory hexes (Amazon Location)',
+      eventPattern: {
+        source: ['aws.geo'],
+        detailType: ['Location Geofence Event'],
+        ...(geofenceCollectionArn ? { resources: [geofenceCollectionArn] } : {}),
+      },
+      targets: [new targets.LambdaFunction(onGeofenceEventFn, { retryAttempts: 4 })],
+    });
 
     // CloudFormation Outputs
     new CfnOutput(this, 'HttpApiUrlOutput', {

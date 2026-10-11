@@ -199,8 +199,10 @@ export const RainbowCard: React.FC<{
   children: React.ReactNode;
   onPress?: () => void;
   accessibilityLabel?: string;
-}> = ({ style, radius = 28, children, onPress, accessibilityLabel }) => {
-  const STEP = 5;
+  /** Height of each colour band in px (default 5). */
+  step?: number;
+}> = ({ style, radius = 28, children, onPress, accessibilityLabel, step = 5 }) => {
+  const STEP = step;
   const [pressed, setPressed] = useState(false);
   const squash = pressed ? 3 : 0;
   const body = (

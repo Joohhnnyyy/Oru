@@ -14,6 +14,15 @@ export interface UserProfile {
   streakDays: number;
   assignedVehicleId?: string;
   assignedSourceId?: string;
+  /** Live home-territory summary from GET /v1/me (null until loaded / if missing). */
+  territory?: {
+    territoryId: string;
+    name: string;
+    ward?: string;
+    mascot?: string;
+    health: number;
+    mood: string;
+  } | null;
 }
 
 export interface Territory {

@@ -1,0 +1,2304 @@
+{
+  "fileKey": "0NzcwCz3EQ7gZYqZyPnzMh",
+  "url": "https://www.figma.com/design/0NzcwCz3EQ7gZYqZyPnzMh",
+  "conceptCount": 80,
+  "screenCount": 160,
+  "sections": {
+    "public": "11:480",
+    "citizen": "11:481",
+    "console": "11:2073",
+    "states": "11:2074",
+    "motion": "11:2075"
+  },
+  "validation": {
+    "counts": {
+      "screens": 160,
+      "text": 4287,
+      "instances": 1409,
+      "animated": 646,
+      "images": 476,
+      "reactions": 3845
+    },
+    "overflow": [],
+    "missingImages": [],
+    "reducedMotionTracks": [
+      {
+        "id": "7:10213",
+        "tracks": 0
+      },
+      {
+        "id": "7:10272",
+        "tracks": 0
+      }
+    ],
+    "flowStartingPoints": [
+      {
+        "nodeId": "5:19",
+        "name": "Desktop \u00b7 landing"
+      },
+      {
+        "nodeId": "5:104",
+        "name": "Mobile \u00b7 landing"
+      },
+      {
+        "nodeId": "7:2588",
+        "name": "Desktop \u00b7 signin"
+      },
+      {
+        "nodeId": "7:2660",
+        "name": "Mobile \u00b7 signin"
+      },
+      {
+        "nodeId": "7:5575",
+        "name": "Desktop \u00b7 collector"
+      },
+      {
+        "nodeId": "7:5638",
+        "name": "Mobile \u00b7 collector"
+      },
+      {
+        "nodeId": "7:5935",
+        "name": "Desktop \u00b7 overview"
+      },
+      {
+        "nodeId": "7:6075",
+        "name": "Mobile \u00b7 overview"
+      },
+      {
+        "nodeId": "7:7887",
+        "name": "Desktop \u00b7 scan-success"
+      },
+      {
+        "nodeId": "7:7951",
+        "name": "Mobile \u00b7 scan-success"
+      },
+      {
+        "nodeId": "7:10318",
+        "name": "Desktop \u00b7 assistant"
+      },
+      {
+        "nodeId": "7:10380",
+        "name": "Mobile \u00b7 assistant"
+      }
+    ],
+    "finalCheck": {
+      "screens": 160,
+      "overflow": 0,
+      "missingImages": 0,
+      "reducedMotionTracks": 0
+    },
+    "countsMethod": "Descendants of all 160 screens; reactions include inherited instance reactions."
+  },
+  "concepts": [
+    {
+      "id": "landing",
+      "route": "/",
+      "group": "public",
+      "title": "Do a little. Grow a lot.",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "5:19",
+        "name": "Desktop \u2022 landing \u2022 /",
+        "route": "/",
+        "specId": "landing",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 8391
+      },
+      "mobile": {
+        "id": "5:104",
+        "name": "Mobile \u2022 landing \u2022 /",
+        "route": "/",
+        "specId": "landing",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 11443.9765625
+      }
+    },
+    {
+      "id": "how",
+      "route": "/how-it-works",
+      "group": "public",
+      "title": "One small act. A ripple of good.",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:26",
+        "name": "Desktop \u2022 how \u2022 /how-it-works",
+        "route": "/how-it-works",
+        "specId": "how",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 3806
+      },
+      "mobile": {
+        "id": "7:96",
+        "name": "Mobile \u2022 how \u2022 /how-it-works",
+        "route": "/how-it-works",
+        "specId": "how",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 4749
+      }
+    },
+    {
+      "id": "guardians",
+      "route": "/guardians",
+      "group": "public",
+      "title": "Six guardians. One shared home.",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:163",
+        "name": "Desktop \u2022 guardians \u2022 /guardians",
+        "route": "/guardians",
+        "specId": "guardians",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 3100
+      },
+      "mobile": {
+        "id": "7:240",
+        "name": "Mobile \u2022 guardians \u2022 /guardians",
+        "route": "/guardians",
+        "specId": "guardians",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 5243
+      }
+    },
+    {
+      "id": "guardian-leopard",
+      "route": "/guardians/leopard",
+      "group": "public",
+      "title": "Snow leopard",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:316",
+        "name": "Desktop \u2022 guardian-leopard \u2022 /guardians/leopard",
+        "route": "/guardians/leopard",
+        "specId": "guardian-leopard",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2568
+      },
+      "mobile": {
+        "id": "7:388",
+        "name": "Mobile \u2022 guardian-leopard \u2022 /guardians/leopard",
+        "route": "/guardians/leopard",
+        "specId": "guardian-leopard",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 3207
+      }
+    },
+    {
+      "id": "guardian-bustard",
+      "route": "/guardians/bustard",
+      "group": "public",
+      "title": "Great Indian bustard",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:457",
+        "name": "Desktop \u2022 guardian-bustard \u2022 /guardians/bustard",
+        "route": "/guardians/bustard",
+        "specId": "guardian-bustard",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2568
+      },
+      "mobile": {
+        "id": "7:529",
+        "name": "Mobile \u2022 guardian-bustard \u2022 /guardians/bustard",
+        "route": "/guardians/bustard",
+        "specId": "guardian-bustard",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 3263
+      }
+    },
+    {
+      "id": "guardian-dolphin",
+      "route": "/guardians/dolphin",
+      "group": "public",
+      "title": "River dolphin",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:598",
+        "name": "Desktop \u2022 guardian-dolphin \u2022 /guardians/dolphin",
+        "route": "/guardians/dolphin",
+        "specId": "guardian-dolphin",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2568
+      },
+      "mobile": {
+        "id": "7:670",
+        "name": "Mobile \u2022 guardian-dolphin \u2022 /guardians/dolphin",
+        "route": "/guardians/dolphin",
+        "specId": "guardian-dolphin",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 3207
+      }
+    },
+    {
+      "id": "guardian-crane",
+      "route": "/guardians/crane",
+      "group": "public",
+      "title": "Sarus crane",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:739",
+        "name": "Desktop \u2022 guardian-crane \u2022 /guardians/crane",
+        "route": "/guardians/crane",
+        "specId": "guardian-crane",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2568
+      },
+      "mobile": {
+        "id": "7:811",
+        "name": "Mobile \u2022 guardian-crane \u2022 /guardians/crane",
+        "route": "/guardians/crane",
+        "specId": "guardian-crane",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 3207
+      }
+    },
+    {
+      "id": "guardian-turtle",
+      "route": "/guardians/turtle",
+      "group": "public",
+      "title": "Sea turtle",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:880",
+        "name": "Desktop \u2022 guardian-turtle \u2022 /guardians/turtle",
+        "route": "/guardians/turtle",
+        "specId": "guardian-turtle",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2568
+      },
+      "mobile": {
+        "id": "7:952",
+        "name": "Mobile \u2022 guardian-turtle \u2022 /guardians/turtle",
+        "route": "/guardians/turtle",
+        "specId": "guardian-turtle",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 3207
+      }
+    },
+    {
+      "id": "guardian-sparrow",
+      "route": "/guardians/sparrow",
+      "group": "public",
+      "title": "House sparrow",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:1021",
+        "name": "Desktop \u2022 guardian-sparrow \u2022 /guardians/sparrow",
+        "route": "/guardians/sparrow",
+        "specId": "guardian-sparrow",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2568
+      },
+      "mobile": {
+        "id": "7:1093",
+        "name": "Mobile \u2022 guardian-sparrow \u2022 /guardians/sparrow",
+        "route": "/guardians/sparrow",
+        "specId": "guardian-sparrow",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 3263
+      }
+    },
+    {
+      "id": "grow",
+      "route": "/grow",
+      "group": "public",
+      "title": "A little plot. A lot of possibility.",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:1162",
+        "name": "Desktop \u2022 grow \u2022 /grow",
+        "route": "/grow",
+        "specId": "grow",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 3806
+      },
+      "mobile": {
+        "id": "7:1222",
+        "name": "Mobile \u2022 grow \u2022 /grow",
+        "route": "/grow",
+        "specId": "grow",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 5503
+      }
+    },
+    {
+      "id": "places",
+      "route": "/places",
+      "group": "public",
+      "title": "A country full of little worlds.",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:1277",
+        "name": "Desktop \u2022 places \u2022 /places",
+        "route": "/places",
+        "specId": "places",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 3512
+      },
+      "mobile": {
+        "id": "7:1422",
+        "name": "Mobile \u2022 places \u2022 /places",
+        "route": "/places",
+        "specId": "places",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 5196
+      }
+    },
+    {
+      "id": "impact",
+      "route": "/impact",
+      "group": "public",
+      "title": "Small acts. Honest progress.",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:1562",
+        "name": "Desktop \u2022 impact \u2022 /impact",
+        "route": "/impact",
+        "specId": "impact",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2592
+      },
+      "mobile": {
+        "id": "7:1632",
+        "name": "Mobile \u2022 impact \u2022 /impact",
+        "route": "/impact",
+        "specId": "impact",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 3534
+      }
+    },
+    {
+      "id": "roadmap",
+      "route": "/roadmap",
+      "group": "public",
+      "title": "Good things take a little growing.",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:1699",
+        "name": "Desktop \u2022 roadmap \u2022 /roadmap",
+        "route": "/roadmap",
+        "specId": "roadmap",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2336
+      },
+      "mobile": {
+        "id": "7:1769",
+        "name": "Mobile \u2022 roadmap \u2022 /roadmap",
+        "route": "/roadmap",
+        "specId": "roadmap",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 3131
+      }
+    },
+    {
+      "id": "play",
+      "route": "/play",
+      "group": "public",
+      "title": "Your first good day starts here.",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:1836",
+        "name": "Desktop \u2022 play \u2022 /play",
+        "route": "/play",
+        "specId": "play",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2310
+      },
+      "mobile": {
+        "id": "7:1906",
+        "name": "Mobile \u2022 play \u2022 /play",
+        "route": "/play",
+        "specId": "play",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 3049
+      }
+    },
+    {
+      "id": "faq",
+      "route": "/faq",
+      "group": "public",
+      "title": "A few things you might wonder.",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:1973",
+        "name": "Desktop \u2022 faq \u2022 /faq",
+        "route": "/faq",
+        "specId": "faq",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 3292
+      },
+      "mobile": {
+        "id": "7:2058",
+        "name": "Mobile \u2022 faq \u2022 /faq",
+        "route": "/faq",
+        "specId": "faq",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 3741
+      }
+    },
+    {
+      "id": "privacy",
+      "route": "/privacy",
+      "group": "public",
+      "title": "Your privacy matters.",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:2138",
+        "name": "Desktop \u2022 privacy \u2022 /privacy",
+        "route": "/privacy",
+        "specId": "privacy",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2798
+      },
+      "mobile": {
+        "id": "7:2207",
+        "name": "Mobile \u2022 privacy \u2022 /privacy",
+        "route": "/privacy",
+        "specId": "privacy",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 3045
+      }
+    },
+    {
+      "id": "terms",
+      "route": "/terms",
+      "group": "public",
+      "title": "A little clarity, before you begin.",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:2271",
+        "name": "Desktop \u2022 terms \u2022 /terms",
+        "route": "/terms",
+        "specId": "terms",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2798
+      },
+      "mobile": {
+        "id": "7:2340",
+        "name": "Mobile \u2022 terms \u2022 /terms",
+        "route": "/terms",
+        "specId": "terms",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 3157
+      }
+    },
+    {
+      "id": "contact",
+      "route": "/contact",
+      "group": "public",
+      "title": "Say hello to Oru.",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:2404",
+        "name": "Desktop \u2022 contact \u2022 /contact",
+        "route": "/contact",
+        "specId": "contact",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2580
+      },
+      "mobile": {
+        "id": "7:2459",
+        "name": "Mobile \u2022 contact \u2022 /contact",
+        "route": "/contact",
+        "specId": "contact",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 2845
+      }
+    },
+    {
+      "id": "not-found",
+      "route": "/404",
+      "group": "public",
+      "title": "This page wandered off.",
+      "backend": "Existing public route; content screen",
+      "desktop": {
+        "id": "7:2509",
+        "name": "Desktop \u2022 not-found \u2022 /404",
+        "route": "/404",
+        "specId": "not-found",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2284
+      },
+      "mobile": {
+        "id": "7:2551",
+        "name": "Mobile \u2022 not-found \u2022 /404",
+        "route": "/404",
+        "specId": "not-found",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 2631
+      }
+    },
+    {
+      "id": "signin",
+      "route": "/signin",
+      "group": "citizen",
+      "title": "Welcome to your little world.",
+      "backend": "Current password authentication; demo/Cognito account",
+      "desktop": {
+        "id": "7:2588",
+        "name": "Desktop \u2022 signin \u2022 /signin",
+        "route": "/signin",
+        "specId": "signin",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1058
+      },
+      "mobile": {
+        "id": "7:2660",
+        "name": "Mobile \u2022 signin \u2022 /signin",
+        "route": "/signin",
+        "specId": "signin",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 1520
+      }
+    },
+    {
+      "id": "verify",
+      "route": "/verify",
+      "group": "citizen",
+      "title": "Check your inbox.",
+      "backend": "Planned email OTP; do not replace current authentication",
+      "desktop": {
+        "id": "7:2719",
+        "name": "Desktop \u2022 verify \u2022 /verify",
+        "route": "/verify",
+        "specId": "verify",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:2789",
+        "name": "Mobile \u2022 verify \u2022 /verify",
+        "route": "/verify",
+        "specId": "verify",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 1100
+      }
+    },
+    {
+      "id": "language",
+      "route": "/onboarding/language",
+      "group": "citizen",
+      "title": "Make yourself at home.",
+      "backend": "Existing /onboarding stage; POST /v1/onboarding",
+      "desktop": {
+        "id": "7:2846",
+        "name": "Desktop \u2022 language \u2022 /onboarding/language",
+        "route": "/onboarding/language",
+        "specId": "language",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1057
+      },
+      "mobile": {
+        "id": "7:2910",
+        "name": "Mobile \u2022 language \u2022 /onboarding/language",
+        "route": "/onboarding/language",
+        "specId": "language",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 960
+      }
+    },
+    {
+      "id": "location",
+      "route": "/onboarding/location",
+      "group": "citizen",
+      "title": "Find your home territory.",
+      "backend": "Existing /onboarding stage; browser permission + POST /v1/onboarding",
+      "desktop": {
+        "id": "7:2961",
+        "name": "Desktop \u2022 location \u2022 /onboarding/location",
+        "route": "/onboarding/location",
+        "specId": "location",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1123
+      },
+      "mobile": {
+        "id": "7:3038",
+        "name": "Mobile \u2022 location \u2022 /onboarding/location",
+        "route": "/onboarding/location",
+        "specId": "location",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 960
+      }
+    },
+    {
+      "id": "reveal",
+      "route": "/onboarding/reveal",
+      "group": "citizen",
+      "title": "Meet your home guardian.",
+      "backend": "Existing onboarding outcome; illustrative guardian/territory",
+      "desktop": {
+        "id": "7:3103",
+        "name": "Desktop \u2022 reveal \u2022 /onboarding/reveal",
+        "route": "/onboarding/reveal",
+        "specId": "reveal",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1089
+      },
+      "mobile": {
+        "id": "7:3172",
+        "name": "Mobile \u2022 reveal \u2022 /onboarding/reveal",
+        "route": "/onboarding/reveal",
+        "specId": "reveal",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 960
+      }
+    },
+    {
+      "id": "home",
+      "route": "/home",
+      "group": "citizen",
+      "title": "A good day for a small act.",
+      "backend": "GET /v1/me, /v1/wallet, /v1/tasks, /v1/trucks/live",
+      "desktop": {
+        "id": "7:3228",
+        "name": "Desktop \u2022 home \u2022 /home",
+        "route": "/home",
+        "specId": "home",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1245
+      },
+      "mobile": {
+        "id": "7:3329",
+        "name": "Mobile \u2022 home \u2022 /home",
+        "route": "/home",
+        "specId": "home",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 1002
+      }
+    },
+    {
+      "id": "map",
+      "route": "/map",
+      "group": "citizen",
+      "title": "Your neighbourhood is alive.",
+      "backend": "Planned map route; GET /v1/trucks/live available; polygons/detail API pending",
+      "desktop": {
+        "id": "7:3419",
+        "name": "Desktop \u2022 map \u2022 /map",
+        "route": "/map",
+        "specId": "map",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1406
+      },
+      "mobile": {
+        "id": "7:3581",
+        "name": "Mobile \u2022 map \u2022 /map",
+        "route": "/map",
+        "specId": "map",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 2530
+      }
+    },
+    {
+      "id": "territory",
+      "route": "/t/yamuna-bank",
+      "group": "citizen",
+      "title": "Yamuna Bank",
+      "backend": "Planned territory detail route and contract",
+      "desktop": {
+        "id": "7:3730",
+        "name": "Desktop \u2022 territory \u2022 /t/yamuna-bank",
+        "route": "/t/yamuna-bank",
+        "specId": "territory",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1642
+      },
+      "mobile": {
+        "id": "7:3874",
+        "name": "Mobile \u2022 territory \u2022 /t/yamuna-bank",
+        "route": "/t/yamuna-bank",
+        "specId": "territory",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 2718
+      }
+    },
+    {
+      "id": "tasks",
+      "route": "/tasks",
+      "group": "citizen",
+      "title": "A little to do. A lot to grow.",
+      "backend": "GET /v1/tasks + POST /v1/tasks/checkin",
+      "desktop": {
+        "id": "7:4003",
+        "name": "Desktop \u2022 tasks \u2022 /tasks",
+        "route": "/tasks",
+        "specId": "tasks",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1188
+      },
+      "mobile": {
+        "id": "7:4109",
+        "name": "Mobile \u2022 tasks \u2022 /tasks",
+        "route": "/tasks",
+        "specId": "tasks",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 2026
+      }
+    },
+    {
+      "id": "scan",
+      "route": "/scan",
+      "group": "citizen",
+      "title": "A scan. A small step forward.",
+      "backend": "POST /v1/scans; permissions and source checks",
+      "desktop": {
+        "id": "7:4204",
+        "name": "Desktop \u2022 scan \u2022 /scan",
+        "route": "/scan",
+        "specId": "scan",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1354
+      },
+      "mobile": {
+        "id": "7:4270",
+        "name": "Mobile \u2022 scan \u2022 /scan",
+        "route": "/scan",
+        "specId": "scan",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 1614
+      }
+    },
+    {
+      "id": "proof",
+      "route": "/proof",
+      "group": "citizen",
+      "title": "Show a little good.",
+      "backend": "POST /v1/submissions + GET /v1/submissions/{id}; signed upload",
+      "desktop": {
+        "id": "7:4323",
+        "name": "Desktop \u2022 proof \u2022 /proof",
+        "route": "/proof",
+        "specId": "proof",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1242
+      },
+      "mobile": {
+        "id": "7:4398",
+        "name": "Mobile \u2022 proof \u2022 /proof",
+        "route": "/proof",
+        "specId": "proof",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 1720
+      }
+    },
+    {
+      "id": "wallet",
+      "route": "/wallet",
+      "group": "citizen",
+      "title": "Every little act has a story.",
+      "backend": "GET /v1/wallet; currently included on /rewards",
+      "desktop": {
+        "id": "7:4460",
+        "name": "Desktop \u2022 wallet \u2022 /wallet",
+        "route": "/wallet",
+        "specId": "wallet",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1202
+      },
+      "mobile": {
+        "id": "7:4584",
+        "name": "Mobile \u2022 wallet \u2022 /wallet",
+        "route": "/wallet",
+        "specId": "wallet",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 1850
+      }
+    },
+    {
+      "id": "coupons",
+      "route": "/coupons",
+      "group": "citizen",
+      "title": "A little thank you, nearby.",
+      "backend": "GET /v1/coupons + POST /v1/coupons/redeem; currently /rewards",
+      "desktop": {
+        "id": "7:4676",
+        "name": "Desktop \u2022 coupons \u2022 /coupons",
+        "route": "/coupons",
+        "specId": "coupons",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:4763",
+        "name": "Mobile \u2022 coupons \u2022 /coupons",
+        "route": "/coupons",
+        "specId": "coupons",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 1608
+      }
+    },
+    {
+      "id": "leaderboard",
+      "route": "/leaderboard",
+      "group": "citizen",
+      "title": "A city growing together.",
+      "backend": "GET /v1/leaderboards",
+      "desktop": {
+        "id": "7:4839",
+        "name": "Desktop \u2022 leaderboard \u2022 /leaderboard",
+        "route": "/leaderboard",
+        "specId": "leaderboard",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1086
+      },
+      "mobile": {
+        "id": "7:4949",
+        "name": "Mobile \u2022 leaderboard \u2022 /leaderboard",
+        "route": "/leaderboard",
+        "specId": "leaderboard",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 1460
+      }
+    },
+    {
+      "id": "profile",
+      "route": "/profile",
+      "group": "citizen",
+      "title": "Your little corner of Oru.",
+      "backend": "GET/PATCH /v1/me",
+      "desktop": {
+        "id": "7:5024",
+        "name": "Desktop \u2022 profile \u2022 /profile",
+        "route": "/profile",
+        "specId": "profile",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1218
+      },
+      "mobile": {
+        "id": "7:5101",
+        "name": "Mobile \u2022 profile \u2022 /profile",
+        "route": "/profile",
+        "specId": "profile",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 1618
+      }
+    },
+    {
+      "id": "community",
+      "route": "/community",
+      "group": "citizen",
+      "title": "Care for the places we share.",
+      "backend": "GET /v1/hotspots + GET /v1/trucks/live",
+      "desktop": {
+        "id": "7:5165",
+        "name": "Desktop \u2022 community \u2022 /community",
+        "route": "/community",
+        "specId": "community",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1602
+      },
+      "mobile": {
+        "id": "7:5307",
+        "name": "Mobile \u2022 community \u2022 /community",
+        "route": "/community",
+        "specId": "community",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 2288
+      }
+    },
+    {
+      "id": "hotspot-report",
+      "route": "/community/report",
+      "group": "citizen",
+      "title": "Give this place a little care.",
+      "backend": "POST /v1/hotspots; currently /community form",
+      "desktop": {
+        "id": "7:5434",
+        "name": "Desktop \u2022 hotspot-report \u2022 /community/report",
+        "route": "/community/report",
+        "specId": "hotspot-report",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1218
+      },
+      "mobile": {
+        "id": "7:5511",
+        "name": "Mobile \u2022 hotspot-report \u2022 /community/report",
+        "route": "/community/report",
+        "specId": "hotspot-report",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 1618
+      }
+    },
+    {
+      "id": "collector",
+      "route": "/collector",
+      "group": "citizen",
+      "title": "A good handover starts here.",
+      "backend": "GET /v1/collector/qr-token",
+      "desktop": {
+        "id": "7:5575",
+        "name": "Desktop \u2022 collector \u2022 /collector",
+        "route": "/collector",
+        "specId": "collector",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1192
+      },
+      "mobile": {
+        "id": "7:5638",
+        "name": "Mobile \u2022 collector \u2022 /collector",
+        "route": "/collector",
+        "specId": "collector",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 1560
+      }
+    },
+    {
+      "id": "collector-route",
+      "route": "/collector/route",
+      "group": "citizen",
+      "title": "Your route, shared with care.",
+      "backend": "GET /v1/collector/qr-token?lat=&lng= updates live position; dedicated route planned",
+      "desktop": {
+        "id": "7:5688",
+        "name": "Desktop \u2022 collector-route \u2022 /collector/route",
+        "route": "/collector/route",
+        "specId": "collector-route",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1406
+      },
+      "mobile": {
+        "id": "7:5819",
+        "name": "Mobile \u2022 collector-route \u2022 /collector/route",
+        "route": "/collector/route",
+        "specId": "collector-route",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 2092
+      }
+    },
+    {
+      "id": "overview",
+      "route": "/console",
+      "group": "console",
+      "title": "Good morning, Ward 12.",
+      "backend": "GET /v1/admin/territory-overview",
+      "desktop": {
+        "id": "7:5935",
+        "name": "Desktop \u2022 overview \u2022 /console",
+        "route": "/console",
+        "specId": "overview",
+        "mobile": false,
+        "group": "console",
+        "width": 1440,
+        "height": 1694
+      },
+      "mobile": {
+        "id": "7:6075",
+        "name": "Mobile \u2022 overview \u2022 /console",
+        "route": "/console",
+        "specId": "overview",
+        "mobile": true,
+        "group": "console",
+        "width": 390,
+        "height": 2454.340087890625
+      }
+    },
+    {
+      "id": "territories",
+      "route": "/console/territories",
+      "group": "console",
+      "title": "Every territory tells a story.",
+      "backend": "GET /v1/admin/territory-overview; dedicated detail route planned",
+      "desktop": {
+        "id": "7:6190",
+        "name": "Desktop \u2022 territories \u2022 /console/territories",
+        "route": "/console/territories",
+        "specId": "territories",
+        "mobile": false,
+        "group": "console",
+        "width": 1440,
+        "height": 1476
+      },
+      "mobile": {
+        "id": "7:6325",
+        "name": "Mobile \u2022 territories \u2022 /console/territories",
+        "route": "/console/territories",
+        "specId": "territories",
+        "mobile": true,
+        "group": "console",
+        "width": 390,
+        "height": 1770
+      }
+    },
+    {
+      "id": "review",
+      "route": "/console/review",
+      "group": "console",
+      "title": "A careful second look.",
+      "backend": "GET /v1/admin/review-queue + POST /v1/admin/review-queue/resolve",
+      "desktop": {
+        "id": "7:6429",
+        "name": "Desktop \u2022 review \u2022 /console/review",
+        "route": "/console/review",
+        "specId": "review",
+        "mobile": false,
+        "group": "console",
+        "width": 1440,
+        "height": 1556
+      },
+      "mobile": {
+        "id": "7:6503",
+        "name": "Mobile \u2022 review \u2022 /console/review",
+        "route": "/console/review",
+        "specId": "review",
+        "mobile": true,
+        "group": "console",
+        "width": 390,
+        "height": 2494
+      }
+    },
+    {
+      "id": "qr-sources",
+      "route": "/console/qr-sources",
+      "group": "console",
+      "title": "Trusted points for real actions.",
+      "backend": "GET/POST /v1/admin/qr-sources",
+      "desktop": {
+        "id": "7:6566",
+        "name": "Desktop \u2022 qr-sources \u2022 /console/qr-sources",
+        "route": "/console/qr-sources",
+        "specId": "qr-sources",
+        "mobile": false,
+        "group": "console",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:6657",
+        "name": "Mobile \u2022 qr-sources \u2022 /console/qr-sources",
+        "route": "/console/qr-sources",
+        "specId": "qr-sources",
+        "mobile": true,
+        "group": "console",
+        "width": 390,
+        "height": 1260
+      }
+    },
+    {
+      "id": "qr-new",
+      "route": "/console/qr/new",
+      "group": "console",
+      "title": "Register a collection point.",
+      "backend": "POST /v1/admin/qr-sources; current registry inline form",
+      "desktop": {
+        "id": "7:6721",
+        "name": "Desktop \u2022 qr-new \u2022 /console/qr/new",
+        "route": "/console/qr/new",
+        "specId": "qr-new",
+        "mobile": false,
+        "group": "console",
+        "width": 1440,
+        "height": 1482
+      },
+      "mobile": {
+        "id": "7:6806",
+        "name": "Mobile \u2022 qr-new \u2022 /console/qr/new",
+        "route": "/console/qr/new",
+        "specId": "qr-new",
+        "mobile": true,
+        "group": "console",
+        "width": 390,
+        "height": 1882
+      }
+    },
+    {
+      "id": "qr-print",
+      "route": "/console/qr/print",
+      "group": "console",
+      "title": "Ready for the neighbourhood.",
+      "backend": "Registry QR preview; print-sheet UI planned",
+      "desktop": {
+        "id": "7:6880",
+        "name": "Desktop \u2022 qr-print \u2022 /console/qr/print",
+        "route": "/console/qr/print",
+        "specId": "qr-print",
+        "mobile": false,
+        "group": "console",
+        "width": 1440,
+        "height": 1222
+      },
+      "mobile": {
+        "id": "7:6941",
+        "name": "Mobile \u2022 qr-print \u2022 /console/qr/print",
+        "route": "/console/qr/print",
+        "specId": "qr-print",
+        "mobile": true,
+        "group": "console",
+        "width": 390,
+        "height": 1586
+      }
+    },
+    {
+      "id": "hotspots",
+      "route": "/console/hotspots",
+      "group": "console",
+      "title": "Find the places that need help.",
+      "backend": "GET /v1/hotspots; municipal workflow UI planned",
+      "desktop": {
+        "id": "7:6991",
+        "name": "Desktop \u2022 hotspots \u2022 /console/hotspots",
+        "route": "/console/hotspots",
+        "specId": "hotspots",
+        "mobile": false,
+        "group": "console",
+        "width": 1440,
+        "height": 1210
+      },
+      "mobile": {
+        "id": "7:7089",
+        "name": "Mobile \u2022 hotspots \u2022 /console/hotspots",
+        "route": "/console/hotspots",
+        "specId": "hotspots",
+        "mobile": true,
+        "group": "console",
+        "width": 390,
+        "height": 1504
+      }
+    },
+    {
+      "id": "bounty",
+      "route": "/console/bounties/new",
+      "group": "console",
+      "title": "Give a community action a purpose.",
+      "backend": "Planned bounty creation; no mounted API route",
+      "desktop": {
+        "id": "7:7172",
+        "name": "Desktop \u2022 bounty \u2022 /console/bounties/new",
+        "route": "/console/bounties/new",
+        "specId": "bounty",
+        "mobile": false,
+        "group": "console",
+        "width": 1440,
+        "height": 1350
+      },
+      "mobile": {
+        "id": "7:7252",
+        "name": "Mobile \u2022 bounty \u2022 /console/bounties/new",
+        "route": "/console/bounties/new",
+        "specId": "bounty",
+        "mobile": true,
+        "group": "console",
+        "width": 390,
+        "height": 1802
+      }
+    },
+    {
+      "id": "reports",
+      "route": "/console/reports",
+      "group": "console",
+      "title": "Your ward, in perspective.",
+      "backend": "Planned ward reports/export; overview aggregates available",
+      "desktop": {
+        "id": "7:7321",
+        "name": "Desktop \u2022 reports \u2022 /console/reports",
+        "route": "/console/reports",
+        "specId": "reports",
+        "mobile": false,
+        "group": "console",
+        "width": 1440,
+        "height": 1362
+      },
+      "mobile": {
+        "id": "7:7420",
+        "name": "Mobile \u2022 reports \u2022 /console/reports",
+        "route": "/console/reports",
+        "specId": "reports",
+        "mobile": true,
+        "group": "console",
+        "width": 390,
+        "height": 1724.3399658203125
+      }
+    },
+    {
+      "id": "merchants",
+      "route": "/console/merchants",
+      "group": "console",
+      "title": "Local rewards, shared value.",
+      "backend": "Planned inventory management; coupon read/redeem exists",
+      "desktop": {
+        "id": "7:7492",
+        "name": "Desktop \u2022 merchants \u2022 /console/merchants",
+        "route": "/console/merchants",
+        "specId": "merchants",
+        "mobile": false,
+        "group": "console",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:7577",
+        "name": "Mobile \u2022 merchants \u2022 /console/merchants",
+        "route": "/console/merchants",
+        "specId": "merchants",
+        "mobile": true,
+        "group": "console",
+        "width": 390,
+        "height": 1582
+      }
+    },
+    {
+      "id": "merchant-import",
+      "route": "/console/merchants/import",
+      "group": "console",
+      "title": "Bring your rewards to Oru.",
+      "backend": "Planned merchant CSV validation/publishing; no mounted API",
+      "desktop": {
+        "id": "7:7653",
+        "name": "Desktop \u2022 merchant-import \u2022 /console/merchants/import",
+        "route": "/console/merchants/import",
+        "specId": "merchant-import",
+        "mobile": false,
+        "group": "console",
+        "width": 1440,
+        "height": 1086
+      },
+      "mobile": {
+        "id": "7:7723",
+        "name": "Mobile \u2022 merchant-import \u2022 /console/merchants/import",
+        "route": "/console/merchants/import",
+        "specId": "merchant-import",
+        "mobile": true,
+        "group": "console",
+        "width": 390,
+        "height": 1512
+      }
+    },
+    {
+      "id": "scan-verifying",
+      "route": "/scan/verifying",
+      "group": "states",
+      "title": "Checking your small act.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:7782",
+        "name": "Desktop \u2022 scan-verifying \u2022 /scan/verifying",
+        "route": "/scan/verifying",
+        "specId": "scan-verifying",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:7841",
+        "name": "Mobile \u2022 scan-verifying \u2022 /scan/verifying",
+        "route": "/scan/verifying",
+        "specId": "scan-verifying",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1216
+      }
+    },
+    {
+      "id": "scan-success",
+      "route": "/scan/success",
+      "group": "states",
+      "title": "A little good, verified.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:7887",
+        "name": "Desktop \u2022 scan-success \u2022 /scan/success",
+        "route": "/scan/success",
+        "specId": "scan-success",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1096
+      },
+      "mobile": {
+        "id": "7:7951",
+        "name": "Mobile \u2022 scan-success \u2022 /scan/success",
+        "route": "/scan/success",
+        "specId": "scan-success",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1596
+      }
+    },
+    {
+      "id": "scan-range",
+      "route": "/scan/out-of-range",
+      "group": "states",
+      "title": "A little closer, please.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:8002",
+        "name": "Desktop \u2022 scan-range \u2022 /scan/out-of-range",
+        "route": "/scan/out-of-range",
+        "specId": "scan-range",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:8061",
+        "name": "Mobile \u2022 scan-range \u2022 /scan/out-of-range",
+        "route": "/scan/out-of-range",
+        "specId": "scan-range",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1216
+      }
+    },
+    {
+      "id": "scan-expired",
+      "route": "/scan/expired",
+      "group": "states",
+      "title": "This QR needs a fresh start.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:8107",
+        "name": "Desktop \u2022 scan-expired \u2022 /scan/expired",
+        "route": "/scan/expired",
+        "specId": "scan-expired",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:8166",
+        "name": "Mobile \u2022 scan-expired \u2022 /scan/expired",
+        "route": "/scan/expired",
+        "specId": "scan-expired",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1190
+      }
+    },
+    {
+      "id": "scan-cooldown",
+      "route": "/scan/cooldown",
+      "group": "states",
+      "title": "You already helped here today.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:8212",
+        "name": "Desktop \u2022 scan-cooldown \u2022 /scan/cooldown",
+        "route": "/scan/cooldown",
+        "specId": "scan-cooldown",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:8271",
+        "name": "Mobile \u2022 scan-cooldown \u2022 /scan/cooldown",
+        "route": "/scan/cooldown",
+        "specId": "scan-cooldown",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1236
+      }
+    },
+    {
+      "id": "camera-denied",
+      "route": "/scan/camera-denied",
+      "group": "states",
+      "title": "Let your camera lend a hand.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:8317",
+        "name": "Desktop \u2022 camera-denied \u2022 /scan/camera-denied",
+        "route": "/scan/camera-denied",
+        "specId": "camera-denied",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:8376",
+        "name": "Mobile \u2022 camera-denied \u2022 /scan/camera-denied",
+        "route": "/scan/camera-denied",
+        "specId": "camera-denied",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1242
+      }
+    },
+    {
+      "id": "location-denied",
+      "route": "/onboarding/location-denied",
+      "group": "states",
+      "title": "Your location is needed here.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:8422",
+        "name": "Desktop \u2022 location-denied \u2022 /onboarding/location-denied",
+        "route": "/onboarding/location-denied",
+        "specId": "location-denied",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:8481",
+        "name": "Mobile \u2022 location-denied \u2022 /onboarding/location-denied",
+        "route": "/onboarding/location-denied",
+        "specId": "location-denied",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1190
+      }
+    },
+    {
+      "id": "habit-complete",
+      "route": "/tasks/complete",
+      "group": "states",
+      "title": "A good habit, recorded.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:8527",
+        "name": "Desktop \u2022 habit-complete \u2022 /tasks/complete",
+        "route": "/tasks/complete",
+        "specId": "habit-complete",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:8586",
+        "name": "Mobile \u2022 habit-complete \u2022 /tasks/complete",
+        "route": "/tasks/complete",
+        "specId": "habit-complete",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1208
+      }
+    },
+    {
+      "id": "proof-processing",
+      "route": "/proof/processing",
+      "group": "states",
+      "title": "Your proof is getting a closer look.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:8632",
+        "name": "Desktop \u2022 proof-processing \u2022 /proof/processing",
+        "route": "/proof/processing",
+        "specId": "proof-processing",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:8691",
+        "name": "Mobile \u2022 proof-processing \u2022 /proof/processing",
+        "route": "/proof/processing",
+        "specId": "proof-processing",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1262
+      }
+    },
+    {
+      "id": "proof-review",
+      "route": "/proof/review",
+      "group": "states",
+      "title": "A human will take a second look.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:8737",
+        "name": "Desktop \u2022 proof-review \u2022 /proof/review",
+        "route": "/proof/review",
+        "specId": "proof-review",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:8796",
+        "name": "Mobile \u2022 proof-review \u2022 /proof/review",
+        "route": "/proof/review",
+        "specId": "proof-review",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1216
+      }
+    },
+    {
+      "id": "proof-approved",
+      "route": "/proof/approved",
+      "group": "states",
+      "title": "Your care made a difference.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:8842",
+        "name": "Desktop \u2022 proof-approved \u2022 /proof/approved",
+        "route": "/proof/approved",
+        "specId": "proof-approved",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:8901",
+        "name": "Mobile \u2022 proof-approved \u2022 /proof/approved",
+        "route": "/proof/approved",
+        "specId": "proof-approved",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1226
+      }
+    },
+    {
+      "id": "proof-rejected",
+      "route": "/proof/rejected",
+      "group": "states",
+      "title": "A clearer photo will help.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:8947",
+        "name": "Desktop \u2022 proof-rejected \u2022 /proof/rejected",
+        "route": "/proof/rejected",
+        "specId": "proof-rejected",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:9006",
+        "name": "Mobile \u2022 proof-rejected \u2022 /proof/rejected",
+        "route": "/proof/rejected",
+        "specId": "proof-rejected",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1242
+      }
+    },
+    {
+      "id": "redeem-confirm",
+      "route": "/coupons/confirm",
+      "group": "states",
+      "title": "A little reward for your efforts?",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:9052",
+        "name": "Desktop \u2022 redeem-confirm \u2022 /coupons/confirm",
+        "route": "/coupons/confirm",
+        "specId": "redeem-confirm",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:9113",
+        "name": "Mobile \u2022 redeem-confirm \u2022 /coupons/confirm",
+        "route": "/coupons/confirm",
+        "specId": "redeem-confirm",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1312
+      }
+    },
+    {
+      "id": "redeem-success",
+      "route": "/coupons/redeemed",
+      "group": "states",
+      "title": "Enjoy your little thank you.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:9161",
+        "name": "Desktop \u2022 redeem-success \u2022 /coupons/redeemed",
+        "route": "/coupons/redeemed",
+        "specId": "redeem-success",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:9221",
+        "name": "Mobile \u2022 redeem-success \u2022 /coupons/redeemed",
+        "route": "/coupons/redeemed",
+        "specId": "redeem-success",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1254
+      }
+    },
+    {
+      "id": "redeem-insufficient",
+      "route": "/coupons/insufficient",
+      "group": "states",
+      "title": "A few small acts away.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:9268",
+        "name": "Desktop \u2022 redeem-insufficient \u2022 /coupons/insufficient",
+        "route": "/coupons/insufficient",
+        "specId": "redeem-insufficient",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:9327",
+        "name": "Mobile \u2022 redeem-insufficient \u2022 /coupons/insufficient",
+        "route": "/coupons/insufficient",
+        "specId": "redeem-insufficient",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1216
+      }
+    },
+    {
+      "id": "empty-tasks",
+      "route": "/tasks/empty",
+      "group": "states",
+      "title": "A quiet moment to begin.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:9373",
+        "name": "Desktop \u2022 empty-tasks \u2022 /tasks/empty",
+        "route": "/tasks/empty",
+        "specId": "empty-tasks",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:9432",
+        "name": "Mobile \u2022 empty-tasks \u2022 /tasks/empty",
+        "route": "/tasks/empty",
+        "specId": "empty-tasks",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1216
+      }
+    },
+    {
+      "id": "network-error",
+      "route": "/error/network",
+      "group": "states",
+      "title": "Let\u2019s try that again.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:9478",
+        "name": "Desktop \u2022 network-error \u2022 /error/network",
+        "route": "/error/network",
+        "specId": "network-error",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:9537",
+        "name": "Mobile \u2022 network-error \u2022 /error/network",
+        "route": "/error/network",
+        "specId": "network-error",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1242
+      }
+    },
+    {
+      "id": "offline",
+      "route": "/offline",
+      "group": "states",
+      "title": "A little pause in the connection.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:9583",
+        "name": "Desktop \u2022 offline \u2022 /offline",
+        "route": "/offline",
+        "specId": "offline",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:9642",
+        "name": "Mobile \u2022 offline \u2022 /offline",
+        "route": "/offline",
+        "specId": "offline",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1242
+      }
+    },
+    {
+      "id": "profile-saved",
+      "route": "/profile/saved",
+      "group": "states",
+      "title": "It feels more like home.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:9688",
+        "name": "Desktop \u2022 profile-saved \u2022 /profile/saved",
+        "route": "/profile/saved",
+        "specId": "profile-saved",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:9747",
+        "name": "Mobile \u2022 profile-saved \u2022 /profile/saved",
+        "route": "/profile/saved",
+        "specId": "profile-saved",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1190
+      }
+    },
+    {
+      "id": "hotspot-reported",
+      "route": "/community/reported",
+      "group": "states",
+      "title": "Your report is part of the change.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:9793",
+        "name": "Desktop \u2022 hotspot-reported \u2022 /community/reported",
+        "route": "/community/reported",
+        "specId": "hotspot-reported",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:9852",
+        "name": "Mobile \u2022 hotspot-reported \u2022 /community/reported",
+        "route": "/community/reported",
+        "specId": "hotspot-reported",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1288
+      }
+    },
+    {
+      "id": "review-resolved",
+      "route": "/console/review/resolved",
+      "group": "states",
+      "title": "A real action, recognised.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:9898",
+        "name": "Desktop \u2022 review-resolved \u2022 /console/review/resolved",
+        "route": "/console/review/resolved",
+        "specId": "review-resolved",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:9957",
+        "name": "Mobile \u2022 review-resolved \u2022 /console/review/resolved",
+        "route": "/console/review/resolved",
+        "specId": "review-resolved",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1190
+      }
+    },
+    {
+      "id": "report-exported",
+      "route": "/console/reports/exported",
+      "group": "states",
+      "title": "Ready to share with your ward.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:10003",
+        "name": "Desktop \u2022 report-exported \u2022 /console/reports/exported",
+        "route": "/console/reports/exported",
+        "specId": "report-exported",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:10062",
+        "name": "Mobile \u2022 report-exported \u2022 /console/reports/exported",
+        "route": "/console/reports/exported",
+        "specId": "report-exported",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1242
+      }
+    },
+    {
+      "id": "session-expired",
+      "route": "/session-expired",
+      "group": "states",
+      "title": "Welcome back. Sign in again.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:10108",
+        "name": "Desktop \u2022 session-expired \u2022 /session-expired",
+        "route": "/session-expired",
+        "specId": "session-expired",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:10167",
+        "name": "Mobile \u2022 session-expired \u2022 /session-expired",
+        "route": "/session-expired",
+        "specId": "session-expired",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1216
+      }
+    },
+    {
+      "id": "reduced-motion",
+      "route": "/accessibility/reduced-motion",
+      "group": "states",
+      "title": "A calmer little world.",
+      "backend": "Alternate UI state; route label is a design identifier",
+      "desktop": {
+        "id": "7:10213",
+        "name": "Desktop \u2022 reduced-motion \u2022 /accessibility/reduced-motion",
+        "route": "/accessibility/reduced-motion",
+        "specId": "reduced-motion",
+        "mobile": false,
+        "group": "states",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:10272",
+        "name": "Mobile \u2022 reduced-motion \u2022 /accessibility/reduced-motion",
+        "route": "/accessibility/reduced-motion",
+        "specId": "reduced-motion",
+        "mobile": true,
+        "group": "states",
+        "width": 390,
+        "height": 1268
+      }
+    },
+    {
+      "id": "assistant",
+      "route": "/assistant",
+      "group": "motion",
+      "title": "A little help with sorting.",
+      "backend": "P2 concept; no implemented assistant API",
+      "desktop": {
+        "id": "7:10318",
+        "name": "Desktop \u2022 assistant \u2022 /assistant",
+        "route": "/assistant",
+        "specId": "assistant",
+        "mobile": false,
+        "group": "motion",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:10380",
+        "name": "Mobile \u2022 assistant \u2022 /assistant",
+        "route": "/assistant",
+        "specId": "assistant",
+        "mobile": true,
+        "group": "motion",
+        "width": 390,
+        "height": 1222
+      }
+    },
+    {
+      "id": "assistant-result",
+      "route": "/assistant/result",
+      "group": "motion",
+      "title": "Give batteries a safe next home.",
+      "backend": "P2 concept; guidance requires review",
+      "desktop": {
+        "id": "7:10429",
+        "name": "Desktop \u2022 assistant-result \u2022 /assistant/result",
+        "route": "/assistant/result",
+        "specId": "assistant-result",
+        "mobile": false,
+        "group": "motion",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:10506",
+        "name": "Mobile \u2022 assistant-result \u2022 /assistant/result",
+        "route": "/assistant/result",
+        "specId": "assistant-result",
+        "mobile": true,
+        "group": "motion",
+        "width": 390,
+        "height": 1464
+      }
+    },
+    {
+      "id": "energy",
+      "route": "/energy",
+      "group": "motion",
+      "title": "A little less energy. A little more care.",
+      "backend": "P2 concept; no implemented bill API",
+      "desktop": {
+        "id": "7:10571",
+        "name": "Desktop \u2022 energy \u2022 /energy",
+        "route": "/energy",
+        "specId": "energy",
+        "mobile": false,
+        "group": "motion",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:10638",
+        "name": "Mobile \u2022 energy \u2022 /energy",
+        "route": "/energy",
+        "specId": "energy",
+        "mobile": true,
+        "group": "motion",
+        "width": 390,
+        "height": 1374
+      }
+    },
+    {
+      "id": "energy-result",
+      "route": "/energy/result",
+      "group": "motion",
+      "title": "A small change worth noticing.",
+      "backend": "P2 concept; illustrative comparison",
+      "desktop": {
+        "id": "7:10692",
+        "name": "Desktop \u2022 energy-result \u2022 /energy/result",
+        "route": "/energy/result",
+        "specId": "energy-result",
+        "mobile": false,
+        "group": "motion",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "7:10779",
+        "name": "Mobile \u2022 energy-result \u2022 /energy/result",
+        "route": "/energy/result",
+        "specId": "energy-result",
+        "mobile": true,
+        "group": "motion",
+        "width": 390,
+        "height": 1582
+      }
+    },
+    {
+      "id": "public-menu",
+      "route": "/menu",
+      "group": "public",
+      "title": "Explore your little world.",
+      "backend": "Responsive public navigation design",
+      "desktop": {
+        "id": "9:1934",
+        "name": "Desktop \u2022 public-menu \u2022 /menu",
+        "route": "/menu",
+        "specId": "public-menu",
+        "mobile": false,
+        "group": "public",
+        "width": 1440,
+        "height": 2554
+      },
+      "mobile": {
+        "id": "9:2025",
+        "name": "Mobile \u2022 public-menu \u2022 /menu",
+        "route": "/menu",
+        "specId": "public-menu",
+        "mobile": true,
+        "group": "public",
+        "width": 390,
+        "height": 3333
+      }
+    },
+    {
+      "id": "account-menu",
+      "route": "/account/menu",
+      "group": "citizen",
+      "title": "Your next small act.",
+      "backend": "Responsive account navigation design",
+      "desktop": {
+        "id": "9:2114",
+        "name": "Desktop \u2022 account-menu \u2022 /account/menu",
+        "route": "/account/menu",
+        "specId": "account-menu",
+        "mobile": false,
+        "group": "citizen",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "9:2232",
+        "name": "Mobile \u2022 account-menu \u2022 /account/menu",
+        "route": "/account/menu",
+        "specId": "account-menu",
+        "mobile": true,
+        "group": "citizen",
+        "width": 390,
+        "height": 2144
+      }
+    },
+    {
+      "id": "console-menu",
+      "route": "/console/menu",
+      "group": "console",
+      "title": "Your ward, at a glance.",
+      "backend": "Responsive municipal navigation design",
+      "desktop": {
+        "id": "9:2341",
+        "name": "Desktop \u2022 console-menu \u2022 /console/menu",
+        "route": "/console/menu",
+        "specId": "console-menu",
+        "mobile": false,
+        "group": "console",
+        "width": 1440,
+        "height": 1024
+      },
+      "mobile": {
+        "id": "9:2457",
+        "name": "Mobile \u2022 console-menu \u2022 /console/menu",
+        "route": "/console/menu",
+        "specId": "console-menu",
+        "mobile": true,
+        "group": "console",
+        "width": 390,
+        "height": 2144
+      }
+    }
+  ],
+  "visualRevision": {
+    "date": "2026-10-11",
+    "source": "User supplied current root frontend screenshots",
+    "direction": "Cinematic parallax opening, editorial manifesto, asymmetrical mission panels, staggered guardians, floating navigation, restrained operational layouts and rainbow Oru branding",
+    "nativeInteractions": [
+      "Guardian front/back variants",
+      "Five-stage seed-to-forest selector",
+      "Button hover and pressed variants"
+    ],
+    "plotComponents": {
+      "seed": "33:370",
+      "sprout": "33:446",
+      "patch": "33:523",
+      "grove": "33:2711",
+      "forest": "33:2799"
+    },
+    "guardianCardComponents": {
+      "leopard": "34:2",
+      "bustard": "34:16",
+      "dolphin": "34:30",
+      "crane": "34:44",
+      "turtle": "34:58",
+      "sparrow": "34:72"
+    },
+    "motionStudy": "59:5939",
+    "choreographyPanel": "61:853",
+    "browserPreview": "docs/design/immersive-preview.html",
+    "verifiedWidths": [
+      1440,
+      390
+    ],
+    "productionScope": "Design and isolated motion preview; application routes and backend are unchanged",
+    "citizenWorld": {
+      "concepts": [
+        "language",
+        "location",
+        "reveal",
+        "home"
+      ],
+      "browserPreview": "docs/design/citizen-preview.html",
+      "motionVideo": "docs/design/citizen-reveal-motion.mp4",
+      "check": "docs/design/verify-citizen-preview.js",
+      "verifiedWidths": [
+        1440,
+        390
+      ],
+      "direction": "Immersive world onboarding, guardian-first citizen home and one daily action",
+      "scope": "Figma and isolated browser prototype; no API calls or production route changes"
+    }
+  }
+}

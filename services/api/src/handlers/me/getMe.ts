@@ -3,6 +3,15 @@ import { GetCommand } from '@aws-sdk/lib-dynamodb';
 import { UserProfile, createErrorResponse } from '@saafsafari/shared';
 import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
 
+interface HomeTerritorySummary {
+  territoryId: string;
+  name: string;
+  ward?: string;
+  mascot?: string;
+  health: number;
+  mood: string;
+}
+
 export const handler = async (
   event: APIGatewayProxyEventV2,
 ): Promise<APIGatewayProxyResultV2> => {
@@ -38,10 +47,36 @@ export const handler = async (
 
     const { PK, SK, GSI1PK, GSI1SK, ...profile } = result.Item;
 
+    // Home territory summary for the app's home card. Best-effort: a missing or
+    // failed territory read must never block the profile itself.
+    let territory: HomeTerritorySummary | null = null;
+    if (profile.homeTerritoryId) {
+      try {
+        const t = await docClient.send(
+          new GetCommand({
+            TableName: TABLE_NAME,
+            Key: { PK: `TERRITORY#${profile.homeTerritoryId}`, SK: 'METADATA' },
+          }),
+        );
+        if (t.Item) {
+          territory = {
+            territoryId: profile.homeTerritoryId,
+            name: t.Item.name || 'Home territory',
+            ward: t.Item.ward,
+            mascot: t.Item.mascot,
+            health: typeof t.Item.health === 'number' ? t.Item.health : 100,
+            mood: t.Item.mood || t.Item.moodState || 'thriving',
+          };
+        }
+      } catch (err: any) {
+        console.warn('[getMe] territory lookup failed', { error: err?.message });
+      }
+    }
+
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(profile as UserProfile),
+      body: JSON.stringify({ ...(profile as UserProfile), territory }),
     };
   } catch (error: any) {
     console.error('[getMe] failed', { error: error?.message, name: error?.name });

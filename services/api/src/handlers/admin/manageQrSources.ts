@@ -8,6 +8,7 @@ import {
 } from '@saafsafari/shared';
 import { docClient, TABLE_NAME } from '../../utils/dynamo.js';
 import { evaluateCedarPolicy } from '../../utils/cedar.js';
+import { generateStaticQrSignature } from '../../utils/hmac.js';
 
 export const handler = async (
   event: APIGatewayProxyEventV2,
@@ -54,7 +55,9 @@ export const handler = async (
         longitude: item.longitude,
         radiusMeters: item.geofenceRadiusMeters || item.radiusMeters || 75,
         isActive: item.isActive !== false,
-        qrPayload: item.qrPayload,
+        qrPayload: item.type !== 'truck_rotating' && item.secretKey
+          ? JSON.stringify({ v: 1, sourceId: item.sourceId || item.qrId, token: generateStaticQrSignature(item.secretKey, item.sourceId || item.qrId) })
+          : undefined,
         createdAt: item.createdAt,
       }));
 
@@ -107,12 +110,9 @@ export const handler = async (
 
       // Encode standard QR payload format
       const qrPayload = JSON.stringify({
+        v: 1,
         sourceId: qrId,
-        type,
-        secretKey: type === 'truck_rotating' ? secretKey : undefined,
-        territoryId,
-        latitude,
-        longitude,
+        ...(type === 'truck_rotating' ? { mode: 'rotating' } : { token: generateStaticQrSignature(secretKey, qrId) }),
       });
 
       // Persist in DynamoDB
@@ -153,7 +153,6 @@ export const handler = async (
         latitude,
         longitude,
         radiusMeters,
-        secretKey: type === 'truck_rotating' ? secretKey : undefined,
         qrPayload,
         createdAt: nowIso,
       };

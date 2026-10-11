@@ -19,20 +19,36 @@ export type CharacterId = 'buddy' | 'leopard' | 'bustard' | 'dolphin' | 'crane' 
 
 /** Transparent cut-outs used for floating / tilting characters. */
 export const CHARACTER: Record<CharacterId, string> = {
-  buddy: '/media/characters/buddy.webp',
-  leopard: '/media/characters/leopard.webp',
-  bustard: '/media/characters/bustard.webp',
-  dolphin: '/media/characters/dolphin.webp',
+  buddy: '/media/characters/buddy.png',
+  leopard: '/media/characters/leopard.png',
+  bustard: '/media/characters/bustard.png',
+  dolphin: '/media/characters/dolphin.png',
   crane: '/media/characters/crane.webp',
-  turtle: '/media/characters/turtle.webp',
-  sparrow: '/media/characters/sparrow.webp',
+  turtle: '/media/characters/turtle.png',
+  sparrow: '/media/characters/sparrow.png',
 };
+
+/** Supplied sad artwork; guardians without a variant keep their normal artwork. */
+export const SAD_CHARACTER: Partial<Record<CharacterId, string>> = {
+  buddy: '/media/characters/Sad_buddy.png',
+  bustard: '/media/characters/sad_bustard.png',
+  dolphin: '/media/characters/Sad_dolphine.png',
+  crane: '/media/characters/Sad_crane.png',
+  turtle: '/media/characters/Sad_turtle.png',
+};
+
+/** Matches the territory rules' sick threshold (rounded health <= 30). */
+export function characterForHealth(id: CharacterId, health?: number): string {
+  return health !== undefined && Math.round(health) <= 30
+    ? SAD_CHARACTER[id] ?? CHARACTER[id]
+    : CHARACTER[id];
+}
 
 /** The recycling truck (loader, scroll-progress road). */
 export const TRUCK = {
   side: '/media/characters/truck-side.webp',
   front: '/media/characters/truck-front34.webp',
-  hero: '/media/characters/truck-hero.webp',
+  hero: '/media/characters/truck-hero.png',
 };
 
 /** Painted habitat scenes (with backgrounds) for cards and bubbles. */
@@ -48,12 +64,13 @@ export const SCENE: Record<Exclude<CharacterId, 'buddy'> | 'plaza' | 'plazaSmall
 };
 
 export const BRAND = {
-  wordmark: '/media/brand/wordmark.webp',
-  /** Opaque sticker version for dark backgrounds (hero), see scripts/art/6_wordmark_on_dark.py. */
-  wordmarkOnDark: '/media/brand/wordmark-on-dark.webp',
-  /** 2x upscale for the giant footer logo. TODO: replace with a high-res/SVG export of the logo. */
-  wordmarkLarge: '/media/brand/wordmark-large.webp',
-  icon: '/icons/icon-192.png',
+  /** High-resolution full-color logo. */
+  wordmark: '/media/brand/oru-color.png',
+  /** High-resolution full-color logo for dark backgrounds (hero). */
+  wordmarkOnDark: '/media/brand/oru-color.png',
+  /** High-resolution full-color logo for the footer. */
+  wordmarkLarge: '/media/brand/oru-color.png',
+  icon: '/icons/oru-nav.png',
 };
 
 /** Hero highlight cards (bottom-right carousel). */

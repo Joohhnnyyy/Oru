@@ -5,15 +5,21 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
     "splash": {
       "backgroundColor": "#FFFFFF"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.saafsafari.app"
+      "bundleIdentifier": "com.saafsafari.app",
+      "icon": "./assets/icon.png"
     },
     "android": {
       "package": "com.saafsafari.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
       "config": {
         "googleMaps": {
           "apiKey": "REMOVED_CREDENTIAL"
@@ -33,6 +39,9 @@
       "cognitoClientId": "2g4b36dekkv7f0lu9ad4h4s7oa",
       "googleMapsApiKey": "REMOVED_CREDENTIAL",
       "demoPassword": "REMOVED_CREDENTIAL"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       [

@@ -72,14 +72,13 @@ describe('Home page', () => {
     expect(container.querySelector('.mark-shimmer')).not.toBeNull();
   });
 
-  it('steps through hero highlights with the carousel buttons', async () => {
-    const user = userEvent.setup();
-    renderAt('/');
-    const highlights = screen.getByRole('complementary', { name: 'Highlights' });
-    expect(within(highlights).getByText('Your first day takes about a minute')).toBeInTheDocument();
-    await user.click(within(highlights).getByRole('button', { name: 'Pause highlights' }));
-    await user.click(within(highlights).getByRole('button', { name: 'Next highlight' }));
-    expect(await within(highlights).findByText('Six guardians are waiting to wake up')).toBeInTheDocument();
+  it('links the cinematic entry to the real authenticated app', () => {
+    const { container } = renderAt('/');
+    const hero = container.querySelector('.cinematic-opening');
+    if (!hero) throw new Error('Cinematic hero missing');
+    expect(within(hero as HTMLElement).getByRole('link', { name: /Enter your world/ })).toHaveAttribute('href', '/home');
+    expect(hero.querySelectorAll('img')).toHaveLength(4);
+    expect(hero.querySelector('.opening-buddy')).toHaveAttribute('src', '/media/characters/buddy.png');
   });
 
   it('links the pills and section buttons to their pages', () => {

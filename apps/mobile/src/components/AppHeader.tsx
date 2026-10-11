@@ -20,6 +20,7 @@ export const AppHeader: React.FC<{
   const { theme, isDark } = useTheme();
   const insets = useSafeAreaInsets();
   const credits = user?.greenCredits ?? 420;
+  const streak = user?.streakDays ?? 0;
 
   return (
     <View style={[styles.header, { backgroundColor: theme.bg, paddingTop: Math.max(insets.top, 12) + 4 }]}>
@@ -40,12 +41,12 @@ export const AppHeader: React.FC<{
         onPress={onNotificationPress}
         hitSlop={8}
         accessibilityRole="button"
-        accessibilityLabel={`Daily streak, 7 days. View notifications`}
+        accessibilityLabel={`Daily streak, ${streak} days. View notifications`}
       >
         <Wiggle loop>
           <Icon name="flame" size={22} color="#FF9F1C" filled strokeWidth={2} />
         </Wiggle>
-        <Text style={[styles.chipText, { color: '#FF9F1C' }]}>7</Text>
+        <Text style={[styles.chipText, { color: '#FF9F1C' }]}>{streak}</Text>
       </Pressable>
 
       <View style={styles.chip}>

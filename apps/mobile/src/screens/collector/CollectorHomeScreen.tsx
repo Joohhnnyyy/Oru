@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, ActivityIndicator } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, Text, StyleSheet, ScrollView, ActivityIndicator, Image } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import * as Location from 'expo-location';
 import QRCode from 'react-native-qrcode-svg';
@@ -10,6 +10,7 @@ import { ScreenHeader } from '../../components/ScreenHeader';
 import { useTheme } from '../../context/ThemeContext';
 import { api, CollectorQrToken } from '../../services/api';
 import { typography } from '../../theme/tokens';
+import { CHARACTERS } from '../../theme/characters';
 
 import { Icon3D } from '../../components/Icon3D';
 
@@ -57,6 +58,48 @@ export const CollectorHomeScreen: React.FC = () => {
     return () => clearInterval(tick);
   }, [isOnRoute, token, fetchQr, refreshProfile]);
 
+  // Live truck tracking while on route: GPS → POST /v1/collector/location →
+  // Amazon Location tracker (territory geofences, route history) + automatic bin pickups.
+  const [gps, setGps] = useState<{ at: number; binsEmptied: number; error?: string } | null>(null);
+  const lastSent = useRef(0);
+  useEffect(() => {
+    if (!isOnRoute || !token) return;
+    let sub: Location.LocationSubscription | null = null;
+    let cancelled = false;
+    (async () => {
+      const perm = await Location.getForegroundPermissionsAsync();
+      if (!perm.granted && !(await Location.requestForegroundPermissionsAsync()).granted) {
+        setGps({ at: Date.now(), binsEmptied: 0, error: 'Location permission is off' });
+        return;
+      }
+      sub = await Location.watchPositionAsync(
+        { accuracy: Location.Accuracy.High, timeInterval: 10_000, distanceInterval: 15 },
+        async (pos) => {
+          if (cancelled || Date.now() - lastSent.current < 10_000) return;
+          lastSent.current = Date.now();
+          try {
+            const res = await api.sendCollectorLocation({
+              latitude: pos.coords.latitude,
+              longitude: pos.coords.longitude,
+              accuracy: pos.coords.accuracy ?? undefined,
+              speedKmh: pos.coords.speed != null && pos.coords.speed >= 0 ? pos.coords.speed * 3.6 : undefined,
+              heading: pos.coords.heading != null && pos.coords.heading >= 0 ? pos.coords.heading : undefined,
+            });
+            if (res.binsEmptied.length) Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+            setGps((g) => ({ at: Date.now(), binsEmptied: (g?.binsEmptied ?? 0) + res.binsEmptied.length }));
+          } catch (err: any) {
+            setGps((g) => ({ at: Date.now(), binsEmptied: g?.binsEmptied ?? 0, error: err?.message || 'GPS upload failed' }));
+          }
+        },
+      );
+      if (cancelled) sub.remove();
+    })();
+    return () => {
+      cancelled = true;
+      sub?.remove();
+    };
+  }, [isOnRoute, token]);
+
   const handleToggleRoute = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium).catch(() => {});
     setIsOnRoute(!isOnRoute);
@@ -70,12 +113,18 @@ export const CollectorHomeScreen: React.FC = () => {
         <View style={styles.body}>
           <ChunkyCard style={styles.vehicle} tint={isOnRoute ? theme.accentLime : undefined}>
             <View style={[styles.truckIcon, { backgroundColor: theme.surface2 }]}>
-              <Icon3D name="truck" size={40} />
+              <Image source={CHARACTERS.truck} style={{ width: 44, height: 44 }} resizeMode="contain" />
             </View>
             <View style={{ flex: 1 }}>
               <Text style={[styles.vehicleId, { color: theme.textPrimary }]}>{user?.assignedVehicleId || 'DL-1M-4821'}</Text>
               <Text style={[styles.vehicleMeta, { color: isOnRoute ? theme.accentLime : theme.textSecondary }]}>
-                {isOnRoute ? 'On route · live GPS shared with each QR' : 'Shift paused'}
+                {!isOnRoute
+                  ? 'Shift paused'
+                  : gps?.error
+                    ? gps.error
+                    : gps
+                      ? `Live tracking · ${gps.binsEmptied} bin${gps.binsEmptied === 1 ? '' : 's'} emptied this shift`
+                      : 'On route · starting GPS…'}
               </Text>
             </View>
             <ChunkyButton small variant={isOnRoute ? 'secondary' : 'success'} label={isOnRoute ? 'Pause' : 'Start'} onPress={handleToggleRoute} />
