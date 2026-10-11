@@ -45,6 +45,10 @@ describe('Live Collection Truck Tracking Handler (TRK-01)', () => {
         longitude: 77.2195,
         h3TerritoryId: '8760824b4ffffff',
         isActive: true,
+        // Collector app reported a live position 1 minute ago
+        liveLatitude: 28.6401,
+        liveLongitude: 77.2301,
+        livePositionAt: new Date(Date.now() - 60_000).toISOString(),
       },
       {
         PK: 'QR#qr_truck_mcd_south_02',
@@ -72,9 +76,11 @@ describe('Live Collection Truck Tracking Handler (TRK-01)', () => {
 
     expect(body.trucks[0].truckId).toBe('trk_ndmc_01');
     expect(body.trucks[0].status).toBe('active');
-    expect(body.trucks[0].latitude).toBe(28.6328);
+    expect(body.trucks[0].latitude).toBe(28.6401); // live position, not the depot
+    expect(body.trucks[0].longitude).toBe(77.2301);
 
     expect(body.trucks[1].truckId).toBe('trk_mcd_south_02');
-    expect(body.trucks[1].status).toBe('idle');
+    expect(body.trucks[1].status).toBe('idle'); // no recent position
+    expect(body.trucks[1].latitude).toBe(28.525);
   });
 });

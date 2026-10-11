@@ -296,6 +296,8 @@ describe('Municipal Admin Console & Cedar Authorization (ADM-01, ADM-02, ADM-03)
           submissionId: 'sub_123456789012',
           userId: 'usr_citizen1',
           territoryId: '8728308281fffff',
+          status: 'FLAGGED_FOR_REVIEW',
+          actionType: 'COMMUNITY_CLEANUP_PROOF',
           taskToken: 'AAAA-task-token-1234',
         },
       });
@@ -351,11 +353,16 @@ describe('Municipal Admin Console & Cedar Authorization (ADM-01, ADM-02, ADM-03)
 
       // Item 1: Credit user balance and XP
       expect(items[1].Update.ExpressionAttributeValues[':gc']).toBe(100);
-      expect(items[1].Update.ExpressionAttributeValues[':lifetimeXP']).toBe(850); // 600 + 250
+      expect(items[1].Update.ExpressionAttributeValues[':xp']).toBe(250); // atomic add, no read-modify-write
 
-      // Item 2: Put ledger entry
-      expect(items[2].Put.Item.amountGC).toBe(100);
-      expect(items[2].Put.Item.type).toBe('ADMIN_APPROVED_PROOF');
+      // Item 0 is conditional on the submission still awaiting review (no double payout)
+      expect(items[0].Update.ConditionExpression).toBe('#st = :flagged');
+
+      // Item 2: Ledger entry uses the same schema as every other credit
+      expect(items[2].Put.Item.PK).toBe('USER#usr_citizen1');
+      expect(items[2].Put.Item.SK).toMatch(/^LEDGER#/);
+      expect(items[2].Put.Item.creditsEarned).toBe(100);
+      expect(items[2].Put.Item.actionType).toBe('COMMUNITY_CLEANUP_PROOF');
 
       // Item 3: Bump territory health (+2)
       expect(items[3].Update.ExpressionAttributeValues[':healthGain']).toBe(2);
@@ -375,6 +382,7 @@ describe('Municipal Admin Console & Cedar Authorization (ADM-01, ADM-02, ADM-03)
           submissionId: 'sub_reject999',
           userId: 'usr_citizen1',
           territoryId: '8728308281fffff',
+          status: 'FLAGGED_FOR_REVIEW',
           taskToken: 'BBBB-task-token-5678',
         },
       });
@@ -412,6 +420,29 @@ describe('Municipal Admin Console & Cedar Authorization (ADM-01, ADM-02, ADM-03)
 
       // Verify SFN task token was signaled
       expect(mockSfnSend).toHaveBeenCalledTimes(1);
+    });
+
+    it('resolveReviewQueue refuses to pay twice for an already-resolved submission', async () => {
+      mockSend.mockResolvedValueOnce({
+        Item: {
+          PK: 'SUBMISSION#sub_done',
+          SK: 'METADATA',
+          submissionId: 'sub_done',
+          userId: 'usr_citizen1',
+          territoryId: '8728308281fffff',
+          status: 'ADMIN_APPROVED',
+        },
+      });
+
+      const event: Partial<APIGatewayProxyEventV2> = {
+        requestContext: { authorizer: { jwt: { claims: adminClaims, scopes: [] } } } as any,
+        body: JSON.stringify({ submissionId: 'sub_done', decision: 'APPROVE', reason: 'Approving again' }),
+      };
+
+      const res: any = await resolveReviewQueueHandler(event as APIGatewayProxyEventV2);
+      expect(res.statusCode).toBe(409);
+      expect(JSON.parse(res.body).error.code).toBe('ALREADY_RESOLVED');
+      expect(mockSend).toHaveBeenCalledTimes(1); // no write attempted
     });
   });
 });

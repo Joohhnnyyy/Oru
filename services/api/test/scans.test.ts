@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { docClient } from '../src/utils/dynamo.js';
-import { generateRotatingQrToken } from '../src/utils/hmac.js';
+import { generateRotatingQrToken, generateStaticQrSignature } from '../src/utils/hmac.js';
 import { handler as verifyScan } from '../src/handlers/scans/verifyScan.js';
 
 vi.mock('../src/utils/dynamo.js', () => {
@@ -18,7 +18,8 @@ describe('QR Scan Verification Handler', () => {
   const mockTerritory = '8760824b4ffffff';
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    // mockReset also drops queued mockResolvedValueOnce values so tests can't leak into each other
+    vi.mocked(docClient.send).mockReset();
   });
 
   const createEvent = (body: any, sub: string | null = mockSub): APIGatewayProxyEventV2 => {
@@ -54,8 +55,10 @@ describe('QR Scan Verification Handler', () => {
       latitude: 28.6328,
       longitude: 77.2195,
       geofenceRadiusMeters: 75,
+      secretKey: 'bin-secret-key-for-tests',
       isActive: true,
     };
+    const binSignature = generateStaticQrSignature('bin-secret-key-for-tests', 'qr_bin_cp_inner_circle_01');
 
     it('successfully verifies scan within 75m and awards credits atomically', async () => {
       // 1. Get QR source
@@ -86,6 +89,7 @@ describe('QR Scan Verification Handler', () => {
       // Scan location 20 meters away from bin
       const event = createEvent({
         sourceId: 'qr_bin_cp_inner_circle_01',
+        qrPayload: binSignature,
         latitude: 28.6329,
         longitude: 77.2195,
       });
@@ -105,6 +109,39 @@ describe('QR Scan Verification Handler', () => {
       // Verify TransactWriteItems
       const txCall = vi.mocked(docClient.send).mock.calls[4][0] as any;
       expect(txCall.input.TransactItems).toHaveLength(4); // ledger, balance, cooldown, territory
+
+      // Cooldown write is conditional so two parallel scans can't both pay
+      const cooldownPut = txCall.input.TransactItems[2].Put;
+      expect(cooldownPut.ConditionExpression).toContain('attribute_not_exists(PK)');
+      // Ledger keys carry a random suffix (no same-millisecond overwrite)
+      expect(txCall.input.TransactItems[0].Put.Item.SK).toMatch(/^LEDGER#.+#[a-z0-9]+$/);
+    });
+
+    it('rejects a static QR without a valid signature (guessable sourceId is not enough)', async () => {
+      for (const qrPayload of [undefined, 'a'.repeat(64)]) {
+        vi.mocked(docClient.send).mockResolvedValueOnce({ Item: dustbinSource } as any);
+        vi.mocked(docClient.send).mockResolvedValueOnce({ Item: undefined } as any);
+        const res: any = await verifyScan(
+          createEvent({ sourceId: 'qr_bin_cp_inner_circle_01', qrPayload, latitude: 28.6329, longitude: 77.2195 }),
+        );
+        expect(res.statusCode).toBe(400);
+        expect(JSON.parse(res.body).error.code).toBe('INVALID_QR_SIGNATURE');
+      }
+    });
+
+    it('rejects scans from a mocked GPS location', async () => {
+      const res: any = await verifyScan(
+        createEvent({
+          sourceId: 'qr_bin_cp_inner_circle_01',
+          qrPayload: binSignature,
+          latitude: 28.6329,
+          longitude: 77.2195,
+          isMockLocation: true,
+        }),
+      );
+      expect(res.statusCode).toBe(400);
+      expect(JSON.parse(res.body).error.code).toBe('MOCK_LOCATION');
+      expect(docClient.send).not.toHaveBeenCalled();
     });
 
     it('rejects scan when user coordinates breach 75m geofence radius', async () => {
@@ -114,6 +151,7 @@ describe('QR Scan Verification Handler', () => {
       // Scan location ~250m away from bin
       const event = createEvent({
         sourceId: 'qr_bin_cp_inner_circle_01',
+        qrPayload: binSignature,
         latitude: 28.6350,
         longitude: 77.2195,
       });
@@ -236,6 +274,50 @@ describe('QR Scan Verification Handler', () => {
       expect(res.statusCode).toBe(400);
       const body = JSON.parse(res.body);
       expect(body.error.code).toBe('TRUCK_PROXIMITY_EXCEEDED');
+    });
+
+    it("checks proximity against the collector's fresh live position, not the registered spot", async () => {
+      const validToken = generateRotatingQrToken(secretKey, truckSource.sourceId, Date.now());
+      // Collector phone reported it is ~1.5 km from the registered depot, 30 s ago
+      const liveSource = {
+        ...truckSource,
+        liveLatitude: 28.6455,
+        liveLongitude: 77.2185,
+        livePositionAt: new Date(Date.now() - 30_000).toISOString(),
+      };
+      vi.mocked(docClient.send).mockResolvedValueOnce({ Item: liveSource } as any);
+      vi.mocked(docClient.send).mockResolvedValueOnce({ Item: undefined } as any);
+      vi.mocked(docClient.send).mockResolvedValueOnce({
+        Item: { PK: `USER#${mockSub}`, SK: 'PROFILE', balanceGC: 0, lifetimeXP: 0, streakDays: 0 },
+      } as any);
+      vi.mocked(docClient.send).mockResolvedValueOnce({ Item: { health: 50 } } as any);
+      vi.mocked(docClient.send).mockResolvedValueOnce({} as any);
+
+      // Citizen stands next to the collector's live position (far from the depot)
+      const res: any = await verifyScan(
+        createEvent({ sourceId: truckSource.sourceId, qrPayload: validToken, latitude: 28.6457, longitude: 77.2185 }),
+      );
+      expect(res.statusCode).toBe(200);
+    });
+
+    it('skips the collector reward (instead of crediting a hard-coded collector) when none is assigned', async () => {
+      const validToken = generateRotatingQrToken(secretKey, truckSource.sourceId, Date.now());
+      const { collectorId, ...unassigned } = truckSource;
+      vi.mocked(docClient.send).mockResolvedValueOnce({ Item: unassigned } as any);
+      vi.mocked(docClient.send).mockResolvedValueOnce({ Item: undefined } as any);
+      vi.mocked(docClient.send).mockResolvedValueOnce({
+        Item: { PK: `USER#${mockSub}`, SK: 'PROFILE', balanceGC: 0, lifetimeXP: 0, streakDays: 0 },
+      } as any);
+      vi.mocked(docClient.send).mockResolvedValueOnce({ Item: { health: 50 } } as any);
+      vi.mocked(docClient.send).mockResolvedValueOnce({} as any);
+
+      const res: any = await verifyScan(
+        createEvent({ sourceId: truckSource.sourceId, qrPayload: validToken, latitude: 28.6321, longitude: 77.2185 }),
+      );
+      expect(res.statusCode).toBe(200);
+      expect(JSON.parse(res.body).collectorReward).toBeUndefined();
+      const txCall = vi.mocked(docClient.send).mock.calls[4][0] as any;
+      expect(txCall.input.TransactItems).toHaveLength(4);
     });
   });
 

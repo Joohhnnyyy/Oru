@@ -1,24 +1,24 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { docClient } from '../src/utils/dynamo.js';
+import { s3Client } from '../src/utils/s3.js';
 import {
   handler as evaluateSubmission,
   rekognitionClient,
   bedrockClient,
+  submissionIdFromKey,
 } from '../src/handlers/submissions/evaluateSubmission.js';
 
-vi.mock('../src/utils/dynamo.js', () => {
-  return {
-    docClient: {
-      send: vi.fn(),
-    },
-    TABLE_NAME: 'SaafSafariMainTest',
-  };
-});
+vi.mock('../src/utils/dynamo.js', () => ({
+  docClient: { send: vi.fn() },
+  TABLE_NAME: 'SaafSafariMainTest',
+}));
 
 describe('AI Photo Verification Pipeline (AI-02 & AI-03)', () => {
   const mockSubmissionId = 'sub_9876543210ab';
   const mockUserId = 'usr_citizen_delhi';
   const mockTerritory = '8760824b4ffffff';
+  const s3Key = `proofs/${mockUserId}/${mockSubmissionId}.jpg`;
+  const input = { s3Bucket: 'saafsafari-proofs-test', s3Key };
 
   const baseSubmission = {
     PK: `SUBMISSION#${mockSubmissionId}`,
@@ -27,168 +27,186 @@ describe('AI Photo Verification Pipeline (AI-02 & AI-03)', () => {
     userId: mockUserId,
     actionType: 'COMMUNITY_CLEANUP_PROOF',
     territoryId: mockTerritory,
-    s3Key: `proofs/${mockUserId}/${mockSubmissionId}.jpg`,
+    s3Key,
     status: 'PENDING_UPLOAD',
   };
+  const photoBytes = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 4]);
+
+  const novaSays = (verdict: { isGenuine: boolean; confidenceScore: number; reasoning: string }) =>
+    ({ output: { message: { role: 'assistant', content: [{ text: JSON.stringify(verdict) }] } } }) as any;
+
+  const ddb = () => vi.mocked(docClient.send);
+  const conditionalFail = () => Object.assign(new Error('conditional'), { name: 'ConditionalCheckFailedException' });
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.restoreAllMocks();
+    ddb().mockReset();
+    vi.spyOn(s3Client, 'send').mockResolvedValue({
+      ContentLength: photoBytes.length,
+      Body: { transformToByteArray: async () => photoBytes },
+    } as any);
   });
 
-  it('rejects submission immediately if Rekognition detects moderation flags', async () => {
-    vi.mocked(docClient.send).mockResolvedValueOnce({ Item: baseSubmission } as any);
+  /** Queue: get submission → put image hash (unique) */
+  const queueSubmissionAndHash = (submission: any = baseSubmission) => {
+    ddb().mockResolvedValueOnce({ Item: submission } as any); // GetCommand submission
+    ddb().mockResolvedValueOnce({} as any); // PutCommand IMGHASH (first time)
+  };
 
-    // Mock Rekognition moderation returning inappropriate flags
+  it('derives the submission id from the S3 key (EventBridge-started executions)', () => {
+    expect(submissionIdFromKey(s3Key)).toBe(mockSubmissionId);
+    expect(submissionIdFromKey('proofs/x/not-a-sub.png')).toBeUndefined();
+  });
+
+  it('rejects immediately if Rekognition detects moderation flags', async () => {
+    queueSubmissionAndHash();
     vi.spyOn(rekognitionClient, 'send').mockResolvedValueOnce({
       ModerationLabels: [{ Name: 'Explicit Nudity', Confidence: 95 }],
     } as any);
+    ddb().mockResolvedValueOnce({} as any); // status update
 
-    // Mock DynamoDB update
-    vi.mocked(docClient.send).mockResolvedValueOnce({} as any);
-
-    const result = await evaluateSubmission({
-      submissionId: mockSubmissionId,
-      s3Bucket: 'saafsafari-proofs-test',
-      s3Key: baseSubmission.s3Key,
-    });
+    const result = await evaluateSubmission(input);
 
     expect(result.status).toBe('REJECTED');
     expect(result.confidenceScore).toBe(0);
-
-    const updateCall = vi.mocked(docClient.send).mock.calls[1][0] as any;
-    expect(updateCall.input.ExpressionAttributeValues[':rejected']).toBe('REJECTED');
+    const update = ddb().mock.calls[2][0] as any;
+    expect(update.input.ExpressionAttributeValues[':status']).toBe('REJECTED');
+    expect(update.input.ConditionExpression).toBe('#status = :pending'); // only the first evaluation counts
   });
 
-  it('auto-approves high-confidence genuine proof and awards credits atomically', async () => {
-    vi.mocked(docClient.send).mockResolvedValueOnce({ Item: baseSubmission } as any);
-
-    // 1. Rekognition moderation passes
+  it('auto-approves high-confidence genuine proof: Nova sees the photo, credits are capped per day', async () => {
+    queueSubmissionAndHash();
     vi.spyOn(rekognitionClient, 'send')
-      .mockResolvedValueOnce({ ModerationLabels: [] } as any) // moderation
-      .mockResolvedValueOnce({
-        Labels: [{ Name: 'Waste' }, { Name: 'Garbage' }, { Name: 'Park' }],
-      } as any); // labels
+      .mockResolvedValueOnce({ ModerationLabels: [] } as any)
+      .mockResolvedValueOnce({ Labels: [{ Name: 'Waste' }, { Name: 'Garbage' }, { Name: 'Park' }] } as any);
+    const bedrockSpy = vi
+      .spyOn(bedrockClient, 'send')
+      .mockResolvedValueOnce(novaSays({ isGenuine: true, confidenceScore: 0.88, reasoning: 'Bagged litter, cleaned spot.' }));
+    ddb().mockResolvedValueOnce({ Item: { PK: `USER#${mockUserId}`, streakDays: 5 } } as any); // user
+    ddb().mockResolvedValueOnce({ Item: { PK: `TERRITORY#${mockTerritory}`, health: 25 } } as any); // territory
+    ddb().mockResolvedValueOnce({} as any); // TransactWrite
+    ddb().mockResolvedValue({} as any); // health clamp writes
 
-    // 2. Bedrock Nova Lite returns high confidence
-    const mockBedrockResponse = {
-      output: {
-        message: {
-          content: [
-            {
-              text: JSON.stringify({
-                isGenuine: true,
-                confidenceScore: 0.88,
-                reasoning: 'Clear evidence of community litter collection into waste bags.',
-              }),
-            },
-          ],
-        },
-      },
-    };
-
-    vi.spyOn(bedrockClient, 'send').mockResolvedValueOnce({
-      body: new TextEncoder().encode(JSON.stringify(mockBedrockResponse)),
-    } as any);
-
-    // 3. DynamoDB TransactWriteCommand succeeds
-    vi.mocked(docClient.send).mockResolvedValueOnce({} as any);
-
-    const result = await evaluateSubmission({
-      submissionId: mockSubmissionId,
-      s3Bucket: 'saafsafari-proofs-test',
-      s3Key: baseSubmission.s3Key,
-    });
+    const result = await evaluateSubmission(input);
 
     expect(result.status).toBe('AUTO_APPROVED');
     expect(result.confidenceScore).toBe(0.88);
     expect(result.creditsAwarded).toBeGreaterThan(0);
-    expect(result.xpAwarded).toBeGreaterThan(0);
+    expect(result.creditsAwarded).toBeLessThan(60); // photo proof never out-earns verified QR actions by much
 
-    // Verify TransactWriteItems call
-    const txCall = vi.mocked(docClient.send).mock.calls[1][0] as any;
-    expect(txCall.input.TransactItems).toHaveLength(4); // submission update, user balance, ledger entry, territory health
+    // The actual image bytes are sent to Bedrock (multimodal), not just label names
+    const converse = bedrockSpy.mock.calls[0][0] as any;
+    expect(converse.input.messages[0].content[0].image.source.bytes).toBe(photoBytes);
+
+    const tx = ddb().mock.calls[4][0] as any;
+    const items = tx.input.TransactItems;
+    expect(items).toHaveLength(5); // submission, daily cap, balance, ledger, territory
+    expect(items[0].Update.ConditionExpression).toBe('#status = :pending');
+    expect(items[1].Update.Key.SK).toMatch(/^PHOTO_LIMIT#/);
+    expect(items[3].Put.Item.SK).toMatch(/^LEDGER#/);
   });
 
-  it('flags borderline submissions for human municipal review with taskToken', async () => {
-    vi.mocked(docClient.send).mockResolvedValueOnce({ Item: baseSubmission } as any);
-
+  it('flags borderline submissions for human review', async () => {
+    queueSubmissionAndHash();
     vi.spyOn(rekognitionClient, 'send')
       .mockResolvedValueOnce({ ModerationLabels: [] } as any)
-      .mockResolvedValueOnce({ Labels: [{ Name: 'Plant' }, { Name: 'Ground' }] } as any);
+      .mockResolvedValueOnce({ Labels: [{ Name: 'Plant' }] } as any);
+    vi.spyOn(bedrockClient, 'send').mockResolvedValueOnce(
+      novaSays({ isGenuine: true, confidenceScore: 0.52, reasoning: 'Bags visible but activity unclear.' }),
+    );
+    ddb().mockResolvedValueOnce({} as any);
 
-    const mockBedrockResponse = {
-      output: {
-        message: {
-          content: [
-            {
-              text: JSON.stringify({
-                isGenuine: true,
-                confidenceScore: 0.52,
-                reasoning: 'Borderline proof: bags visible but cleanup activity partially obscured.',
-              }),
-            },
-          ],
-        },
-      },
-    };
-
-    vi.spyOn(bedrockClient, 'send').mockResolvedValueOnce({
-      body: new TextEncoder().encode(JSON.stringify(mockBedrockResponse)),
-    } as any);
-
-    vi.mocked(docClient.send).mockResolvedValueOnce({} as any);
-
-    const result = await evaluateSubmission({
-      submissionId: mockSubmissionId,
-      s3Bucket: 'saafsafari-proofs-test',
-      s3Key: baseSubmission.s3Key,
-      taskToken: 'AAAA-task-token-1234',
-    });
+    const result = await evaluateSubmission(input);
 
     expect(result.status).toBe('FLAGGED_FOR_REVIEW');
     expect(result.confidenceScore).toBe(0.52);
-
-    const updateCall = vi.mocked(docClient.send).mock.calls[1][0] as any;
-    expect(updateCall.input.ExpressionAttributeValues[':flagged']).toBe('FLAGGED_FOR_REVIEW');
-    expect(updateCall.input.ExpressionAttributeValues[':token']).toBe('AAAA-task-token-1234');
+    const update = ddb().mock.calls[2][0] as any;
+    expect(update.input.ExpressionAttributeValues[':gsi2pk']).toBe('STATUS#FLAGGED_FOR_REVIEW');
   });
 
-  it('rejects submissions with low confidence or non-genuine images', async () => {
-    vi.mocked(docClient.send).mockResolvedValueOnce({ Item: baseSubmission } as any);
-
+  it('rejects low-confidence or non-genuine images', async () => {
+    queueSubmissionAndHash();
     vi.spyOn(rekognitionClient, 'send')
       .mockResolvedValueOnce({ ModerationLabels: [] } as any)
-      .mockResolvedValueOnce({ Labels: [{ Name: 'Car' }, { Name: 'Highway' }] } as any);
+      .mockResolvedValueOnce({ Labels: [{ Name: 'Car' }] } as any);
+    vi.spyOn(bedrockClient, 'send').mockResolvedValueOnce(
+      novaSays({ isGenuine: false, confidenceScore: 0.15, reasoning: 'Traffic photo, no waste activity.' }),
+    );
+    ddb().mockResolvedValueOnce({} as any);
 
-    const mockBedrockResponse = {
-      output: {
-        message: {
-          content: [
-            {
-              text: JSON.stringify({
-                isGenuine: false,
-                confidenceScore: 0.15,
-                reasoning: 'Irrelevant image showing traffic with zero civic waste activity.',
-              }),
-            },
-          ],
-        },
-      },
-    };
-
-    vi.spyOn(bedrockClient, 'send').mockResolvedValueOnce({
-      body: new TextEncoder().encode(JSON.stringify(mockBedrockResponse)),
-    } as any);
-
-    vi.mocked(docClient.send).mockResolvedValueOnce({} as any);
-
-    const result = await evaluateSubmission({
-      submissionId: mockSubmissionId,
-      s3Bucket: 'saafsafari-proofs-test',
-      s3Key: baseSubmission.s3Key,
-    });
-
+    const result = await evaluateSubmission(input);
     expect(result.status).toBe('REJECTED');
     expect(result.confidenceScore).toBe(0.15);
+  });
+
+  it('FAILS CLOSED: a Rekognition error sends the photo to human review, never auto-approves', async () => {
+    queueSubmissionAndHash();
+    vi.spyOn(rekognitionClient, 'send').mockRejectedValueOnce(new Error('AccessDenied'));
+    const bedrockSpy = vi.spyOn(bedrockClient, 'send');
+    ddb().mockResolvedValueOnce({} as any);
+
+    const result = await evaluateSubmission(input);
+
+    expect(result.status).toBe('FLAGGED_FOR_REVIEW');
+    expect(bedrockSpy).not.toHaveBeenCalled();
+    expect(ddb()).toHaveBeenCalledTimes(3); // get, hash, status update — no credit transaction
+  });
+
+  it('FAILS CLOSED: a Bedrock error sends the photo to human review', async () => {
+    queueSubmissionAndHash();
+    vi.spyOn(rekognitionClient, 'send')
+      .mockResolvedValueOnce({ ModerationLabels: [] } as any)
+      .mockResolvedValueOnce({ Labels: [{ Name: 'Waste' }, { Name: 'Trash' }] } as any);
+    vi.spyOn(bedrockClient, 'send').mockRejectedValueOnce(new Error('ThrottlingException'));
+    ddb().mockResolvedValueOnce({} as any);
+
+    const result = await evaluateSubmission(input);
+    expect(result.status).toBe('FLAGGED_FOR_REVIEW');
+    expect(ddb()).toHaveBeenCalledTimes(3);
+  });
+
+  it('rejects a photo that was already submitted (SHA-256 dedupe)', async () => {
+    ddb().mockResolvedValueOnce({ Item: baseSubmission } as any);
+    ddb().mockRejectedValueOnce(conditionalFail()); // IMGHASH already exists
+    ddb().mockResolvedValueOnce({} as any);
+    const rekSpy = vi.spyOn(rekognitionClient, 'send');
+
+    const result = await evaluateSubmission(input);
+    expect(result.status).toBe('REJECTED');
+    expect(result.reasoning).toMatch(/already submitted/);
+    expect(rekSpy).not.toHaveBeenCalled();
+  });
+
+  it('is idempotent: an already-evaluated submission is not re-scored or re-paid', async () => {
+    ddb().mockResolvedValueOnce({ Item: { ...baseSubmission, status: 'AUTO_APPROVED' } } as any);
+    const s3Spy = vi.mocked(s3Client.send);
+
+    const result = await evaluateSubmission(input);
+    expect(result.status).toBe('AUTO_APPROVED');
+    expect(s3Spy).not.toHaveBeenCalled();
+    expect(ddb()).toHaveBeenCalledTimes(1);
+  });
+
+  it('routes to human review once the daily auto-approval cap is reached', async () => {
+    queueSubmissionAndHash();
+    vi.spyOn(rekognitionClient, 'send')
+      .mockResolvedValueOnce({ ModerationLabels: [] } as any)
+      .mockResolvedValueOnce({ Labels: [{ Name: 'Waste' }] } as any);
+    vi.spyOn(bedrockClient, 'send').mockResolvedValueOnce(
+      novaSays({ isGenuine: true, confidenceScore: 0.9, reasoning: 'Clear cleanup.' }),
+    );
+    ddb().mockResolvedValueOnce({ Item: { streakDays: 0 } } as any);
+    ddb().mockResolvedValueOnce({ Item: { health: 60 } } as any);
+    ddb().mockRejectedValueOnce(
+      Object.assign(new Error('cancelled'), {
+        name: 'TransactionCanceledException',
+        CancellationReasons: [{ Code: 'None' }, { Code: 'ConditionalCheckFailed' }],
+      }),
+    );
+    ddb().mockResolvedValueOnce({} as any); // status update to FLAGGED
+
+    const result = await evaluateSubmission(input);
+    expect(result.status).toBe('FLAGGED_FOR_REVIEW');
+    expect(result.reasoning).toMatch(/Daily auto-approval limit/);
   });
 });

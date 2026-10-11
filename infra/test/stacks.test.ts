@@ -148,6 +148,7 @@ describe('AWS CDK Infrastructure Stacks', () => {
       'GET /v1/admin/qr-sources',
       'GET /v1/admin/review-queue',
       'POST /v1/admin/review-queue/resolve',
+      'GET /v1/collector/qr-token',
     ];
 
     for (const routeKey of securedRoutes) {
@@ -188,6 +189,15 @@ describe('AWS CDK Infrastructure Stacks', () => {
     template.hasResourceProperties('AWS::StepFunctions::StateMachine', {
       StateMachineName: 'saafsafari-ai-verification',
     });
+
+    // Every proof upload starts the workflow (S3 → EventBridge → Step Functions)
+    template.hasResourceProperties('AWS::Events::Rule', {
+      EventPattern: Match.objectLike({ source: ['aws.s3'], 'detail-type': ['Object Created'] }),
+    });
+
+    // Human review pauses the execution on a task token
+    const machine = Object.values(template.findResources('AWS::StepFunctions::StateMachine'))[0] as any;
+    expect(JSON.stringify(machine.Properties.DefinitionString)).toContain('waitForTaskToken');
 
     // Assert IAM policy for Rekognition and Bedrock
     template.hasResourceProperties('AWS::IAM::Policy', {

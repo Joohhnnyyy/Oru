@@ -94,26 +94,46 @@ describe('Civic Hotspot Reporting & Bounties (HOT-01, HOT-02)', () => {
         xp: 250,
       });
 
-      // Verify TransactWriteItems call
-      expect(mockSend).toHaveBeenCalledTimes(1);
+      // Verify TransactWriteItems call (followed by the best-effort health clamp writes)
       const transactCall = mockSend.mock.calls[0][0];
       const items = transactCall.input.TransactItems;
-      expect(items).toHaveLength(3);
+      expect(items).toHaveLength(4);
 
-      // Item 0: Hotspot Put
-      expect(items[0].Put.Item.PK).toBe(`HOTSPOT#${body.hotspotId}`);
-      expect(items[0].Put.Item.reporterUserId).toBe(mockUserId);
-      expect(items[0].Put.Item.severity).toBe('HIGH');
+      // Item 0: Per-user daily report limit (anti-griefing)
+      expect(items[0].Update.Key.SK).toMatch(/^HOTSPOT_LIMIT#/);
+      expect(items[0].Update.ConditionExpression).toContain('reportCount < :max');
 
-      // Item 1: Territory health update (-5)
-      expect(items[1].Update.Key.PK).toBe(`TERRITORY#${body.territoryId}`);
-      expect(items[1].Update.ExpressionAttributeValues[':penalty']).toBe(5);
+      // Item 1: Hotspot Put
+      expect(items[1].Put.Item.PK).toBe(`HOTSPOT#${body.hotspotId}`);
+      expect(items[1].Put.Item.reporterUserId).toBe(mockUserId);
+      expect(items[1].Put.Item.severity).toBe('HIGH');
 
-      // Item 2: Bounty task Put
-      expect(items[2].Put.Item.PK).toBe(`BOUNTY#${body.bountyId}`);
-      expect(items[2].Put.Item.rewardGC).toBe(120);
-      expect(items[2].Put.Item.rewardXP).toBe(250);
-      expect(items[2].Put.Item.status).toBe('AVAILABLE');
+      // Item 2: Territory health update (-5), only for existing territories
+      expect(items[2].Update.Key.PK).toBe(`TERRITORY#${body.territoryId}`);
+      expect(items[2].Update.ExpressionAttributeValues[':penalty']).toBe(5);
+      expect(items[2].Update.ConditionExpression).toBe('attribute_exists(PK)');
+
+      // Item 3: Bounty task Put
+      expect(items[3].Put.Item.PK).toBe(`BOUNTY#${body.bountyId}`);
+      expect(items[3].Put.Item.rewardGC).toBe(120);
+      expect(items[3].Put.Item.rewardXP).toBe(250);
+      expect(items[3].Put.Item.status).toBe('AVAILABLE');
+    });
+
+    it('returns 429 once a user hits the daily report limit', async () => {
+      mockSend.mockReset();
+      const err: any = new Error('cancelled');
+      err.name = 'TransactionCanceledException';
+      err.CancellationReasons = [{ Code: 'ConditionalCheckFailed' }, { Code: 'None' }, { Code: 'None' }, { Code: 'None' }];
+      mockSend.mockRejectedValueOnce(err);
+
+      const event: Partial<APIGatewayProxyEventV2> = {
+        requestContext: { authorizer: { jwt: { claims: { sub: mockUserId }, scopes: [] } } } as any,
+        body: JSON.stringify({ latitude: 28.6139, longitude: 77.209, title: 'Dump site', description: 'Fourth report today', severity: 'LOW' }),
+      };
+      const res: any = await reportHotspotHandler(event as APIGatewayProxyEventV2);
+      expect(res.statusCode).toBe(429);
+      expect(JSON.parse(res.body).error.code).toBe('DAILY_LIMIT_REACHED');
     });
   });
 

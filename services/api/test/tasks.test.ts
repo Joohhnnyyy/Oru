@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { istDayString } from '../src/utils/territory.js';
 import type { APIGatewayProxyEventV2 } from 'aws-lambda';
 import { docClient } from '../src/utils/dynamo.js';
 import { handler as getTasks } from '../src/handlers/tasks/getTasks.js';
@@ -129,7 +130,7 @@ describe('Task Board & Habit Handlers', () => {
     });
 
     it('returns 409 when user has already completed habit check-in today', async () => {
-      const todayStr = new Date().toISOString().slice(0, 10);
+      const todayStr = istDayString(new Date()) // check-in days are IST with a 3 AM cutoff;
       vi.mocked(docClient.send).mockResolvedValueOnce({
         Item: {
           PK: `USER#${mockSub}`,
@@ -147,7 +148,7 @@ describe('Task Board & Habit Handlers', () => {
     });
 
     it('increments streak and writes atomic transaction when consecutive day checkin', async () => {
-      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+      const yesterday = istDayString(new Date(), -1);
       vi.mocked(docClient.send).mockResolvedValueOnce({
         Item: {
           PK: `USER#${mockSub}`,
@@ -175,7 +176,8 @@ describe('Task Board & Habit Handlers', () => {
       expect(body.newLifetimeXP).toBe(110);
       expect(body.streakDays).toBe(4); // incremented from 3 to 4
 
-      expect(docClient.send).toHaveBeenCalledTimes(2);
+      // 1 profile read + 1 transaction + 2 best-effort health clamp writes
+      expect(docClient.send).toHaveBeenCalledTimes(4);
       const txCall = vi.mocked(docClient.send).mock.calls[1][0] as any;
       expect(txCall.input.TransactItems).toHaveLength(4); // HABIT item, LEDGER item, USER update, TERRITORY update
     });

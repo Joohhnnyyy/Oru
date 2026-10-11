@@ -26,7 +26,7 @@ describe('EventBridge Nightly Health Decay Scheduler (MAP-03)', () => {
     expect(mockSend).toHaveBeenCalledTimes(1);
   });
 
-  it('correctly applies 3% decay, updates moodState, and chunks writes into 25-item batches', async () => {
+  it('correctly applies 3% decay and updates only health/mood per territory', async () => {
     // Generate 68 mock territories
     const mockTerritories = Array.from({ length: 68 }, (_, idx) => ({
       PK: `TERRITORY#872830828${idx.toString().padStart(2, '0')}fffff`,
@@ -42,8 +42,8 @@ describe('EventBridge Nightly Health Decay Scheduler (MAP-03)', () => {
       Items: mockTerritories,
     });
 
-    // Mock BatchWrite responses (68 items / 25 = 3 batches: 25, 25, 18)
-    mockSend.mockResolvedValue({ UnprocessedItems: {} });
+    // Mock per-territory UpdateCommand responses
+    mockSend.mockResolvedValue({});
 
     const result = await nightlyHealthDecayHandler();
 
@@ -52,23 +52,14 @@ describe('EventBridge Nightly Health Decay Scheduler (MAP-03)', () => {
     expect(result.averageHealthBefore).toBe(100);
     expect(result.averageHealthAfter).toBe(97); // 100 * 0.97 = 97
 
-    // Verify 1 Scan + 3 BatchWrites = 4 DynamoDB calls
-    expect(mockSend).toHaveBeenCalledTimes(4);
+    // 1 Scan + 68 targeted UpdateCommands (no whole-item Put that could clobber concurrent scans)
+    expect(mockSend).toHaveBeenCalledTimes(69);
 
-    // Verify batch chunk sizes
-    const batch1 = mockSend.mock.calls[1][0].input.RequestItems['SaafSafariMain'];
-    const batch2 = mockSend.mock.calls[2][0].input.RequestItems['SaafSafariMain'];
-    const batch3 = mockSend.mock.calls[3][0].input.RequestItems['SaafSafariMain'];
-
-    expect(batch1).toHaveLength(25);
-    expect(batch2).toHaveLength(25);
-    expect(batch3).toHaveLength(18);
-
-    // Verify item decay in batch
-    const firstDecayedItem = batch1[0].PutRequest.Item;
-    expect(firstDecayedItem.health).toBe(97);
-    expect(firstDecayedItem.moodState).toBe('legendary'); // 97 > 85 is legendary
-    expect(firstDecayedItem.lastUpdated).toBeDefined();
+    const firstUpdate = mockSend.mock.calls[1][0].input;
+    expect(firstUpdate.Key).toEqual({ PK: mockTerritories[0].PK, SK: 'METADATA' });
+    expect(firstUpdate.UpdateExpression).toContain('health = :h');
+    expect(firstUpdate.ExpressionAttributeValues[':h']).toBe(97);
+    expect(firstUpdate.ExpressionAttributeValues[':m']).toBe('legendary'); // 97 > 85 is legendary
   });
 
   it('updates moodState to thriving or recovering when health drops across thresholds', async () => {
@@ -97,18 +88,18 @@ describe('EventBridge Nightly Health Decay Scheduler (MAP-03)', () => {
     ];
 
     mockSend.mockResolvedValueOnce({ Items: mockTerritories });
-    mockSend.mockResolvedValueOnce({ UnprocessedItems: {} });
+    mockSend.mockResolvedValue({});
 
     await nightlyHealthDecayHandler();
 
-    const writeRequests = mockSend.mock.calls[1][0].input.RequestItems['SaafSafariMain'];
-    expect(writeRequests[0].PutRequest.Item.health).toBe(83);
-    expect(writeRequests[0].PutRequest.Item.moodState).toBe('thriving');
+    const values = [1, 2, 3].map((i) => mockSend.mock.calls[i][0].input.ExpressionAttributeValues);
+    expect(values[0][':h']).toBe(83);
+    expect(values[0][':m']).toBe('thriving');
 
-    expect(writeRequests[1].PutRequest.Item.health).toBe(60);
-    expect(writeRequests[1].PutRequest.Item.moodState).toBe('recovering');
+    expect(values[1][':h']).toBe(60);
+    expect(values[1][':m']).toBe('recovering');
 
-    expect(writeRequests[2].PutRequest.Item.health).toBe(30);
-    expect(writeRequests[2].PutRequest.Item.moodState).toBe('sick');
+    expect(values[2][':h']).toBe(30);
+    expect(values[2][':m']).toBe('sick');
   });
 });
