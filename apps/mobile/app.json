@@ -1,0 +1,67 @@
+{
+  "expo": {
+    "name": "Oru",
+    "slug": "saafsafari",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "backgroundColor": "#FFFFFF"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.saafsafari.app",
+      "icon": "./assets/icon.png"
+    },
+    "android": {
+      "package": "com.saafsafari.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFFFFF"
+      },
+      "config": {
+        "googleMaps": {
+          "apiKey": ""
+        }
+      },
+      "permissions": [
+        "CAMERA",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_BACKGROUND_LOCATION",
+        "FOREGROUND_SERVICE"
+      ]
+    },
+    "extra": {
+      "apiUrl": "https://dp029jx9uf.execute-api.ap-south-1.amazonaws.com",
+      "cognitoUserPoolId": "ap-south-1_KZcMN2CaO",
+      "cognitoClientId": "2g4b36dekkv7f0lu9ad4h4s7oa",
+      "googleMapsApiKey": "",
+      "demoPassword": ""
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Oru uses the camera to scan bin and collector QR codes and to take cleanup proof photos."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Oru checks you are next to the bin or collector when you scan."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Oru uses the camera to take cleanup proof photos."
+        }
+      ]
+    ]
+  }
+}

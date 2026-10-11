@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { RollText } from '../../../components/TextFx';
 import { BRAND } from '../../../content/media';
 import { LangSwitch, NAV, PlayLink } from './shared';
@@ -12,21 +12,8 @@ import { LangSwitch, NAV, PlayLink } from './shared';
  */
 export function StickyHeader() {
   const { t } = useTranslation();
-  const { pathname } = useLocation();
-  const isHome = pathname === '/';
-  const [pastHero, setPastHero] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const visible = !isHome || pastHero;
-
-  useEffect(() => {
-    const hero = isHome ? document.getElementById('top') : null;
-    if (!hero) return;
-    const io = new IntersectionObserver(([entry]) => setPastHero(!(entry?.isIntersecting ?? true)), {
-      rootMargin: '-72px 0px 0px 0px',
-    });
-    io.observe(hero);
-    return () => io.disconnect();
-  }, [isHome]);
+  const visible = true;
 
   return (
     <AnimatePresence>
@@ -36,11 +23,11 @@ export function StickyHeader() {
           animate={{ y: 0 }}
           exit={{ y: '-100%' }}
           transition={{ duration: 0.28, ease: [0.2, 0.8, 0.2, 1] }}
-          className="fixed inset-x-0 top-0 z-40 border-b border-line bg-white/95 backdrop-blur"
+          className="cinematic-header fixed inset-x-0 top-0 z-40 border-b border-line bg-white/95 backdrop-blur"
         >
           <div className="mx-auto flex h-[72px] w-full max-w-[1320px] items-center gap-4 px-4 sm:px-6">
-            <Link to="/" aria-label={t('a11y.home')} className="shrink-0 rounded-xl">
-              <img src={BRAND.icon} alt="" width={44} height={44} className="size-11 rounded-xl transition-transform duration-300 hover:-rotate-6" />
+            <Link to="/" aria-label={t('a11y.home')} className="flex shrink-0 items-center rounded-xl">
+              <img src={BRAND.icon} alt="Oru" width={1630} height={965} className="h-10 w-auto max-w-[120px] object-contain transition-transform duration-300 hover:scale-105" />
             </Link>
             <nav aria-label={t('nav.label')} className="mx-auto hidden lg:block">
               <ul className="flex gap-1">

@@ -1,4 +1,3 @@
-import { Band } from './sections/Band';
 import { Guardians } from './sections/Guardians';
 import { Hero } from './sections/Hero';
 import { Mission } from './sections/Mission';
@@ -11,7 +10,6 @@ export function LandingPage() {
     <>
       <Hero />
       <Mission />
-      <Band />
       <SplitCards />
       <Guardians />
       <Pills />

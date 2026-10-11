@@ -1,0 +1,3299 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "id": "873da1140ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.20697,
+              28.62537
+            ],
+            [
+              77.21285,
+              28.61385
+            ],
+            [
+              77.22779,
+              28.61259
+            ],
+            [
+              77.23685,
+              28.62284
+            ],
+            [
+              77.23097,
+              28.63435
+            ],
+            [
+              77.21603,
+              28.63562
+            ],
+            [
+              77.20697,
+              28.62537
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1140ffffff",
+        "name": "Connaught Place",
+        "ward": "NDMC Central",
+        "mascot": "peafowl",
+        "mascotNameEn": "Indian Peafowl",
+        "mascotNameHi": "भारतीय मोर",
+        "mascotHabitatEn": "Urban Parks & Lutyens Green Belt",
+        "mascotColor": "#3B82F6",
+        "health": 78,
+        "mood": "thriving",
+        "cleanIndex": 7.8,
+        "centerLat": 28.6241,
+        "centerLng": 77.22191
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1142ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2038,
+              28.60361
+            ],
+            [
+              77.20968,
+              28.59209
+            ],
+            [
+              77.22461,
+              28.59083
+            ],
+            [
+              77.23367,
+              28.60108
+            ],
+            [
+              77.22779,
+              28.61259
+            ],
+            [
+              77.21285,
+              28.61385
+            ],
+            [
+              77.2038,
+              28.60361
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1142ffffff",
+        "name": "Lodhi Gardens & Khan Market",
+        "ward": "NDMC South",
+        "mascot": "peafowl",
+        "mascotNameEn": "Indian Peafowl",
+        "mascotNameHi": "भारतीय मोर",
+        "mascotHabitatEn": "Urban Parks & Lutyens Green Belt",
+        "mascotColor": "#3B82F6",
+        "health": 88,
+        "mood": "legendary",
+        "cleanIndex": 8.8,
+        "centerLat": 28.60234,
+        "centerLng": 77.21873
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1143ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.22779,
+              28.61259
+            ],
+            [
+              77.23367,
+              28.60108
+            ],
+            [
+              77.2486,
+              28.59981
+            ],
+            [
+              77.25766,
+              28.61006
+            ],
+            [
+              77.25178,
+              28.62157
+            ],
+            [
+              77.23685,
+              28.62284
+            ],
+            [
+              77.22779,
+              28.61259
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1143ffffff",
+        "name": "India Gate & Lutyens",
+        "ward": "NDMC Central",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 92,
+        "mood": "legendary",
+        "cleanIndex": 9.2,
+        "centerLat": 28.61132,
+        "centerLng": 77.24272
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1155ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.17981,
+              28.59462
+            ],
+            [
+              77.1857,
+              28.58311
+            ],
+            [
+              77.20063,
+              28.58185
+            ],
+            [
+              77.20968,
+              28.59209
+            ],
+            [
+              77.2038,
+              28.60361
+            ],
+            [
+              77.18886,
+              28.60487
+            ],
+            [
+              77.17981,
+              28.59462
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1155ffffff",
+        "name": "Chanakyapuri Diplomatic Enclave",
+        "ward": "NDMC West",
+        "mascot": "peafowl",
+        "mascotNameEn": "Indian Peafowl",
+        "mascotNameHi": "भारतीय मोर",
+        "mascotHabitatEn": "Urban Parks & Lutyens Green Belt",
+        "mascotColor": "#3B82F6",
+        "health": 72,
+        "mood": "thriving",
+        "cleanIndex": 7.2,
+        "centerLat": 28.59336,
+        "centerLng": 77.19475
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1152ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.17349,
+              28.55111
+            ],
+            [
+              77.17938,
+              28.53961
+            ],
+            [
+              77.1943,
+              28.53835
+            ],
+            [
+              77.20334,
+              28.54859
+            ],
+            [
+              77.19746,
+              28.5601
+            ],
+            [
+              77.18254,
+              28.56136
+            ],
+            [
+              77.17349,
+              28.55111
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1152ffffff",
+        "name": "Hauz Khas & Deer Park",
+        "ward": "MCD South 34",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 84,
+        "mood": "thriving",
+        "cleanIndex": 8.4,
+        "centerLat": 28.54985,
+        "centerLng": 77.18842
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1153ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.19746,
+              28.5601
+            ],
+            [
+              77.20334,
+              28.54859
+            ],
+            [
+              77.21827,
+              28.54733
+            ],
+            [
+              77.22731,
+              28.55757
+            ],
+            [
+              77.22144,
+              28.56908
+            ],
+            [
+              77.20651,
+              28.57034
+            ],
+            [
+              77.19746,
+              28.5601
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1153ffffff",
+        "name": "Green Park & Safdarjung",
+        "ward": "MCD South 35",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 68,
+        "mood": "thriving",
+        "cleanIndex": 6.8,
+        "centerLat": 28.55883,
+        "centerLng": 77.21239
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da115effffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.22144,
+              28.56908
+            ],
+            [
+              77.22731,
+              28.55757
+            ],
+            [
+              77.24224,
+              28.55631
+            ],
+            [
+              77.25129,
+              28.56655
+            ],
+            [
+              77.24542,
+              28.57806
+            ],
+            [
+              77.23049,
+              28.57932
+            ],
+            [
+              77.22144,
+              28.56908
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da115effffff",
+        "name": "Lajpat Nagar Central Market",
+        "ward": "MCD South 38",
+        "mascot": "peafowl",
+        "mascotNameEn": "Indian Peafowl",
+        "mascotNameHi": "भारतीय मोर",
+        "mascotHabitatEn": "Urban Parks & Lutyens Green Belt",
+        "mascotColor": "#3B82F6",
+        "health": 54,
+        "mood": "recovering",
+        "cleanIndex": 5.4,
+        "centerLat": 28.56781,
+        "centerLng": 77.23636
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da102dffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.21827,
+              28.54733
+            ],
+            [
+              77.22414,
+              28.53583
+            ],
+            [
+              77.23906,
+              28.53456
+            ],
+            [
+              77.24811,
+              28.5448
+            ],
+            [
+              77.24224,
+              28.55631
+            ],
+            [
+              77.22731,
+              28.55757
+            ],
+            [
+              77.21827,
+              28.54733
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da102dffffff",
+        "name": "Greater Kailash 1 & 2",
+        "ward": "MCD South 42",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 76,
+        "mood": "thriving",
+        "cleanIndex": 7.6,
+        "centerLat": 28.54607,
+        "centerLng": 77.23319
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1028ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.21509,
+              28.52559
+            ],
+            [
+              77.22097,
+              28.51409
+            ],
+            [
+              77.23588,
+              28.51282
+            ],
+            [
+              77.24493,
+              28.52306
+            ],
+            [
+              77.23906,
+              28.53456
+            ],
+            [
+              77.22414,
+              28.53583
+            ],
+            [
+              77.21509,
+              28.52559
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1028ffffff",
+        "name": "Saket & Select Citywalk",
+        "ward": "MCD South 45",
+        "mascot": "nilgai",
+        "mascotNameEn": "Nilgai (Blue Bull)",
+        "mascotNameHi": "नीलगाय",
+        "mascotHabitatEn": "Southern Ridge & Forest Corridors",
+        "mascotColor": "#10B981",
+        "health": 62,
+        "mood": "thriving",
+        "cleanIndex": 6.2,
+        "centerLat": 28.52432,
+        "centerLng": 77.23001
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1020ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.14638,
+              28.52037
+            ],
+            [
+              77.15227,
+              28.50888
+            ],
+            [
+              77.16718,
+              28.50762
+            ],
+            [
+              77.17622,
+              28.51786
+            ],
+            [
+              77.17034,
+              28.52936
+            ],
+            [
+              77.15542,
+              28.53062
+            ],
+            [
+              77.14638,
+              28.52037
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1020ffffff",
+        "name": "Vasant Kunj Forest Fringe",
+        "ward": "MCD South 48",
+        "mascot": "nilgai",
+        "mascotNameEn": "Nilgai (Blue Bull)",
+        "mascotNameHi": "नीलगाय",
+        "mascotHabitatEn": "Southern Ridge & Forest Corridors",
+        "mascotColor": "#10B981",
+        "health": 82,
+        "mood": "thriving",
+        "cleanIndex": 8.2,
+        "centerLat": 28.51912,
+        "centerLng": 77.1613
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1001ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.20876,
+              28.48211
+            ],
+            [
+              77.21463,
+              28.47062
+            ],
+            [
+              77.22953,
+              28.46936
+            ],
+            [
+              77.23857,
+              28.47959
+            ],
+            [
+              77.23271,
+              28.49109
+            ],
+            [
+              77.2178,
+              28.49235
+            ],
+            [
+              77.20876,
+              28.48211
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1001ffffff",
+        "name": "Asola Bhatti Sanctuary Gate",
+        "ward": "MCD South 51",
+        "mascot": "nilgai",
+        "mascotNameEn": "Nilgai (Blue Bull)",
+        "mascotNameHi": "नीलगाय",
+        "mascotHabitatEn": "Southern Ridge & Forest Corridors",
+        "mascotColor": "#10B981",
+        "health": 28,
+        "mood": "sick",
+        "cleanIndex": 2.8,
+        "centerLat": 28.48085,
+        "centerLng": 77.22367
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da102bffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.23588,
+              28.51282
+            ],
+            [
+              77.24175,
+              28.50132
+            ],
+            [
+              77.25666,
+              28.50006
+            ],
+            [
+              77.26571,
+              28.51029
+            ],
+            [
+              77.25984,
+              28.52179
+            ],
+            [
+              77.24493,
+              28.52306
+            ],
+            [
+              77.23588,
+              28.51282
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da102bffffff",
+        "name": "Tughlakabad Fort Ridge",
+        "ward": "MCD South 53",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 48,
+        "mood": "recovering",
+        "cleanIndex": 4.8,
+        "centerLat": 28.51156,
+        "centerLng": 77.25079
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da115affffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.24224,
+              28.55631
+            ],
+            [
+              77.24811,
+              28.5448
+            ],
+            [
+              77.26303,
+              28.54353
+            ],
+            [
+              77.27208,
+              28.55377
+            ],
+            [
+              77.26621,
+              28.56528
+            ],
+            [
+              77.25129,
+              28.56655
+            ],
+            [
+              77.24224,
+              28.55631
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da115affffff",
+        "name": "Nehru Place Electronics Hub",
+        "ward": "MCD South 40",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 64,
+        "mood": "thriving",
+        "cleanIndex": 6.4,
+        "centerLat": 28.55504,
+        "centerLng": 77.25716
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1076ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.25984,
+              28.52179
+            ],
+            [
+              77.26571,
+              28.51029
+            ],
+            [
+              77.28062,
+              28.50903
+            ],
+            [
+              77.28967,
+              28.51926
+            ],
+            [
+              77.28381,
+              28.53076
+            ],
+            [
+              77.26889,
+              28.53203
+            ],
+            [
+              77.25984,
+              28.52179
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1076ffffff",
+        "name": "Okhla Industrial Area Phase 1",
+        "ward": "MCD South 44",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 25,
+        "mood": "sick",
+        "cleanIndex": 2.5,
+        "centerLat": 28.52053,
+        "centerLng": 77.27476
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1145ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.21014,
+              28.64714
+            ],
+            [
+              77.21603,
+              28.63562
+            ],
+            [
+              77.23097,
+              28.63435
+            ],
+            [
+              77.24003,
+              28.6446
+            ],
+            [
+              77.23415,
+              28.65612
+            ],
+            [
+              77.2192,
+              28.65739
+            ],
+            [
+              77.21014,
+              28.64714
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1145ffffff",
+        "name": "Chandni Chowk Heritage",
+        "ward": "MCD North 12",
+        "mascot": "macaque",
+        "mascotNameEn": "Rhesus Macaque",
+        "mascotNameHi": "बंदर",
+        "mascotHabitatEn": "Dense Urban Hubs & Markets",
+        "mascotColor": "#F59E0B",
+        "health": 22,
+        "mood": "sick",
+        "cleanIndex": 2.2,
+        "centerLat": 28.64587,
+        "centerLng": 77.22509
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da116affffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.23415,
+              28.65612
+            ],
+            [
+              77.24003,
+              28.6446
+            ],
+            [
+              77.25497,
+              28.64333
+            ],
+            [
+              77.26404,
+              28.65358
+            ],
+            [
+              77.25816,
+              28.6651
+            ],
+            [
+              77.24321,
+              28.66637
+            ],
+            [
+              77.23415,
+              28.65612
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da116affffff",
+        "name": "Red Fort & Daryaganj",
+        "ward": "MCD North 14",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 38,
+        "mood": "recovering",
+        "cleanIndex": 3.8,
+        "centerLat": 28.65485,
+        "centerLng": 77.24909
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1161ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.19248,
+              28.68169
+            ],
+            [
+              77.19837,
+              28.67017
+            ],
+            [
+              77.21332,
+              28.66891
+            ],
+            [
+              77.22238,
+              28.67916
+            ],
+            [
+              77.21649,
+              28.69069
+            ],
+            [
+              77.20154,
+              28.69195
+            ],
+            [
+              77.19248,
+              28.68169
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1161ffffff",
+        "name": "Civil Lines & Delhi University",
+        "ward": "MCD North 08",
+        "mascot": "macaque",
+        "mascotNameEn": "Rhesus Macaque",
+        "mascotNameHi": "बंदर",
+        "mascotHabitatEn": "Dense Urban Hubs & Markets",
+        "mascotColor": "#F59E0B",
+        "health": 70,
+        "mood": "thriving",
+        "cleanIndex": 7,
+        "centerLat": 28.68043,
+        "centerLng": 77.20743
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1162ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.1653,
+              28.65092
+            ],
+            [
+              77.1712,
+              28.63941
+            ],
+            [
+              77.18614,
+              28.63815
+            ],
+            [
+              77.1952,
+              28.6484
+            ],
+            [
+              77.18931,
+              28.65992
+            ],
+            [
+              77.17436,
+              28.66118
+            ],
+            [
+              77.1653,
+              28.65092
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1162ffffff",
+        "name": "Karol Bagh Market",
+        "ward": "MCD Central 18",
+        "mascot": "macaque",
+        "mascotNameEn": "Rhesus Macaque",
+        "mascotNameHi": "बंदर",
+        "mascotHabitatEn": "Dense Urban Hubs & Markets",
+        "mascotColor": "#F59E0B",
+        "health": 45,
+        "mood": "recovering",
+        "cleanIndex": 4.5,
+        "centerLat": 28.64966,
+        "centerLng": 77.18025
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da114affffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.27259,
+              28.60879
+            ],
+            [
+              77.27846,
+              28.59727
+            ],
+            [
+              77.29339,
+              28.596
+            ],
+            [
+              77.30246,
+              28.60624
+            ],
+            [
+              77.29659,
+              28.61776
+            ],
+            [
+              77.28166,
+              28.61903
+            ],
+            [
+              77.27259,
+              28.60879
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da114affffff",
+        "name": "Mayur Vihar Phase 1 Wetlands",
+        "ward": "MCD East 22",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 52,
+        "mood": "recovering",
+        "cleanIndex": 5.2,
+        "centerLat": 28.60751,
+        "centerLng": 77.28753
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da114bffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.29659,
+              28.61776
+            ],
+            [
+              77.30246,
+              28.60624
+            ],
+            [
+              77.31739,
+              28.60497
+            ],
+            [
+              77.32646,
+              28.61521
+            ],
+            [
+              77.32059,
+              28.62673
+            ],
+            [
+              77.30566,
+              28.628
+            ],
+            [
+              77.29659,
+              28.61776
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da114bffffff",
+        "name": "Mayur Vihar Phase 2",
+        "ward": "MCD East 23",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 66,
+        "mood": "thriving",
+        "cleanIndex": 6.6,
+        "centerLat": 28.61648,
+        "centerLng": 77.31152
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1148ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.27579,
+              28.63055
+            ],
+            [
+              77.28166,
+              28.61903
+            ],
+            [
+              77.29659,
+              28.61776
+            ],
+            [
+              77.30566,
+              28.628
+            ],
+            [
+              77.29979,
+              28.63952
+            ],
+            [
+              77.28485,
+              28.64079
+            ],
+            [
+              77.27579,
+              28.63055
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1148ffffff",
+        "name": "Laxmi Nagar Commercial Hub",
+        "ward": "MCD East 25",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 32,
+        "mood": "recovering",
+        "cleanIndex": 3.2,
+        "centerLat": 28.62927,
+        "centerLng": 77.29072
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da114dffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.27898,
+              28.65231
+            ],
+            [
+              77.28485,
+              28.64079
+            ],
+            [
+              77.29979,
+              28.63952
+            ],
+            [
+              77.30886,
+              28.64976
+            ],
+            [
+              77.303,
+              28.66129
+            ],
+            [
+              77.28805,
+              28.66256
+            ],
+            [
+              77.27898,
+              28.65231
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da114dffffff",
+        "name": "Preet Vihar & Karkardooma",
+        "ward": "MCD East 27",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 59,
+        "mood": "recovering",
+        "cleanIndex": 5.9,
+        "centerLat": 28.65104,
+        "centerLng": 77.29392
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1ab6ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.28218,
+              28.67408
+            ],
+            [
+              77.28805,
+              28.66256
+            ],
+            [
+              77.303,
+              28.66129
+            ],
+            [
+              77.31207,
+              28.67153
+            ],
+            [
+              77.3062,
+              28.68306
+            ],
+            [
+              77.29125,
+              28.68433
+            ],
+            [
+              77.28218,
+              28.67408
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1ab6ffffff",
+        "name": "Shahdara Heritage Quarter",
+        "ward": "MCD East 29",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 29,
+        "mood": "sick",
+        "cleanIndex": 2.9,
+        "centerLat": 28.67281,
+        "centerLng": 77.29712
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1b9affffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.26454,
+              28.70866
+            ],
+            [
+              77.27042,
+              28.69713
+            ],
+            [
+              77.28538,
+              28.69586
+            ],
+            [
+              77.29445,
+              28.70611
+            ],
+            [
+              77.28858,
+              28.71764
+            ],
+            [
+              77.27362,
+              28.71891
+            ],
+            [
+              77.26454,
+              28.70866
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1b9affffff",
+        "name": "Yamuna Vihar Riverside",
+        "ward": "MCD East 31",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 44,
+        "mood": "recovering",
+        "cleanIndex": 4.4,
+        "centerLat": 28.70738,
+        "centerLng": 77.2795
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1105ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.04224,
+              28.58413
+            ],
+            [
+              77.04815,
+              28.57262
+            ],
+            [
+              77.06309,
+              28.57138
+            ],
+            [
+              77.07212,
+              28.58163
+            ],
+            [
+              77.06621,
+              28.59314
+            ],
+            [
+              77.05127,
+              28.59439
+            ],
+            [
+              77.04224,
+              28.58413
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1105ffffff",
+        "name": "Dwarka Sector 6 & 10",
+        "ward": "MCD West 62",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 79,
+        "mood": "thriving",
+        "cleanIndex": 7.9,
+        "centerLat": 28.58288,
+        "centerLng": 77.05718
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1100ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.03913,
+              28.56237
+            ],
+            [
+              77.04503,
+              28.55087
+            ],
+            [
+              77.05997,
+              28.54962
+            ],
+            [
+              77.06899,
+              28.55988
+            ],
+            [
+              77.06309,
+              28.57138
+            ],
+            [
+              77.04815,
+              28.57262
+            ],
+            [
+              77.03913,
+              28.56237
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1100ffffff",
+        "name": "Dwarka Sector 21 Transportation Hub",
+        "ward": "MCD West 65",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 81,
+        "mood": "thriving",
+        "cleanIndex": 8.1,
+        "centerLat": 28.56112,
+        "centerLng": 77.05406
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1128ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.06934,
+              28.61491
+            ],
+            [
+              77.07525,
+              28.6034
+            ],
+            [
+              77.09019,
+              28.60215
+            ],
+            [
+              77.09923,
+              28.61241
+            ],
+            [
+              77.09332,
+              28.62392
+            ],
+            [
+              77.07838,
+              28.62517
+            ],
+            [
+              77.06934,
+              28.61491
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1128ffffff",
+        "name": "Janakpuri District Center",
+        "ward": "MCD West 58",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 71,
+        "mood": "thriving",
+        "cleanIndex": 7.1,
+        "centerLat": 28.61366,
+        "centerLng": 77.08428
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da112dffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.07247,
+              28.63668
+            ],
+            [
+              77.07838,
+              28.62517
+            ],
+            [
+              77.09332,
+              28.62392
+            ],
+            [
+              77.10236,
+              28.63418
+            ],
+            [
+              77.09646,
+              28.64569
+            ],
+            [
+              77.08151,
+              28.64694
+            ],
+            [
+              77.07247,
+              28.63668
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da112dffffff",
+        "name": "Tilak Nagar Market",
+        "ward": "MCD West 57",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 55,
+        "mood": "recovering",
+        "cleanIndex": 5.5,
+        "centerLat": 28.63543,
+        "centerLng": 77.08742
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da18daffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.09646,
+              28.64569
+            ],
+            [
+              77.10236,
+              28.63418
+            ],
+            [
+              77.11731,
+              28.63292
+            ],
+            [
+              77.12636,
+              28.64318
+            ],
+            [
+              77.12045,
+              28.6547
+            ],
+            [
+              77.1055,
+              28.65595
+            ],
+            [
+              77.09646,
+              28.64569
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da18daffffff",
+        "name": "Rajouri Garden Central",
+        "ward": "MCD West 55",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 63,
+        "mood": "thriving",
+        "cleanIndex": 6.3,
+        "centerLat": 28.64444,
+        "centerLng": 77.11141
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da18d9ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.1236,
+              28.67647
+            ],
+            [
+              77.1295,
+              28.66496
+            ],
+            [
+              77.14446,
+              28.6637
+            ],
+            [
+              77.15351,
+              28.67396
+            ],
+            [
+              77.14761,
+              28.68548
+            ],
+            [
+              77.13265,
+              28.68674
+            ],
+            [
+              77.1236,
+              28.67647
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da18d9ffffff",
+        "name": "Punjabi Bagh Green Enclave",
+        "ward": "MCD West 52",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 77,
+        "mood": "thriving",
+        "cleanIndex": 7.7,
+        "centerLat": 28.67522,
+        "centerLng": 77.13856
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da18caffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.12675,
+              28.69826
+            ],
+            [
+              77.13265,
+              28.68674
+            ],
+            [
+              77.14761,
+              28.68548
+            ],
+            [
+              77.15667,
+              28.69574
+            ],
+            [
+              77.15077,
+              28.70726
+            ],
+            [
+              77.13581,
+              28.70852
+            ],
+            [
+              77.12675,
+              28.69826
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da18caffffff",
+        "name": "Pitampura TV Tower",
+        "ward": "MCD North-West 71",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 85,
+        "mood": "thriving",
+        "cleanIndex": 8.5,
+        "centerLat": 28.697,
+        "centerLng": 77.14171
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da18ceffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.10588,
+              28.71104
+            ],
+            [
+              77.11179,
+              28.69951
+            ],
+            [
+              77.12675,
+              28.69826
+            ],
+            [
+              77.13581,
+              28.70852
+            ],
+            [
+              77.1299,
+              28.72005
+            ],
+            [
+              77.11493,
+              28.7213
+            ],
+            [
+              77.10588,
+              28.71104
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da18ceffffff",
+        "name": "Rohini Sector 7 & 8",
+        "ward": "MCD North-West 75",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 87,
+        "mood": "legendary",
+        "cleanIndex": 8.7,
+        "centerLat": 28.70978,
+        "centerLng": 77.12084
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da18ccffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.10902,
+              28.73283
+            ],
+            [
+              77.11493,
+              28.7213
+            ],
+            [
+              77.1299,
+              28.72005
+            ],
+            [
+              77.13896,
+              28.73031
+            ],
+            [
+              77.13305,
+              28.74184
+            ],
+            [
+              77.11808,
+              28.7431
+            ],
+            [
+              77.10902,
+              28.73283
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da18ccffffff",
+        "name": "Rohini Sector 15 & 16",
+        "ward": "MCD North-West 78",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 89,
+        "mood": "legendary",
+        "cleanIndex": 8.9,
+        "centerLat": 28.73157,
+        "centerLng": 77.12399
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1165ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.17163,
+              28.69448
+            ],
+            [
+              77.17752,
+              28.68296
+            ],
+            [
+              77.19248,
+              28.68169
+            ],
+            [
+              77.20154,
+              28.69195
+            ],
+            [
+              77.19565,
+              28.70348
+            ],
+            [
+              77.18069,
+              28.70474
+            ],
+            [
+              77.17163,
+              28.69448
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1165ffffff",
+        "name": "Model Town & Naini Lake",
+        "ward": "MCD North 05",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 73,
+        "mood": "thriving",
+        "cleanIndex": 7.3,
+        "centerLat": 28.69322,
+        "centerLng": 77.18658
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da18cbffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.15077,
+              28.70726
+            ],
+            [
+              77.15667,
+              28.69574
+            ],
+            [
+              77.17163,
+              28.69448
+            ],
+            [
+              77.18069,
+              28.70474
+            ],
+            [
+              77.17479,
+              28.71626
+            ],
+            [
+              77.15983,
+              28.71753
+            ],
+            [
+              77.15077,
+              28.70726
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da18cbffffff",
+        "name": "Shalimar Bagh Orchards",
+        "ward": "MCD North-West 73",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 67,
+        "mood": "thriving",
+        "cleanIndex": 6.7,
+        "centerLat": 28.706,
+        "centerLng": 77.16573
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da18deffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.0756,
+              28.65845
+            ],
+            [
+              77.08151,
+              28.64694
+            ],
+            [
+              77.09646,
+              28.64569
+            ],
+            [
+              77.1055,
+              28.65595
+            ],
+            [
+              77.0996,
+              28.66747
+            ],
+            [
+              77.08464,
+              28.66872
+            ],
+            [
+              77.0756,
+              28.65845
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da18deffffff",
+        "name": "Paschim Vihar Outer Ring",
+        "ward": "MCD West 60",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 56,
+        "mood": "recovering",
+        "cleanIndex": 5.6,
+        "centerLat": 28.6572,
+        "centerLng": 77.09055
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1126ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              76.97655,
+              28.6006
+            ],
+            [
+              76.98248,
+              28.58909
+            ],
+            [
+              76.99742,
+              28.58785
+            ],
+            [
+              77.00644,
+              28.59812
+            ],
+            [
+              77.00052,
+              28.60962
+            ],
+            [
+              76.98558,
+              28.61086
+            ],
+            [
+              76.97655,
+              28.6006
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1126ffffff",
+        "name": "Najafgarh Rural Fringe",
+        "ward": "MCD South-West 82",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 31,
+        "mood": "recovering",
+        "cleanIndex": 3.1,
+        "centerLat": 28.59936,
+        "centerLng": 76.9915
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1842ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.07979,
+              28.84564
+            ],
+            [
+              77.08572,
+              28.8341
+            ],
+            [
+              77.10071,
+              28.83285
+            ],
+            [
+              77.10978,
+              28.84313
+            ],
+            [
+              77.10386,
+              28.85467
+            ],
+            [
+              77.08886,
+              28.85593
+            ],
+            [
+              77.07979,
+              28.84564
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1842ffffff",
+        "name": "Narela Industrial Ward",
+        "ward": "MCD North 88",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 26,
+        "mood": "sick",
+        "cleanIndex": 2.6,
+        "centerLat": 28.84439,
+        "centerLng": 77.09479
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1856ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.02855,
+              28.80576
+            ],
+            [
+              77.03448,
+              28.79423
+            ],
+            [
+              77.04947,
+              28.79298
+            ],
+            [
+              77.05853,
+              28.80326
+            ],
+            [
+              77.0526,
+              28.81479
+            ],
+            [
+              77.03761,
+              28.81605
+            ],
+            [
+              77.02855,
+              28.80576
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1856ffffff",
+        "name": "Bawana Clean Green Belt",
+        "ward": "MCD North 86",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 42,
+        "mood": "recovering",
+        "cleanIndex": 4.2,
+        "centerLat": 28.80451,
+        "centerLng": 77.04354
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da185affffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.11847,
+              28.79824
+            ],
+            [
+              77.12438,
+              28.7867
+            ],
+            [
+              77.13936,
+              28.78544
+            ],
+            [
+              77.14843,
+              28.79571
+            ],
+            [
+              77.14252,
+              28.80725
+            ],
+            [
+              77.12754,
+              28.80851
+            ],
+            [
+              77.11847,
+              28.79824
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da185affffff",
+        "name": "Alipur Heritage GT Road",
+        "ward": "MCD North 84",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 49,
+        "mood": "recovering",
+        "cleanIndex": 4.9,
+        "centerLat": 28.79698,
+        "centerLng": 77.13345
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1021ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.17034,
+              28.52936
+            ],
+            [
+              77.17622,
+              28.51786
+            ],
+            [
+              77.19114,
+              28.51661
+            ],
+            [
+              77.20018,
+              28.52685
+            ],
+            [
+              77.1943,
+              28.53835
+            ],
+            [
+              77.17938,
+              28.53961
+            ],
+            [
+              77.17034,
+              28.52936
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1021ffffff",
+        "name": "Mehrauli Archaeological Park",
+        "ward": "MCD South 47",
+        "mascot": "nilgai",
+        "mascotNameEn": "Nilgai (Blue Bull)",
+        "mascotNameHi": "नीलगाय",
+        "mascotHabitatEn": "Southern Ridge & Forest Corridors",
+        "mascotColor": "#10B981",
+        "health": 83,
+        "mood": "thriving",
+        "cleanIndex": 8.3,
+        "centerLat": 28.52811,
+        "centerLng": 77.18526
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1035ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.11929,
+              28.48964
+            ],
+            [
+              77.12518,
+              28.47815
+            ],
+            [
+              77.14009,
+              28.4769
+            ],
+            [
+              77.14912,
+              28.48714
+            ],
+            [
+              77.14324,
+              28.49863
+            ],
+            [
+              77.12832,
+              28.49989
+            ],
+            [
+              77.11929,
+              28.48964
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1035ffffff",
+        "name": "Sultanpur Bird Corridor South",
+        "ward": "MCD South-West 90",
+        "mascot": "nilgai",
+        "mascotNameEn": "Nilgai (Blue Bull)",
+        "mascotNameHi": "नीलगाय",
+        "mascotHabitatEn": "Southern Ridge & Forest Corridors",
+        "mascotColor": "#10B981",
+        "health": 90,
+        "mood": "legendary",
+        "cleanIndex": 9,
+        "centerLat": 28.48839,
+        "centerLng": 77.13421
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1b9effffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.2437,
+              28.72146
+            ],
+            [
+              77.24959,
+              28.70993
+            ],
+            [
+              77.26454,
+              28.70866
+            ],
+            [
+              77.27362,
+              28.71891
+            ],
+            [
+              77.26774,
+              28.73044
+            ],
+            [
+              77.25278,
+              28.73171
+            ],
+            [
+              77.2437,
+              28.72146
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1b9effffff",
+        "name": "Sonia Vihar Water Works",
+        "ward": "MCD North-East 15",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 39,
+        "mood": "recovering",
+        "cleanIndex": 3.9,
+        "centerLat": 28.72019,
+        "centerLng": 77.25866
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1070ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.28381,
+              28.53076
+            ],
+            [
+              77.28967,
+              28.51926
+            ],
+            [
+              77.30458,
+              28.51799
+            ],
+            [
+              77.31363,
+              28.52822
+            ],
+            [
+              77.30778,
+              28.53973
+            ],
+            [
+              77.29286,
+              28.541
+            ],
+            [
+              77.28381,
+              28.53076
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1070ffffff",
+        "name": "Sarita Vihar & Jasola",
+        "ward": "MCD South 43",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 47,
+        "mood": "recovering",
+        "cleanIndex": 4.7,
+        "centerLat": 28.52949,
+        "centerLng": 77.29872
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1072ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.28062,
+              28.50903
+            ],
+            [
+              77.28648,
+              28.49752
+            ],
+            [
+              77.30138,
+              28.49626
+            ],
+            [
+              77.31043,
+              28.50649
+            ],
+            [
+              77.30458,
+              28.51799
+            ],
+            [
+              77.28967,
+              28.51926
+            ],
+            [
+              77.28062,
+              28.50903
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1072ffffff",
+        "name": "Badarpur Border Green Hub",
+        "ward": "MCD South 46",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 34,
+        "mood": "recovering",
+        "cleanIndex": 3.4,
+        "centerLat": 28.50776,
+        "centerLng": 77.29553
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1029ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.23906,
+              28.53456
+            ],
+            [
+              77.24493,
+              28.52306
+            ],
+            [
+              77.25984,
+              28.52179
+            ],
+            [
+              77.26889,
+              28.53203
+            ],
+            [
+              77.26303,
+              28.54353
+            ],
+            [
+              77.24811,
+              28.5448
+            ],
+            [
+              77.23906,
+              28.53456
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1029ffffff",
+        "name": "CR Park Bengali Colony",
+        "ward": "MCD South 39",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 75,
+        "mood": "thriving",
+        "cleanIndex": 7.5,
+        "centerLat": 28.5333,
+        "centerLng": 77.25398
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1156ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.15268,
+              28.56387
+            ],
+            [
+              77.15857,
+              28.55237
+            ],
+            [
+              77.17349,
+              28.55111
+            ],
+            [
+              77.18254,
+              28.56136
+            ],
+            [
+              77.17665,
+              28.57286
+            ],
+            [
+              77.16172,
+              28.57412
+            ],
+            [
+              77.15268,
+              28.56387
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1156ffffff",
+        "name": "Vasant Vihar Embassy Belt",
+        "ward": "MCD South 36",
+        "mascot": "peafowl",
+        "mascotNameEn": "Indian Peafowl",
+        "mascotNameHi": "भारतीय मोर",
+        "mascotHabitatEn": "Urban Parks & Lutyens Green Belt",
+        "mascotColor": "#3B82F6",
+        "health": 86,
+        "mood": "legendary",
+        "cleanIndex": 8.6,
+        "centerLat": 28.56261,
+        "centerLng": 77.16761
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1150ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.17665,
+              28.57286
+            ],
+            [
+              77.18254,
+              28.56136
+            ],
+            [
+              77.19746,
+              28.5601
+            ],
+            [
+              77.20651,
+              28.57034
+            ],
+            [
+              77.20063,
+              28.58185
+            ],
+            [
+              77.1857,
+              28.58311
+            ],
+            [
+              77.17665,
+              28.57286
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1150ffffff",
+        "name": "RK Puram Government Quarters",
+        "ward": "MCD South 37",
+        "mascot": "peafowl",
+        "mascotNameEn": "Indian Peafowl",
+        "mascotNameHi": "भारतीय मोर",
+        "mascotHabitatEn": "Urban Parks & Lutyens Green Belt",
+        "mascotColor": "#3B82F6",
+        "health": 69,
+        "mood": "thriving",
+        "cleanIndex": 6.9,
+        "centerLat": 28.5716,
+        "centerLng": 77.19158
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1154ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.15583,
+              28.58563
+            ],
+            [
+              77.16172,
+              28.57412
+            ],
+            [
+              77.17665,
+              28.57286
+            ],
+            [
+              77.1857,
+              28.58311
+            ],
+            [
+              77.17981,
+              28.59462
+            ],
+            [
+              77.16488,
+              28.59588
+            ],
+            [
+              77.15583,
+              28.58563
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1154ffffff",
+        "name": "Moti Bagh & Shanti Path",
+        "ward": "NDMC South-West",
+        "mascot": "peafowl",
+        "mascotNameEn": "Indian Peafowl",
+        "mascotNameHi": "भारतीय मोर",
+        "mascotHabitatEn": "Urban Parks & Lutyens Green Belt",
+        "mascotColor": "#3B82F6",
+        "health": 80,
+        "mood": "thriving",
+        "cleanIndex": 8,
+        "centerLat": 28.58437,
+        "centerLng": 77.17077
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1172ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.13501,
+              28.59839
+            ],
+            [
+              77.1409,
+              28.58688
+            ],
+            [
+              77.15583,
+              28.58563
+            ],
+            [
+              77.16488,
+              28.59588
+            ],
+            [
+              77.15899,
+              28.60739
+            ],
+            [
+              77.14405,
+              28.60864
+            ],
+            [
+              77.13501,
+              28.59839
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1172ffffff",
+        "name": "Dhaula Kuan Army Ridge",
+        "ward": "Cantonment 01",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 91,
+        "mood": "legendary",
+        "cleanIndex": 9.1,
+        "centerLat": 28.59713,
+        "centerLng": 77.14994
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1176ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.11417,
+              28.61115
+            ],
+            [
+              77.12007,
+              28.59964
+            ],
+            [
+              77.13501,
+              28.59839
+            ],
+            [
+              77.14405,
+              28.60864
+            ],
+            [
+              77.13815,
+              28.62015
+            ],
+            [
+              77.12321,
+              28.62141
+            ],
+            [
+              77.11417,
+              28.61115
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1176ffffff",
+        "name": "Delhi Cantonment Sadar Bazar",
+        "ward": "Cantonment 02",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 93,
+        "mood": "legendary",
+        "cleanIndex": 9.3,
+        "centerLat": 28.6099,
+        "centerLng": 77.12911
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1174ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.11731,
+              28.63292
+            ],
+            [
+              77.12321,
+              28.62141
+            ],
+            [
+              77.13815,
+              28.62015
+            ],
+            [
+              77.1472,
+              28.63041
+            ],
+            [
+              77.1413,
+              28.64192
+            ],
+            [
+              77.12636,
+              28.64318
+            ],
+            [
+              77.11731,
+              28.63292
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1174ffffff",
+        "name": "Naraina Industrial Area",
+        "ward": "MCD West 54",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 57,
+        "mood": "recovering",
+        "cleanIndex": 5.7,
+        "centerLat": 28.63167,
+        "centerLng": 77.13226
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da18dbffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.12045,
+              28.6547
+            ],
+            [
+              77.12636,
+              28.64318
+            ],
+            [
+              77.1413,
+              28.64192
+            ],
+            [
+              77.15035,
+              28.65218
+            ],
+            [
+              77.14446,
+              28.6637
+            ],
+            [
+              77.1295,
+              28.66496
+            ],
+            [
+              77.12045,
+              28.6547
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da18dbffffff",
+        "name": "Kirti Nagar Furniture Market",
+        "ward": "MCD West 53",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 51,
+        "mood": "recovering",
+        "cleanIndex": 5.1,
+        "centerLat": 28.65344,
+        "centerLng": 77.1354
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1166ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.14446,
+              28.6637
+            ],
+            [
+              77.15035,
+              28.65218
+            ],
+            [
+              77.1653,
+              28.65092
+            ],
+            [
+              77.17436,
+              28.66118
+            ],
+            [
+              77.16846,
+              28.6727
+            ],
+            [
+              77.15351,
+              28.67396
+            ],
+            [
+              77.14446,
+              28.6637
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1166ffffff",
+        "name": "Patel Nagar East",
+        "ward": "MCD Central 20",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 61,
+        "mood": "thriving",
+        "cleanIndex": 6.1,
+        "centerLat": 28.66244,
+        "centerLng": 77.15941
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1175ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.1413,
+              28.64192
+            ],
+            [
+              77.1472,
+              28.63041
+            ],
+            [
+              77.16214,
+              28.62915
+            ],
+            [
+              77.1712,
+              28.63941
+            ],
+            [
+              77.1653,
+              28.65092
+            ],
+            [
+              77.15035,
+              28.65218
+            ],
+            [
+              77.1413,
+              28.64192
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1175ffffff",
+        "name": "Shadipur Depot Hub",
+        "ward": "MCD Central 16",
+        "mascot": "jackal",
+        "mascotNameEn": "Golden Jackal",
+        "mascotNameHi": "सियार",
+        "mascotHabitatEn": "Semi-Arid Scrublands & Outskirts",
+        "mascotColor": "#8B5CF6",
+        "health": 53,
+        "mood": "recovering",
+        "cleanIndex": 5.3,
+        "centerLat": 28.64067,
+        "centerLng": 77.15625
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da115cffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.22461,
+              28.59083
+            ],
+            [
+              77.23049,
+              28.57932
+            ],
+            [
+              77.24542,
+              28.57806
+            ],
+            [
+              77.25447,
+              28.5883
+            ],
+            [
+              77.2486,
+              28.59981
+            ],
+            [
+              77.23367,
+              28.60108
+            ],
+            [
+              77.22461,
+              28.59083
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da115cffffff",
+        "name": "Jangpura & Nizamuddin Dargah",
+        "ward": "MCD South 33",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 68,
+        "mood": "thriving",
+        "cleanIndex": 6.8,
+        "centerLat": 28.58957,
+        "centerLng": 77.23954
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1141ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.23097,
+              28.63435
+            ],
+            [
+              77.23685,
+              28.62284
+            ],
+            [
+              77.25178,
+              28.62157
+            ],
+            [
+              77.26085,
+              28.63182
+            ],
+            [
+              77.25497,
+              28.64333
+            ],
+            [
+              77.24003,
+              28.6446
+            ],
+            [
+              77.23097,
+              28.63435
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1141ffffff",
+        "name": "ITO Press Enclave",
+        "ward": "MCD Central 15",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 77,
+        "mood": "thriving",
+        "cleanIndex": 7.7,
+        "centerLat": 28.63309,
+        "centerLng": 77.24591
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da114cffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.25497,
+              28.64333
+            ],
+            [
+              77.26085,
+              28.63182
+            ],
+            [
+              77.27579,
+              28.63055
+            ],
+            [
+              77.28485,
+              28.64079
+            ],
+            [
+              77.27898,
+              28.65231
+            ],
+            [
+              77.26404,
+              28.65358
+            ],
+            [
+              77.25497,
+              28.64333
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da114cffffff",
+        "name": "Geeta Colony Riverfront",
+        "ward": "MCD East 24",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 43,
+        "mood": "recovering",
+        "cleanIndex": 4.3,
+        "centerLat": 28.64206,
+        "centerLng": 77.26991
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da116bffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.25816,
+              28.6651
+            ],
+            [
+              77.26404,
+              28.65358
+            ],
+            [
+              77.27898,
+              28.65231
+            ],
+            [
+              77.28805,
+              28.66256
+            ],
+            [
+              77.28218,
+              28.67408
+            ],
+            [
+              77.26723,
+              28.67535
+            ],
+            [
+              77.25816,
+              28.6651
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da116bffffff",
+        "name": "Gandhi Nagar Garment Hub",
+        "ward": "MCD East 26",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 37,
+        "mood": "recovering",
+        "cleanIndex": 3.7,
+        "centerLat": 28.66383,
+        "centerLng": 77.27311
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1ab0ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.3062,
+              28.68306
+            ],
+            [
+              77.31207,
+              28.67153
+            ],
+            [
+              77.32701,
+              28.67025
+            ],
+            [
+              77.33609,
+              28.6805
+            ],
+            [
+              77.33023,
+              28.69203
+            ],
+            [
+              77.31528,
+              28.69331
+            ],
+            [
+              77.3062,
+              28.68306
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1ab0ffffff",
+        "name": "Dilshad Garden Health Hub",
+        "ward": "MCD East 30",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 50,
+        "mood": "recovering",
+        "cleanIndex": 5,
+        "centerLat": 28.68178,
+        "centerLng": 77.32115
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "873da1ab2ffffff",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              77.303,
+              28.66129
+            ],
+            [
+              77.30886,
+              28.64976
+            ],
+            [
+              77.3238,
+              28.64849
+            ],
+            [
+              77.33288,
+              28.65873
+            ],
+            [
+              77.32701,
+              28.67025
+            ],
+            [
+              77.31207,
+              28.67153
+            ],
+            [
+              77.303,
+              28.66129
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "h3Index": "873da1ab2ffffff",
+        "name": "Anand Vihar Railway & Bus Terminal",
+        "ward": "MCD East 28",
+        "mascot": "blackbuck",
+        "mascotNameEn": "Blackbuck",
+        "mascotNameHi": "काला हिरण",
+        "mascotHabitatEn": "Yamuna Floodplains & Wetlands",
+        "mascotColor": "#06B6D4",
+        "health": 46,
+        "mood": "recovering",
+        "cleanIndex": 4.6,
+        "centerLat": 28.66001,
+        "centerLng": 77.31794
+      }
+    }
+  ]
+}

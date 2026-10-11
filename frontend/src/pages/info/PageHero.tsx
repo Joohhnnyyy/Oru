@@ -20,7 +20,7 @@ interface PageHeroProps {
 export function PageHero({ title, intro, art, tone, children }: PageHeroProps) {
   const { t } = useTranslation();
   return (
-    <section aria-labelledby="page-title" className="pt-28 pb-12 sm:pt-36 sm:pb-20">
+    <section aria-labelledby="page-title" className="public-hero">
       <Container className="grid items-center gap-12 lg:grid-cols-[1.25fr_1fr]">
         <div>
           <Link to="/" className="roll-host inline-flex min-h-11 items-center gap-2 font-semibold text-muted no-underline hover:text-ink">
@@ -40,7 +40,7 @@ export function PageHero({ title, intro, art, tone, children }: PageHeroProps) {
           )}
         </div>
         <motion.div
-          className={`relative mx-auto grid aspect-square w-full max-w-[440px] place-items-center rounded-[44px] bg-gradient-to-br ${tone}`}
+          className={`public-hero-art relative mx-auto grid aspect-square w-full max-w-[440px] place-items-center rounded-[44px] bg-gradient-to-br ${tone}`}
           initial={{ opacity: 0, scale: 0.9, rotate: -3 }}
           animate={{ opacity: 1, scale: 1, rotate: 0 }}
           transition={{ type: 'spring', stiffness: 110, damping: 14, delay: 0.1 }}
@@ -55,7 +55,7 @@ export function PageHero({ title, intro, art, tone, children }: PageHeroProps) {
 /** Section heading used inside inner pages. */
 export function PageSection({ id, title, children, className = '' }: { id: string; title: string; children: ReactNode; className?: string }) {
   return (
-    <section aria-labelledby={id} className={`py-14 sm:py-20 ${className}`}>
+    <section aria-labelledby={id} className={`public-section ${className}`}>
       <Container>
         <h2 id={id} className="text-[clamp(1.875rem,3.4vw,2.75rem)] leading-[1.1] font-extrabold">
           <SplitWords text={title} />

@@ -50,7 +50,7 @@ export function FlipCard({ id, mission, bg, index = 0 }: { id: GuardianId; missi
   const lift = useTransform(rotateY, [-12, 12], [-10, 10]);
 
   const onMove = (e: PointerEvent) => {
-    if (reduced || flipped) return;
+    if (reduced || flipped || e.pointerType !== 'mouse') return;
     const r = e.currentTarget.getBoundingClientRect();
     ry.set(((e.clientX - r.left) / r.width - 0.5) * 18);
     rx.set(((e.clientY - r.top) / r.height - 0.5) * -14);
@@ -78,7 +78,7 @@ export function FlipCard({ id, mission, bg, index = 0 }: { id: GuardianId; missi
           className="flip block h-full w-full scroll-mt-28 rounded-card text-left"
         >
           <span className="flip-inner">
-            <span aria-hidden={flipped} className={`flip-face flip-front flex flex-col overflow-visible rounded-card bg-gradient-to-b ${bg} p-6 shadow-soft`}>
+            <span aria-hidden={flipped} className={`flip-face flip-front flex flex-col overflow-visible rounded-card bg-gradient-to-b ${bg} p-6 shadow-soft`} {...{ string: 'spotlight' }}>
               <motion.span style={{ x: lift, translateZ: 40 }} className="relative mx-auto -mt-14 block h-56 w-full">
                 <img
                   src={CHARACTER[id]}
@@ -121,7 +121,7 @@ export function FlipCard({ id, mission, bg, index = 0 }: { id: GuardianId; missi
 export function GuardianGrid() {
   const { t } = useTranslation();
   return (
-    <ul className="grid gap-x-6 gap-y-20 sm:grid-cols-2 lg:grid-cols-3">
+    <ul className="guardian-collection grid gap-x-6 gap-y-20 sm:grid-cols-2 lg:grid-cols-3">
       {GUARDIANS.map((g, i) => (
         <li key={g.id} className="flex flex-col">
           <FlipCard {...g} index={i} />

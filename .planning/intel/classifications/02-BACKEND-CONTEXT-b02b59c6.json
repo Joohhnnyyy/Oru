@@ -1,0 +1,28 @@
+{
+  "source_path": "/Users/anshjohnson/Oru/docs/02-BACKEND-CONTEXT.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "SaafSafari — Backend Context",
+  "summary": "Backend technical specification defining TypeScript Lambdas, API Gateway routes, DynamoDB single-table schema, EventBridge events, and Cedar authorization.",
+  "scope": [
+    "Backend",
+    "Node.js 22",
+    "TypeScript",
+    "AWS Lambda",
+    "API Gateway",
+    "DynamoDB Single-Table",
+    "EventBridge",
+    "Cedar Authz",
+    "Powertools",
+    "Zod"
+  ],
+  "cross_refs": [
+    "00-PROJECT-CONTEXT.md",
+    "01-AWS-REQUIREMENTS.md",
+    "05-GAME-DESIGN.md"
+  ],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

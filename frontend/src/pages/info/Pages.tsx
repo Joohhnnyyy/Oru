@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import type { ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router-dom';
+import { env } from '../../config/env';
 import { RiseIn } from '../../components/ScrollFx';
 import { Rich, RollText, Unmask } from '../../components/TextFx';
 import { CHARACTER, SCENE, TRUCK } from '../../content/media';
@@ -59,7 +60,7 @@ export function HowItWorksPage() {
         <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {MISSIONS.map((m, i) => (
             <Stagger key={m.id} i={i} className="rounded-card bg-surface p-6">
-              <MissionIcon mission={m.id} />
+              <span id={m.id}><MissionIcon mission={m.id} /></span>
               <p className="mt-4 inline-flex items-center gap-2 text-sm font-bold">
                 <span aria-hidden="true" className={`size-3 rounded-full ${m.dot}`} />
                 {t(`why.${m.id}.name`)}
@@ -263,6 +264,7 @@ export function PlayPage() {
     <>
       <PageHero title={t('pages.play.title')} intro={t('pages.play.intro')} art={CHARACTER.buddy} tone="from-butter/70 to-mint/40">
         <span className="inline-flex min-h-11 items-center rounded-full bg-butter px-4 font-bold">{t('pages.play.status')}</span>
+        <MoreLink to="/home" label={t('cta.play')} />
         <InstallButton />
       </PageHero>
       <PageSection id="play-steps" title={t('pages.play.steps')}>
@@ -284,6 +286,131 @@ export function PlayPage() {
           <MoreLink to="/how-it-works" label={t('pages.how.title')} />
           <MoreLink to="/guardians" label={t('pages.guardians.title')} />
           <MoreLink to="/places" label={t('pages.places.title')} />
+        </div>
+      </PageSection>
+    </>
+  );
+}
+
+const FAQ_CATEGORIES = [
+  { id: 'start', items: ['startWhat', 'startFree', 'startAccount'] },
+  { id: 'missions', items: ['missionsWhat', 'missionsSeeds', 'missionsVerify'] },
+  { id: 'guardians', items: ['guardiansWhat', 'guardiansGrow'] },
+  { id: 'privacy', items: ['privacyData', 'privacyExport'] },
+  { id: 'access', items: ['accessLang', 'accessA11y'] },
+] as const;
+
+export function FaqPage() {
+  const { t } = useTranslation();
+  const [query, setQuery] = useState('');
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return FAQ_CATEGORIES;
+    return FAQ_CATEGORIES.map((cat) => ({
+      ...cat,
+      items: cat.items.filter((id) => `${t(`pages.faq.q.${id}.q`)} ${t(`pages.faq.q.${id}.a`)}`.toLowerCase().includes(q)),
+    })).filter((cat) => cat.items.length > 0);
+  }, [query, t]);
+
+  return (
+    <>
+      <PageHero title={t('pages.faq.title')} intro={t('pages.faq.intro')} art={CHARACTER.crane} tone="from-sky/40 to-butter/40" />
+      <PageSection id="faq-list" title={t('pages.faq.title')}>
+        <label className="block max-w-[28rem]">
+          <span className="sr-only">{t('pages.faq.searchLabel')}</span>
+          <input
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder={t('pages.faq.searchPlaceholder')}
+            className="min-h-11 w-full rounded-full border border-line bg-white px-5 py-2.5 text-base outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          />
+        </label>
+        {filtered.length === 0 ? (
+          <p className="mt-10 text-muted">{t('pages.faq.noResults')}</p>
+        ) : (
+          <div className="mt-10 space-y-10">
+            {filtered.map((cat) => (
+              <div key={cat.id}>
+                <h3 className="font-display text-xl font-bold">{t(`pages.faq.cat.${cat.id}`)}</h3>
+                <ul className="mt-4 space-y-3">
+                  {cat.items.map((id) => (
+                    <li key={id}>
+                      <details className="group rounded-card bg-surface p-5 open:bg-white">
+                        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 font-semibold marker:content-none">
+                          {t(`pages.faq.q.${id}.q`)}
+                          <span aria-hidden="true" className="shrink-0 text-xl leading-none transition-transform group-open:rotate-45">
+                            +
+                          </span>
+                        </summary>
+                        <p className="mt-3 leading-relaxed text-muted">{t(`pages.faq.q.${id}.a`)}</p>
+                      </details>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+      </PageSection>
+    </>
+  );
+}
+
+export function PrivacyPage() {
+  const { t } = useTranslation();
+  return (
+    <>
+      <PageHero title={t('pages.privacy.title')} intro={t('pages.privacy.intro')} art={CHARACTER.turtle} tone="from-mint/50 to-sky/40" />
+      <PageSection id="privacy-body" title={t('pages.privacy.title')}>
+        <div className="max-w-[44rem] space-y-8">
+          {(['p1', 'p2', 'p3', 'p4'] as const).map((k) => (
+            <div key={k}>
+              <h3 className="font-display text-xl font-bold">{t(`pages.privacy.${k}Title`)}</h3>
+              <p className="mt-2 leading-relaxed text-muted">{t(`pages.privacy.${k}`)}</p>
+            </div>
+          ))}
+        </div>
+      </PageSection>
+    </>
+  );
+}
+
+export function TermsPage() {
+  const { t } = useTranslation();
+  return (
+    <>
+      <PageHero title={t('pages.terms.title')} intro={t('pages.terms.intro')} art={CHARACTER.bustard} tone="from-butter/60 to-pink/40" />
+      <PageSection id="terms-body" title={t('pages.terms.title')}>
+        <div className="max-w-[44rem] space-y-8">
+          {(['p1', 'p2', 'p3', 'p4'] as const).map((k) => (
+            <div key={k}>
+              <h3 className="font-display text-xl font-bold">{t(`pages.terms.${k}Title`)}</h3>
+              <p className="mt-2 leading-relaxed text-muted">{t(`pages.terms.${k}`)}</p>
+            </div>
+          ))}
+        </div>
+      </PageSection>
+    </>
+  );
+}
+
+export function ContactPage() {
+  const { t } = useTranslation();
+  return (
+    <>
+      <PageHero title={t('pages.contact.title')} intro={t('pages.contact.intro')} art={CHARACTER.dolphin} tone="from-lilac/40 to-sky/40" />
+      <PageSection id="contact-body" title={t('pages.contact.issuesTitle')}>
+        <div className="max-w-[40rem]">
+          <p className="leading-relaxed text-muted">{t('pages.contact.issuesBody')}</p>
+          <a
+            href={`${env.VITE_SOURCE_URL}/issues/new`}
+            rel="noopener"
+            className="btn btn-play mt-6"
+          >
+            {t('pages.contact.issuesCta')}
+          </a>
         </div>
       </PageSection>
     </>

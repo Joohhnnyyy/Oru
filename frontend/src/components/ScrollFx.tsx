@@ -10,7 +10,8 @@ import { useReducedMotion } from '../hooks/useReducedMotion';
 export function ScrollProgress() {
   const { scrollYProgress } = useScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 24, mass: 0.3 });
-  const left = useTransform(progress, (v) => `calc(${(v * 100).toFixed(3)}% - ${(v * 64).toFixed(2)}px)`);
+  const x = useTransform(progress, (v) => `${v * 100}%`);
+  const truckX = useTransform(progress, (v) => `${-v * 100}%`);
   // Show once the visitor has scrolled a little past the top of the hero.
   const { scrollY } = useScroll();
   const [shown, setShown] = useState(false);
@@ -21,14 +22,16 @@ export function ScrollProgress() {
       aria-hidden="true"
       className={`pointer-events-none fixed inset-x-0 bottom-0 z-30 transition-opacity duration-300 ${shown ? 'opacity-100' : 'opacity-0'}`}
     >
+      <motion.div style={{ x }} className="absolute bottom-1.5 hidden w-full sm:block">
       <motion.img
         src={TRUCK.side}
         alt=""
         width={64}
         height={30}
-        style={{ left }}
-        className="loader-bump absolute bottom-1.5 hidden h-auto w-16 drop-shadow-[0_4px_6px_rgba(29,35,48,0.25)] sm:block"
+        style={{ x: truckX }}
+        className="h-auto w-16 drop-shadow-[0_4px_6px_rgba(29,35,48,0.25)]"
       />
+      </motion.div>
       <div className="h-1.5 bg-line/50">
         <motion.div style={{ scaleX: progress }} className="rainbow h-full origin-left" />
       </div>

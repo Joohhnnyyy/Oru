@@ -1,64 +1,35 @@
 # Dependencies
 node_modules/
-*/node_modules/
 .pnpm-store/
 
-# Production builds
+# Build outputs
 dist/
-*/dist/
 build/
-*/build/
+cdk.out/
+*.tsbuildinfo
+.expo/
 
-# Local Environment & Secrets
+# Environment & local files
 .env
 .env.*
-!.env.example
-*.local
-
-# Logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
+.env.local
+.env.*.local
+*.env
+**/.env
+**/.env.*
+cdk-outputs.json
 *.log
 
-# Editor & OS files
+# IDE & OS
 .DS_Store
-Thumbs.db
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json
 .idea/
+.vscode/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-# Temporary / Cache
-.temp/
-.tmp/
-.cache/
-
-# AI planning artifacts (dev-only)
-.planning/
-
-# Scraped reference site (dev-only)
-Butter-Video-Online-Video-Editor-Engineered-for-Creativity/
-
-# Playwright (MCP screenshots/traces + test output)
-.playwright-mcp/
-test-results/
-playwright-report/
-
-# Claude Code local settings
-.claude/settings.local.json
-
-# Web build intermediates
-.ssr/
-dist-analyze/
-
-# Art pipeline intermediates
-frontend/design/crops/
-frontend/design/cutouts/_*.png
-.venv-art/
+# Testing & Coverage
+coverage/
+.nyc_output/

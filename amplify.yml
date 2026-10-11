@@ -1,19 +1,21 @@
 version: 1
-applications:
-  - appRoot: frontend
-    frontend:
-      phases:
-        preBuild:
-          commands:
-            - corepack enable
-            - pnpm install --frozen-lockfile
-        build:
-          commands:
-            - pnpm --filter web build
-      artifacts:
-        baseDirectory: dist
-        files:
-          - '**/*'
-      cache:
-        paths:
-          - node_modules/**/*
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm install -g pnpm
+        - pnpm install
+        - if [ -f cdk-outputs.json ]; then pnpm export-env --frontend-only; fi
+        - pnpm --filter @saafsafari/shared build
+        - pnpm --filter @saafsafari/game-rules build
+    build:
+      commands:
+        - pnpm --filter web build
+  artifacts:
+    baseDirectory: frontend/dist
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - .pnpm-store/**/*

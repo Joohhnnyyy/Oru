@@ -1,0 +1,109 @@
+/* StringTune Scroll & Motion Styles */
+
+/* Base progress binding (supports official --progress and custom --string-progress) */
+[string="progress"] {
+  --st-p: var(--progress, var(--string-progress, 0));
+  will-change: transform, opacity;
+}
+
+/* Scroll-driven progress reveals */
+.string-scroll-reveal {
+  opacity: calc(0.25 + (var(--progress, var(--string-progress, 0)) * 0.75));
+  transform: translateY(calc((1 - var(--progress, var(--string-progress, 0))) * 24px));
+  transition: opacity 0.1s linear, transform 0.1s linear;
+}
+
+/* Scroll-driven parallax elements */
+[string="parallax"] {
+  will-change: transform;
+}
+
+/* Subtle magnetic button physics */
+[string="magnetic"] {
+  transform: translate3d(
+    calc(var(--magnetic-x, 0) * 1px),
+    calc(var(--magnetic-y, 0) * 1px),
+    0
+  );
+  transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+  will-change: transform;
+}
+
+/* Cursor spotlight radial highlight */
+[string="spotlight"] {
+  position: relative;
+  overflow: hidden;
+}
+
+[string="spotlight"]::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: radial-gradient(
+    420px circle at calc(50% + cos(calc(var(--spotlight-angle, 0) * 1deg)) * calc(var(--spotlight-distance, 0) * 1px)) calc(50% + sin(calc(var(--spotlight-angle, 0) * 1deg)) * calc(var(--spotlight-distance, 0) * 1px)),
+    rgba(16, 185, 129, 0.14),
+    transparent 65%
+  );
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+[string="spotlight"]:hover::before {
+  opacity: 1;
+}
+
+/* Kinetic scroll rotation */
+.string-scroll-spin {
+  transform: rotate(calc(var(--progress, var(--string-progress, 0)) * 180deg));
+  will-change: transform;
+}
+
+/* Scroll-driven horizontal stretch/scale */
+.string-scroll-scale {
+  transform: scale(calc(0.95 + (var(--progress, var(--string-progress, 0)) * 0.05)));
+  will-change: transform;
+}
+
+/* Global scroll progress tracker bar */
+.string-top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #10b981, #06b6d4, #f59e0b);
+  transform-origin: left;
+  transform: scaleX(var(--progress, var(--string-progress, 0)));
+  z-index: 99;
+  pointer-events: none;
+}
+
+/* Solarpunk card hover elevation */
+.oru-card {
+  position: relative;
+  transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.oru-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 28px -8px rgba(16, 185, 129, 0.16), var(--shadow);
+}
+
+/* Hide animations when reduced motion is preferred */
+@media (prefers-reduced-motion: reduce) {
+  [string="progress"],
+  [string="parallax"],
+  [string="magnetic"],
+  [string="spotlight"]::before,
+  .string-scroll-reveal,
+  .string-scroll-spin,
+  .string-scroll-scale,
+  .oru-card {
+    transform: none !important;
+    opacity: 1 !important;
+    transition: none !important;
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "source_path": "/Users/anshjohnson/Oru/docs/03-WEB-CONTEXT.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "SaafSafari — Web Context",
+  "summary": "Frontend web specification detailing Vite + React + TypeScript citizen web portal and municipal console with MapLibre GL and Amplify Hosting.",
+  "scope": [
+    "Web",
+    "React",
+    "Vite",
+    "TypeScript",
+    "Citizen Portal",
+    "Municipal Console",
+    "MapLibre GL",
+    "AWS Amplify Hosting",
+    "Tailwind CSS"
+  ],
+  "cross_refs": [
+    "00-PROJECT-CONTEXT.md",
+    "01-AWS-REQUIREMENTS.md",
+    "02-BACKEND-CONTEXT.md"
+  ],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

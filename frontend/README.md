@@ -1,6 +1,6 @@
-# Oru web: landing page
+# Oru web
 
-The public landing page for **Oru**, a climate-habit game for India, with original 3D-rendered characters (the flower buddy and six guardians).
+The production website and citizen/municipal app for **Oru**, a climate-habit game for India, with original 3D-rendered characters (the flower buddy and six guardians).
 It is built in the team stack: Vite + React 18 + TypeScript + Tailwind v4 + i18next (English/Hindi) + Framer Motion. It is prerendered to static HTML at build time and is installable as a PWA.
 
 The layout and motion follow the patterns of a large-brand corporate character site: an isometric plaza hero with a floating highlights card, a sticky white header, a scroll-revealed mission statement, a dark band with drifting character bubbles, big split cards with accent bars, and pill cards. All code, copy, characters and artwork are Oru's own. No third-party assets, text or code are used.
@@ -45,7 +45,7 @@ To deploy, upload `dist/` to S3 + CloudFront, or use Amplify Hosting via the rep
 
 ## Pages
 
-Every button opens its own page (React Router v6 data router, `src/app/routes.tsx`). Each page is prerendered to static HTML at build time (`dist/<route>/index.html`, plus `dist/404.html`) with its own title and canonical URL.
+Every button opens its own page (React Router v6 data router, `src/app/routes.tsx`). Each public page is prerendered to static HTML at build time (`dist/<route>/index.html`, plus `dist/404.html`) with its own title and canonical URL.
 
 | URL | Page |
 |---|---|
@@ -87,7 +87,9 @@ Light chrome with pastel accents taken from the logo, defined in `src/styles/ind
 
 Missions: waste = mint, heat = coral, energy = butter, water = sky. Headings use **Baloo 2** (self-hosted, Latin + Devanagari); body text uses the system Noto Sans stack.
 
-## Measured (production build, local preview)
+## Earlier public-only measurements
+
+These measurements predate the immersive layouts and account integration. They are not current performance results.
 
 | Metric | Result |
 |---|---|
@@ -117,3 +119,43 @@ Missions: waste = mint, heat = coral, energy = butter, water = sky. Headings use
 - [ ] **Map.** The simplified pixel map of India carries a "not an official map" note. Confirm that's acceptable, or swap it for a region picker.
 - [ ] **Dark mode.** Removed for the light palette you asked for; it can be added back with tokens.
 - [ ] **`framer-motion` is pinned to 13.4.4.** 14.x was too new for pnpm's minimum-release-age policy; upgrade when it ages in.
+
+## Backend integration
+
+See [the verified integration report](../docs/10-FRONTEND-BACKEND-INTEGRATION.md) for the current route coverage, deployed AWS checks and service gaps.
+
+`frontend` is the production website. `apps/web` remains the prototype for reference. Amplify builds the `web` workspace and publishes `frontend/dist`.
+
+Run `pnpm export-env --frontend-only` from the repository root to populate `frontend/.env.local` from `cdk-outputs.json`. Only public API/Cognito settings are needed in the browser: `VITE_API_URL`, `VITE_COGNITO_CLIENT_ID`, and optional `VITE_COGNITO_REGION` (defaults to `ap-south-1`). Never put AWS credentials in a `VITE_*` variable. Public pages can build without a backend; sign-in displays a configuration error when the connection is missing.
+
+The existing AWS backend stays in `services/api` and `infra`; the root frontend now calls it directly using Cognito ID tokens. The default Play button opens `/home`, which requires sign-in. `/play` remains the game introduction and links into the dashboard.
+
+| URL | Account page |
+|---|---|
+| `/signin` | Demo or email/password sign-in |
+| `/home` | Citizen balance, XP, streak, and scan entry |
+| `/scan` | Camera QR scan and geolocation verification |
+| `/console` | Territory health and hotspots; ward administrators only |
+| `/console/review` | Approve/reject photo submissions; ward administrators only |
+
+Account URLs receive client-rendered HTML shells at build time so direct links work on static hosting. They are excluded from search indexing and offline caching. Sessions are held in memory; a full reload requires sign-in again. Camera/location access requires HTTPS or localhost.
+
+### Additional account pages
+
+The root website now exposes all account features available in the existing API.
+
+| URL | Feature |
+|---|---|
+| `/onboarding` | Language and location setup for authenticated accounts without a profile |
+| `/tasks` | Daily, weekly, monthly task progress and segregation habit check-in |
+| `/rewards` | Wallet, transaction history, coupon catalog, confirmed redemption and redeemed codes |
+| `/leaderboard` | Citywide, local citizen and territory health rankings |
+| `/community` | Hotspots, truck locations and geolocated issue reporting |
+| `/proof` | JPEG upload to the signed S3 URL and submission verification status |
+| `/profile` | Profile details and persisted language preference |
+| `/collector` | Collector-only rotating QR and explicit truck location updates |
+| `/console/qr-sources` | Administrator-only source listing and registration |
+
+Console requests use the paths defined in `infra/lib/api-stack.ts`: `/v1/admin/territory-overview`, `/v1/admin/review-queue`, `/v1/admin/review-queue/resolve`, and `/v1/admin/qr-sources`.
+
+Photo proof accepts JPEG files up to 10 MB. Status checks stop after two minutes or on a terminal/review status; use Refresh status to check again. The submission ID is preserved in the query string. API failures are displayed on-page; shared data pages have a retry action.

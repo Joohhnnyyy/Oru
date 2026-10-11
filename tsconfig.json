@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["apps/web/src/*"],
+      "@saafsafari/shared": ["packages/shared/src/index.ts"],
+      "@saafsafari/game-rules": ["packages/game-rules/src/index.ts"]
+    }
+  },
+  "include": [
+    "apps/web/src/**/*",
+    "apps/web/vite.config.ts",
+    "packages/*/src/**/*",
+    "services/*/src/**/*",
+    "scripts/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/dist",
+    "cdk.out"
+  ]
+}

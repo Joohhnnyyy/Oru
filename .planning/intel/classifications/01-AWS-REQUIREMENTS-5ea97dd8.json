@@ -1,0 +1,29 @@
+{
+  "source_path": "/Users/anshjohnson/Oru/docs/01-AWS-REQUIREMENTS.md",
+  "type": "SPEC",
+  "confidence": "high",
+  "manifest_override": false,
+  "title": "SaafSafari — AWS Requirements",
+  "summary": "Specification of AWS architecture, service allocation (Cognito, Location Service, Bedrock, DynamoDB, CDK), cost constraints, and end-to-end request flows.",
+  "scope": [
+    "AWS",
+    "Amazon Cognito",
+    "API Gateway",
+    "AWS Lambda",
+    "DynamoDB",
+    "Amazon Location Service",
+    "Amazon Bedrock",
+    "Step Functions",
+    "EventBridge",
+    "CloudFront",
+    "AWS CDK"
+  ],
+  "cross_refs": [
+    "00-PROJECT-CONTEXT.md",
+    "02-BACKEND-CONTEXT.md",
+    "05-GAME-DESIGN.md"
+  ],
+  "locked": false,
+  "precedence": null,
+  "notes": ""
+}

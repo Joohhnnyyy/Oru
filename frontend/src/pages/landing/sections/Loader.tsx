@@ -42,7 +42,7 @@ export function Loader() {
     >
       <span className="sr-only">{t('loader.label')}</span>
       <div className="flex w-full flex-col items-center gap-8" aria-hidden="true">
-        <img src={BRAND.wordmark} alt="" width={150} height={89} className="h-auto w-32 sm:w-40" />
+        <img src={BRAND.wordmark} alt="" width={1630} height={965} className="h-auto w-36 sm:w-44 select-none" />
         <div className="relative w-[min(560px,86vw)]">
           <div className="loader-truck relative mx-auto w-[min(240px,52vw)]">
             <span className="loader-puff absolute bottom-6 -left-2 size-4 rounded-full bg-line" />

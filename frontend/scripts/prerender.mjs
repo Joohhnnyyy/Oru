@@ -11,7 +11,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const dist = path.join(root, 'dist');
 const ssrDir = path.join(root, '.ssr');
 
-const { render, PRERENDER_PATHS } = await import(pathToFileURL(path.join(ssrDir, 'entry-server.js')).href);
+const { render, PRERENDER_PATHS, APP_PATHS } = await import(pathToFileURL(path.join(ssrDir, 'entry-server.js')).href);
 const indexPath = path.join(dist, 'index.html');
 const template = await readFile(indexPath, 'utf8');
 if (!template.includes('<!--app-html-->')) throw new Error('index.html is missing the <!--app-html--> marker');
@@ -34,6 +34,12 @@ for (const route of PRERENDER_PATHS) {
   await mkdir(path.dirname(out), { recursive: true });
   await writeFile(out, page);
 }
+// Account URLs get an empty client shell, so direct links work on static hosting.
+for (const route of APP_PATHS) {
+  const out = path.join(dist, route.slice(1), 'index.html');
+  await mkdir(path.dirname(out), { recursive: true });
+  await writeFile(out, template.replace('<!--app-html-->', '').replace(/<link rel="canonical"[^>]*>/, '').replace('</head>', '<meta name="robots" content="noindex" /></head>'));
+}
 await rm(ssrDir, { recursive: true, force: true });
 console.log(`prerendered ${PRERENDER_PATHS.length} pages`);
 
@@ -47,6 +53,7 @@ async function walk(dir) {
 const files = (await walk(dist))
   .map((f) => '/' + path.relative(dist, f).split(path.sep).join('/'))
   .filter((f) => f !== '/sw.js' && !f.endsWith('.map') && f !== '/robots.txt' && f !== '/index.html' && f !== '/404.html')
+  .filter((f) => !APP_PATHS.some((route) => f === `${route}/index.html`))
   .map((f) => (f.endsWith('/index.html') ? f.slice(0, -'index.html'.length) : f));
 const precache = ['/', ...files.sort()];
 const hash = createHash('sha256');
