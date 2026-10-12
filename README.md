@@ -15,6 +15,10 @@
   <a href="docs/12-AWS-DEPLOYMENT.md">Deployment Guide</a>
 </p>
 
+
+https://github.com/user-attachments/assets/28cdf088-ca78-465d-ab90-869260e77a44
+
+
 ## Overview
 
 Oru connects citizens, waste collectors and municipal teams through verified participation, neighborhood guardians and a shared geographic map. Citizens earn Green Credits and XP for supported actions, collectors share their location and confirm pickups, and administrators review evidence and monitor territory activity.
